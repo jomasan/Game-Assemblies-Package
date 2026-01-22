@@ -51,11 +51,12 @@ public class SA_CreateGoalWindow : EditorWindow
 
     private void CreateGoal()
     {
+        SA_AssetPathHelper.EnsureAssetPathDirectories("Simulated Assemblies/Databases/Goals");
+
         ResourceGoalSO newAsset = ScriptableObject.CreateInstance<ResourceGoalSO>();
         newAsset.name = goalName;
         newAsset.timeLimit = timeLimit;
         newAsset.resourceType = resourceType;
-        //newAsset.icon = objectSprite;
 
         string assetPath = $"Assets/Simulated Assemblies/Databases/Goals/{goalName}.asset";
         AssetDatabase.CreateAsset(newAsset, assetPath);

@@ -7,6 +7,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.5] - 2026-01-22
+
+### Added
+- **SA_AssetPathHelper** – Shared helper for resolving prefabs and assets in both package and Assets (Samples) layouts
+- `FindPrefab(relativePath)` – Resolves prefabs from `Packages/...` or `Assets/...` with filename fallback
+- `FindAsset<T>(relativePath)` – Same for textures and other assets (e.g. tutorial images)
+- `GetAssetSearchFolders(relativeFolder)` – Returns `[Assets/..., Packages/...]` for `FindAssets`
+- `EnsureAssetPathDirectories(relativePathUnderAssets)` – Creates `Assets/Simulated Assemblies/...` before `CreateAsset`/`CopyAsset`
+
+### Changed
+- **Editor scripts – path resolution**: Replaced hardcoded `Assets/Simulated Assemblies/...` paths with flexible lookup
+- **SA_Menu.cs** – Uses `SA_AssetPathHelper.FindPrefab` for all prefab-based menu items
+- **SA_CreatePlayersWindow.cs** – Uses `SA_AssetPathHelper.FindPrefab` for PlayerManager and Player_Drawn
+- **SA_CreateResourceWindow.cs** – Template prefab and tutorial image via helper; `EnsureAssetPathDirectories` for Prefabs/Resources and Databases/Resources
+- **SA_CreateLootTableWindow.cs** – Tutorial image and `FindAssets` over package + Assets; `EnsureAssetPathDirectories` for LootTables
+- **SA_CreateLevelWindow.cs** – Tutorial image via helper; `EnsureAssetPathDirectories` for Databases/Levels
+- **SA_CreateGoalWindow.cs** – `EnsureAssetPathDirectories` for Databases/Goals before `CreateAsset`
+
+### Fixed
+- Editor menu items and create windows now work when the package is installed as a UPM package (prefabs in `Packages/`) or when Samples are imported into `Assets/`
+- "Prefab not found" and similar errors when using Game Assemblies menus in package-based projects
+
 ## [1.0.4] - 2026-01-22
 
 ### Fixed

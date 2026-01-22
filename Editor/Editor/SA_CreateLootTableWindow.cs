@@ -32,23 +32,21 @@ public class SA_CreateLootTableWindow : EditorWindow
 
     private void OnEnable()
     {
-        // Load the tutorial image (you can use the same or a different one)
-        tutorialImage = AssetDatabase.LoadAssetAtPath<Texture2D>("Assets/Simulated Assemblies/2d Assets/Asset02b.png");
+        tutorialImage = SA_AssetPathHelper.FindAsset<Texture2D>("Simulated Assemblies/2d Assets/Asset02b.png");
 
-        // Add one empty entry by default
         if (resourceEntries.Count == 0)
         {
             resourceEntries.Add(new ResourceEntryEditor());
         }
 
-        // Refresh existing loot tables
         RefreshExistingLootTables();
     }
 
     private void RefreshExistingLootTables()
     {
         existingLootTables.Clear();
-        string[] guids = AssetDatabase.FindAssets("t:LootTable", new[] { "Assets/Simulated Assemblies/Databases/LootTables" });
+        string[] searchFolders = SA_AssetPathHelper.GetAssetSearchFolders("Simulated Assemblies/Databases/LootTables");
+        string[] guids = AssetDatabase.FindAssets("t:LootTable", searchFolders);
 
         foreach (string guid in guids)
         {
@@ -103,7 +101,7 @@ public class SA_CreateLootTableWindow : EditorWindow
 
         if (existingLootTables.Count == 0)
         {
-            EditorGUILayout.HelpBox("No loot tables found in Assets/Simulated Assemblies/Databases/LootTables", MessageType.Info);
+            EditorGUILayout.HelpBox("No loot tables found in Simulated Assemblies/Databases/LootTables (Assets or package).", MessageType.Info);
             return;
         }
 
@@ -419,22 +417,8 @@ public class SA_CreateLootTableWindow : EditorWindow
             return;
         }
 
-        // Create the folder if it doesn't exist
+        SA_AssetPathHelper.EnsureAssetPathDirectories("Simulated Assemblies/Databases/LootTables");
         string folderPath = "Assets/Simulated Assemblies/Databases/LootTables";
-        if (!AssetDatabase.IsValidFolder(folderPath))
-        {
-            string parentFolder = "Assets/Simulated Assemblies/Databases";
-            if (!AssetDatabase.IsValidFolder(parentFolder))
-            {
-                string simulatedAssembliesFolder = "Assets/Simulated Assemblies";
-                if (!AssetDatabase.IsValidFolder(simulatedAssembliesFolder))
-                {
-                    AssetDatabase.CreateFolder("Assets", "Simulated Assemblies");
-                }
-                AssetDatabase.CreateFolder(simulatedAssembliesFolder, "Databases");
-            }
-            AssetDatabase.CreateFolder(parentFolder, "LootTables");
-        }
 
         // Create the loot table asset
         string assetPath = $"{folderPath}/{lootTableName}.asset";

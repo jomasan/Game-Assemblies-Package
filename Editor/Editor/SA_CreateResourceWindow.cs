@@ -58,28 +58,30 @@ public class SA_CreateResourceWindow : EditorWindow
 
     private void OnEnable()
     {
-        // Load a tutorial image from your assets.
-        // Make sure the image exists at the given path.
-        tutorialImage = AssetDatabase.LoadAssetAtPath<Texture2D>("Assets/Simulated Assemblies/2d Assets/Asset02b.png");
+        tutorialImage = SA_AssetPathHelper.FindAsset<Texture2D>("Simulated Assemblies/2d Assets/Asset02b.png");
     }
 
     private void CreateResource()
     {
+        GameObject templatePrefab = SA_AssetPathHelper.FindPrefab("Simulated Assemblies/Prefabs/Resources/resource_obj_template.prefab");
+        if (templatePrefab == null)
+        {
+            Debug.LogError("Template prefab not found: Simulated Assemblies/Prefabs/Resources/resource_obj_template.prefab");
+            return;
+        }
+        string templatePrefabPath = AssetDatabase.GetAssetPath(templatePrefab);
 
-        // --- 1. Instantiate the prefab ---
-        // Specify the path to your prefab template asset (update this path as needed)
-        string templatePrefabPath = "Assets/Simulated Assemblies/Prefabs/Resources/resource_obj_template.prefab";
-        // Specify the destination path for the new prefab (using the provided resource name)
+        SA_AssetPathHelper.EnsureAssetPathDirectories("Simulated Assemblies/Prefabs/Resources");
+        SA_AssetPathHelper.EnsureAssetPathDirectories("Simulated Assemblies/Databases/Resources");
+
         string newPrefabPath = $"Assets/Simulated Assemblies/Prefabs/Resources/{resourceName}.prefab";
 
-        // Check if a prefab with this name already exists
         if (AssetDatabase.LoadAssetAtPath<GameObject>(newPrefabPath) != null)
         {
             Debug.LogError("A prefab with this name already exists: " + newPrefabPath);
             return;
         }
 
-        // Copy the template prefab to create a new prefab asset
         bool copySuccess = AssetDatabase.CopyAsset(templatePrefabPath, newPrefabPath);
         if (!copySuccess)
         {
@@ -97,8 +99,6 @@ public class SA_CreateResourceWindow : EditorWindow
         newAsset.name = resourceName;
         newAsset.resourceName = resourceName;
         newAsset.icon = objectSprite;
-
-        // Determine where to save the new asset (you can adjust the folder if desired)
 
         string assetPath = $"Assets/Simulated Assemblies/Databases/Resources/{resourceName}.asset";
         AssetDatabase.CreateAsset(newAsset, assetPath);

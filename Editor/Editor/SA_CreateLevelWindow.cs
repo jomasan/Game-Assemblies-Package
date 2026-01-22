@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using UnityEditor;
 using System.Collections.Generic;
 
@@ -37,8 +37,7 @@ public class SA_CreateLevelWindow : EditorWindow
 
     private void OnEnable()
     {
-        // Load a tutorial image from your assets
-        tutorialImage = AssetDatabase.LoadAssetAtPath<Texture2D>("Assets/Simulated Assemblies/2d Assets/Asset02b.png");
+        tutorialImage = SA_AssetPathHelper.FindAsset<Texture2D>("Simulated Assemblies/2d Assets/Asset02b.png");
     }
 
     private void OnGUI()
@@ -178,7 +177,7 @@ public class SA_CreateLevelWindow : EditorWindow
 
     private void CreateLevel()
     {
-        // Check if a level with this name already exists
+        SA_AssetPathHelper.EnsureAssetPathDirectories("Simulated Assemblies/Databases/Levels");
         string assetPath = $"Assets/Simulated Assemblies/Databases/Levels/{levelName}.asset";
 
         if (AssetDatabase.LoadAssetAtPath<LevelDataSO>(assetPath) != null)
@@ -191,10 +190,8 @@ public class SA_CreateLevelWindow : EditorWindow
             }
         }
 
-        // Create the LevelDataSO asset
         LevelDataSO newLevel = ScriptableObject.CreateInstance<LevelDataSO>();
 
-        // Set properties
         newLevel.name = levelName;
         newLevel.levelName = levelName;
         newLevel.levelType = levelType;
@@ -202,7 +199,6 @@ public class SA_CreateLevelWindow : EditorWindow
         newLevel.endLevelWhenComplete = endLevelWhenComplete;
         newLevel.timeToComplete = timeLimit;
 
-        // Set type-specific properties
         if (levelType == LevelType.Sequential)
         {
             newLevel.sequentialGoals = new List<ResourceGoalSO>(sequentialGoals);
@@ -213,14 +209,6 @@ public class SA_CreateLevelWindow : EditorWindow
             newLevel.maxActiveGoals = maxActiveGoals;
         }
 
-        // Ensure directories exist
-        string directory = System.IO.Path.GetDirectoryName(assetPath);
-        if (!System.IO.Directory.Exists(directory))
-        {
-            System.IO.Directory.CreateDirectory(directory);
-        }
-
-        // Create asset
         AssetDatabase.CreateAsset(newLevel, assetPath);
         AssetDatabase.SaveAssets();
         AssetDatabase.Refresh();
