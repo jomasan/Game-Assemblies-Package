@@ -1,0 +1,29 @@
+{
+  "name": "com.gameassemblylab.testpackage",
+  "version": "1.0.1",
+  "displayName": "Test Package",
+  "description": "Test Package description",
+  "unity": "2021.3",
+  "unityRelease": "0f1",
+  "documentationUrl": "",
+  "changelogUrl": "",
+  "licensesUrl": "",
+  "keywords": [
+    "keyword1",
+    "keyword2"
+  ],
+  "author": {
+    "name": "Jose Sanchez",
+    "email": "jsanchez@cornell.edu",
+    "url": "https://www.plethora-project.com"
+  },
+  "type": "library",
+  "dependencies": {},
+  "samples": [
+    {
+      "displayName": "Example Sample",
+      "description": "Description of the sample",
+      "path": "Samples~/ExampleSample"
+    }
+  ]
+}

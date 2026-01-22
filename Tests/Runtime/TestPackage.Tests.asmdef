@@ -1,0 +1,20 @@
+{
+    "name": "GameAssemblyLab.TestPackage.Tests",
+    "rootNamespace": "GameAssemblyLab.TestPackage.Tests",
+    "references": [
+        "GameAssemblyLab.TestPackage"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [
+        "nunit.framework.dll"
+    ],
+    "autoReferenced": false,
+    "defineConstraints": [
+        "UNITY_INCLUDE_TESTS"
+    ],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

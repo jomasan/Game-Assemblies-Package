@@ -1,0 +1,14 @@
+{
+    "name": "GameAssemblyLab.TestPackage",
+    "rootNamespace": "GameAssemblyLab.TestPackage",
+    "references": [],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
