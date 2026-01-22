@@ -1,37 +1,68 @@
 using UnityEngine;
 using UnityEditor;
 using UnityEngine.SceneManagement;
-using TMPro; 
+using TMPro;
 
 public static class SA_Menu
 {
+    /// <summary>
+    /// Helper method to find a prefab by relative path, checking both package and Assets folders
+    /// </summary>
+    private static GameObject FindPrefab(string relativePath)
+    {
+        // Try package path first (for when installed as a package)
+        string packagePath = $"Packages/com.gameassemblylab.gameassemblies/{relativePath}";
+        GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(packagePath);
+        
+        if (prefab != null)
+            return prefab;
+        
+        // Try Assets path (for when imported directly or in samples)
+        string assetsPath = $"Assets/{relativePath}";
+        prefab = AssetDatabase.LoadAssetAtPath<GameObject>(assetsPath);
+        
+        if (prefab != null)
+            return prefab;
+        
+        // Try finding by filename as fallback
+        string fileName = System.IO.Path.GetFileName(relativePath);
+        string[] guids = AssetDatabase.FindAssets($"{System.IO.Path.GetFileNameWithoutExtension(fileName)} t:Prefab");
+        
+        foreach (string guid in guids)
+        {
+            string path = AssetDatabase.GUIDToAssetPath(guid);
+            if (path.Contains("Simulated Assemblies") || path.Contains("gameassemblies"))
+            {
+                prefab = AssetDatabase.LoadAssetAtPath<GameObject>(path);
+                if (prefab != null && path.EndsWith(fileName))
+                    return prefab;
+            }
+        }
+        
+        return null;
+    }
     [MenuItem("Game Assemblies/Systems/Create Resource Management System")]
     public static void CreateResourceManagementSystem()
     {
-        string resourceManagerprefabPath = "Assets/Simulated Assemblies/Prefabs/Managers/ResourceManager.prefab";
-        GameObject rm_prefab = AssetDatabase.LoadAssetAtPath<GameObject>(resourceManagerprefabPath);
-
-        string goalManagerPrefabPath = "Assets/Simulated Assemblies/Prefabs/Managers/GoalManager.prefab";
-        GameObject gm_prefab = AssetDatabase.LoadAssetAtPath<GameObject>(goalManagerPrefabPath);
-
-        string rmCanvasPrefabPath = "Assets/Simulated Assemblies/Prefabs/UI Prefabs/ResourceManager_Canvas.prefab";
-        GameObject rmc_prefab = AssetDatabase.LoadAssetAtPath<GameObject>(rmCanvasPrefabPath);
+        GameObject rm_prefab = FindPrefab("Simulated Assemblies/Prefabs/Managers/ResourceManager.prefab");
+        GameObject gm_prefab = FindPrefab("Simulated Assemblies/Prefabs/Managers/GoalManager.prefab");
+        GameObject rmc_prefab = FindPrefab("Simulated Assemblies/Prefabs/UI Prefabs/ResourceManager_Canvas.prefab");
 
         if (rm_prefab == null)
         {
-            Debug.LogError($"Prefab not found at path: {resourceManagerprefabPath}");
+            Debug.LogError($"Prefab not found: ResourceManager.prefab");
             return;
         }
 
         if (gm_prefab == null)
         {
-            Debug.LogError($"Prefab not found at path: {goalManagerPrefabPath}");
+            Debug.LogError($"Prefab not found: GoalManager.prefab");
             return;
         }
 
         if (rmc_prefab == null)
         {
-            Debug.LogError($"Prefab not found at path: {rmCanvasPrefabPath}");
+            Debug.LogError($"Prefab not found: ResourceManager_Canvas.prefab");
             return;
         }
 
@@ -59,21 +90,18 @@ public static class SA_Menu
     [MenuItem("Game Assemblies/Systems/Create Levels System and Menu")]
     public static void CreateLevelGameSystem()
     {
-        string levelManagerprefabPath = "Assets/Simulated Assemblies/Prefabs/Managers/LevelManager.prefab";
-        GameObject lm_prefab = AssetDatabase.LoadAssetAtPath<GameObject>(levelManagerprefabPath);
-
-        string gameStateManagerCanvas = "Assets/Simulated Assemblies/Prefabs/Managers/GameStateManagerAndCanvas.prefab";
-        GameObject gsmc_prefab = AssetDatabase.LoadAssetAtPath<GameObject>(gameStateManagerCanvas);
+        GameObject lm_prefab = FindPrefab("Simulated Assemblies/Prefabs/Managers/LevelManager.prefab");
+        GameObject gsmc_prefab = FindPrefab("Simulated Assemblies/Prefabs/Managers/GameStateManagerAndCanvas.prefab");
 
         if (lm_prefab == null)
         {
-            Debug.LogError($"Prefab not found at path: {levelManagerprefabPath}");
+            Debug.LogError($"Prefab not found: LevelManager.prefab");
             return;
         }
 
         if (gsmc_prefab == null)
         {
-            Debug.LogError($"Prefab not found at path: {gameStateManagerCanvas}");
+            Debug.LogError($"Prefab not found: GameStateManagerAndCanvas.prefab");
             return;
         }
 
@@ -100,17 +128,12 @@ public static class SA_Menu
     [MenuItem("Game Assemblies/Environment/Create White Canvas")]
     public static void CreateEmptyEnvironment()
     {
-        // Replace the path below with the actual path to your prefab
-        // e.g., "Assets/Prefabs/AutomaticStation.prefab"
-        string prefabPath = "Assets/Simulated Assemblies/Prefabs/Canvas/BackgroundPlane.prefab";
-
-
-        // Load the prefab from the specified path
-        GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(prefabPath);
+        string relativePath = "Simulated Assemblies/Prefabs/Canvas/BackgroundPlane.prefab";
+        GameObject prefab = FindPrefab(relativePath);
 
         if (prefab == null)
         {
-            Debug.LogError($"Prefab not found at path: {prefabPath}");
+            Debug.LogError($"Prefab not found: {relativePath}. Searched in both package and Assets folders.");
             return;
         }
 
@@ -130,17 +153,12 @@ public static class SA_Menu
     [MenuItem("Game Assemblies/Environment/Create Stage Background")]
     public static void CreateBackgroundEnvironment()
     {
-        // Replace the path below with the actual path to your prefab
-        // e.g., "Assets/Prefabs/AutomaticStation.prefab"
-        string prefabPath = "Assets/Simulated Assemblies/Prefabs/Canvas/ScreenBackground.prefab";
-
-
-        // Load the prefab from the specified path
-        GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(prefabPath);
+        string relativePath = "Simulated Assemblies/Prefabs/Canvas/ScreenBackground.prefab";
+        GameObject prefab = FindPrefab(relativePath);
 
         if (prefab == null)
         {
-            Debug.LogError($"Prefab not found at path: {prefabPath}");
+            Debug.LogError($"Prefab not found: {relativePath}");
             return;
         }
 
@@ -160,16 +178,12 @@ public static class SA_Menu
     [MenuItem("Game Assemblies/Environment/Create Ground Tile")]
     public static void CreateGroundTile()
     {
-        // Replace the path below with the actual path to your prefab
-        // e.g., "Assets/Prefabs/AutomaticStation.prefab"
-        string prefabPath = "Assets/Simulated Assemblies/Prefabs/Tile_template_01.prefab";
-
-        // Load the prefab from the specified path
-        GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(prefabPath);
+        string relativePath = "Simulated Assemblies/Prefabs/Tile_template_01.prefab";
+        GameObject prefab = FindPrefab(relativePath);
 
         if (prefab == null)
         {
-            Debug.LogError($"Prefab not found at path: {prefabPath}");
+            Debug.LogError($"Prefab not found: {relativePath}");
             return;
         }
 
@@ -201,16 +215,12 @@ public static class SA_Menu
     [MenuItem("Game Assemblies/Environment/Create Bush")]
     public static void CreateBush()
     {
-        // Replace the path below with the actual path to your prefab
-        // e.g., "Assets/Prefabs/AutomaticStation.prefab"
-        string prefabPath = "Assets/Simulated Assemblies/Prefabs/Bush.prefab";
-
-        // Load the prefab from the specified path
-        GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(prefabPath);
+        string relativePath = "Simulated Assemblies/Prefabs/Bush.prefab";
+        GameObject prefab = FindPrefab(relativePath);
 
         if (prefab == null)
         {
-            Debug.LogError($"Prefab not found at path: {prefabPath}");
+            Debug.LogError($"Prefab not found: {relativePath}");
             return;
         }
 
@@ -242,17 +252,12 @@ public static class SA_Menu
     [MenuItem("Game Assemblies/Stations/Create Automatic Station")]
     public static void CreateAutomaticStation()
     {
-        // Replace the path below with the actual path to your prefab
-        // e.g., "Assets/Prefabs/AutomaticStation.prefab"
-        string prefabPath = "Assets/Simulated Assemblies/Prefabs/Tutorial Objects/Automatic_Resources.prefab";
-        
-
-        // Load the prefab from the specified path
-        GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(prefabPath);
+        string relativePath = "Simulated Assemblies/Prefabs/Tutorial Objects/Automatic_Resources.prefab";
+        GameObject prefab = FindPrefab(relativePath);
 
         if (prefab == null)
         {
-            Debug.LogError($"Prefab not found at path: {prefabPath}");
+            Debug.LogError($"Prefab not found: {relativePath}");
             return;
         }
 
@@ -284,17 +289,12 @@ public static class SA_Menu
     [MenuItem("Game Assemblies/Stations/Create Resources When Worked Station")]
     public static void CreateResourcesWhenWorkedStation()
     {
-        // Replace the path below with the actual path to your prefab
-        // e.g., "Assets/Prefabs/AutomaticStation.prefab"
-        string prefabPath = "Assets/Simulated Assemblies/Prefabs/Tutorial Objects/Resources_when_Worked.prefab";
-
-
-        // Load the prefab from the specified path
-        GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(prefabPath);
+        string relativePath = "Simulated Assemblies/Prefabs/Tutorial Objects/Resources_when_Worked.prefab";
+        GameObject prefab = FindPrefab(relativePath);
 
         if (prefab == null)
         {
-            Debug.LogError($"Prefab not found at path: {prefabPath}");
+            Debug.LogError($"Prefab not found: {relativePath}");
             return;
         }
 
@@ -326,17 +326,12 @@ public static class SA_Menu
     [MenuItem("Game Assemblies/Stations/Create Random Resources When Worked Station")]
     public static void CreateRandomResourcesWhenWorkedStation()
     {
-        // Replace the path below with the actual path to your prefab
-        // e.g., "Assets/Prefabs/AutomaticStation.prefab"
-        string prefabPath = "Assets/Simulated Assemblies/Prefabs/Tutorial Objects/Random_Resources_when_Worked.prefab";
-
-
-        // Load the prefab from the specified path
-        GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(prefabPath);
+        string relativePath = "Simulated Assemblies/Prefabs/Tutorial Objects/Random_Resources_when_Worked.prefab";
+        GameObject prefab = FindPrefab(relativePath);
 
         if (prefab == null)
         {
-            Debug.LogError($"Prefab not found at path: {prefabPath}");
+            Debug.LogError($"Prefab not found: {relativePath}");
             return;
         }
 
@@ -368,17 +363,12 @@ public static class SA_Menu
     [MenuItem("Game Assemblies/Stations/Create Convert Resources on Work Station")]
     public static void CreateConvertOnWorkStation()
     {
-        // Replace the path below with the actual path to your prefab
-        // e.g., "Assets/Prefabs/AutomaticStation.prefab"
-        string prefabPath = "Assets/Simulated Assemblies/Prefabs/Tutorial Objects/Convert_Resources_On_Work.prefab";
-
-
-        // Load the prefab from the specified path
-        GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(prefabPath);
+        string relativePath = "Simulated Assemblies/Prefabs/Tutorial Objects/Convert_Resources_On_Work.prefab";
+        GameObject prefab = FindPrefab(relativePath);
 
         if (prefab == null)
         {
-            Debug.LogError($"Prefab not found at path: {prefabPath}");
+            Debug.LogError($"Prefab not found: {relativePath}");
             return;
         }
 
@@ -410,16 +400,12 @@ public static class SA_Menu
     [MenuItem("Game Assemblies/Stations/Create Output Box")]
     public static void CreateOutputBox()
     {
-        // Replace the path below with the actual path to your prefab
-        // e.g., "Assets/Prefabs/AutomaticStation.prefab"
-        string prefabPath = "Assets/Simulated Assemblies/Prefabs/Tutorial Objects/Convert_Resources_To_Capital.prefab";
-
-        // Load the prefab from the specified path
-        GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(prefabPath);
+        string relativePath = "Simulated Assemblies/Prefabs/Tutorial Objects/Convert_Resources_To_Capital.prefab";
+        GameObject prefab = FindPrefab(relativePath);
 
         if (prefab == null)
         {
-            Debug.LogError($"Prefab not found at path: {prefabPath}");
+            Debug.LogError($"Prefab not found: {relativePath}");
             return;
         }
 
@@ -451,17 +437,12 @@ public static class SA_Menu
     [MenuItem("Game Assemblies/Stations/Create Single Extract Station")]
     public static void CreateSingleExtractStation()
     {
-        // Replace the path below with the actual path to your prefab
-        // e.g., "Assets/Prefabs/AutomaticStation.prefab"
-        string prefabPath = "Assets/Simulated Assemblies/Prefabs/Tutorial Objects/Single_Use_Resource.prefab";
-
-
-        // Load the prefab from the specified path
-        GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(prefabPath);
+        string relativePath = "Simulated Assemblies/Prefabs/Tutorial Objects/Single_Use_Resource.prefab";
+        GameObject prefab = FindPrefab(relativePath);
 
         if (prefab == null)
         {
-            Debug.LogError($"Prefab not found at path: {prefabPath}");
+            Debug.LogError($"Prefab not found: {relativePath}");
             return;
         }
 
@@ -493,16 +474,12 @@ public static class SA_Menu
     [MenuItem("Game Assemblies/Camera/Create Pixel Perfect Camera")]
     public static void CreateCameraSetup()
     {
-        // Replace the path below with the actual path to your prefab
-        // e.g., "Assets/Prefabs/AutomaticStation.prefab"
-        string prefabPath = "Assets/Simulated Assemblies/Prefabs/Cameras/Pixel Perfect Camera.prefab";
-
-        // Load the prefab from the specified path
-        GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(prefabPath);
+        string relativePath = "Simulated Assemblies/Prefabs/Cameras/Pixel Perfect Camera.prefab";
+        GameObject prefab = FindPrefab(relativePath);
 
         if (prefab == null)
         {
-            Debug.LogError($"Prefab not found at path: {prefabPath}");
+            Debug.LogError($"Prefab not found: {relativePath}");
             return;
         }
 
