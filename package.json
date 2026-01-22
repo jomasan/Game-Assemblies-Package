@@ -29,9 +29,9 @@
   },
   "samples": [
     {
-      "displayName": "Example Sample",
-      "description": "Description of the sample",
-      "path": "Samples~/ExampleSample"
+      "displayName": "Game Assemblies Examples and Tutorials",
+      "description": "Complete sample content including prefabs, scenes, and tutorials demonstrating how to use the Game Assemblies library. These examples showcase various systems including resource management, stations, goals, player controllers, and complete game setups. Use these as reference implementations and starting points for your own games.",
+      "path": "Samples~"
     }
   ]
 }
