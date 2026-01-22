@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEditor;
 using UnityEngine.SceneManagement;
-using TMPro;
+// using TMPro; // Commented out - Unity 6.3+ has TMPro integrated by default
 
 public static class SA_Menu
 {
