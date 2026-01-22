@@ -10,6 +10,43 @@ public class SA_CreatePlayersWindow : EditorWindow
     private Sprite player_3_Sprite;
     private Sprite player_4_Sprite;
 
+    /// <summary>
+    /// Helper method to find a prefab by relative path, checking both package and Assets folders
+    /// </summary>
+    private static GameObject FindPrefab(string relativePath)
+    {
+        // Try package path first (for when installed as a package)
+        string packagePath = $"Packages/com.gameassemblylab.gameassemblies/{relativePath}";
+        GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(packagePath);
+        
+        if (prefab != null)
+            return prefab;
+        
+        // Try Assets path (for when imported directly or in samples)
+        string assetsPath = $"Assets/{relativePath}";
+        prefab = AssetDatabase.LoadAssetAtPath<GameObject>(assetsPath);
+        
+        if (prefab != null)
+            return prefab;
+        
+        // Try finding by filename as fallback
+        string fileName = System.IO.Path.GetFileName(relativePath);
+        string[] guids = AssetDatabase.FindAssets($"{System.IO.Path.GetFileNameWithoutExtension(fileName)} t:Prefab");
+        
+        foreach (string guid in guids)
+        {
+            string path = AssetDatabase.GUIDToAssetPath(guid);
+            if (path.Contains("Simulated Assemblies") || path.Contains("gameassemblies"))
+            {
+                prefab = AssetDatabase.LoadAssetAtPath<GameObject>(path);
+                if (prefab != null && path.EndsWith(fileName))
+                    return prefab;
+            }
+        }
+        
+        return null;
+    }
+
     // Adds a menu item under Tools -> Create Resource
     [MenuItem("Game Assemblies/Players/Create Local Multiplayer System")]
     public static void ShowWindow()
@@ -45,9 +82,14 @@ public class SA_CreatePlayersWindow : EditorWindow
 
     public void UpdateCharacterIcons()
     {
-        string playerPrefabPath = "Assets/Simulated Assemblies/Prefabs/Players/Player_Drawn.prefab";
+        string relativePath = "Simulated Assemblies/Prefabs/Players/Player_Drawn.prefab";
+        GameObject playerPrefab = FindPrefab(relativePath);
 
-        GameObject playerPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(playerPrefabPath);
+        if (playerPrefab == null)
+        {
+            Debug.LogError($"Prefab not found: {relativePath}");
+            return;
+        }
 
         playerPrefab.GetComponent<playerController>().sprite1 = player_1_Sprite;
         playerPrefab.GetComponent<playerController>().sprite2 = player_2_Sprite;
@@ -60,18 +102,21 @@ public class SA_CreatePlayersWindow : EditorWindow
 
     public void CreateEnvironment()
     {
-        // Replace the path below with the actual path to your prefab
-        // e.g., "Assets/Prefabs/AutomaticStation.prefab"
-        string prefabPath = "Assets/Simulated Assemblies/Prefabs/Managers/PlayerManager.prefab";
-        string playerPrefabPath = "Assets/Simulated Assemblies/Prefabs/Players/Player_Drawn.prefab";
+        string managerPath = "Simulated Assemblies/Prefabs/Managers/PlayerManager.prefab";
+        string playerPath = "Simulated Assemblies/Prefabs/Players/Player_Drawn.prefab";
 
-        // Load the prefab from the specified path
-        GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(prefabPath);
-        GameObject playerPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(playerPrefabPath);
+        GameObject prefab = FindPrefab(managerPath);
+        GameObject playerPrefab = FindPrefab(playerPath);
 
         if (prefab == null)
         {
-            Debug.LogError($"Prefab not found at path: {prefabPath}");
+            Debug.LogError($"Prefab not found: {managerPath}");
+            return;
+        }
+
+        if (playerPrefab == null)
+        {
+            Debug.LogError($"Prefab not found: {playerPath}");
             return;
         }
 
