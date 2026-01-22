@@ -2,15 +2,20 @@
   "name": "com.gameassemblylab.testpackage",
   "version": "1.0.1",
   "displayName": "Game Assemblies",
-  "description": "Game Assemblies package description",
+  "description": "A Unity-based game development library for creating local multiplayer games centered around resource conversion and goal achievement mechanics. Provides comprehensive systems for resource management, station-based production, goal tracking, level management, and player coordination - perfect for building cooperative and competitive multiplayer experiences inspired by games like Overcooked.",
   "unity": "2021.3",
   "unityRelease": "0f1",
   "documentationUrl": "https://github.com/yourusername/your-repo/blob/main/Documentation/README.md",
   "changelogUrl": "",
   "licensesUrl": "",
   "keywords": [
-    "keyword1",
-    "keyword2"
+    "local-multiplayer",
+    "resource-management",
+    "game-development",
+    "cooperative-games",
+    "station-system",
+    "goal-system",
+    "unity-library"
   ],
   "author": {
     "name": "Jose Sanchez",
