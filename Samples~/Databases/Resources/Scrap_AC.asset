@@ -1,0 +1,17 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2cad58e9858d73642bbdcd39c9837b4e, type: 3}
+  m_Name: Scrap_AC
+  m_EditorClassIdentifier: 
+  resourceName: Scrap_AC
+  icon: {fileID: 1851308583, guid: 8aebc36964bc36d489fd7a326c3ac387, type: 3}
+  resourcePrefab: {fileID: 1116237097334872513, guid: 38cae79d5067491448e61ebff418c51d, type: 3}

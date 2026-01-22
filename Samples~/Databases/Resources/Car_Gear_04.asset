@@ -1,0 +1,17 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2cad58e9858d73642bbdcd39c9837b4e, type: 3}
+  m_Name: Car_Gear_04
+  m_EditorClassIdentifier: 
+  resourceName: Car_Gear_04
+  icon: {fileID: 517206522, guid: 1199bcaf083ec9648983fe0ceb797510, type: 3}
+  resourcePrefab: {fileID: 1116237097334872513, guid: 55e6f37c142c00a4ca94d578ac3f2512, type: 3}

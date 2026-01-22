@@ -1,0 +1,17 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2cad58e9858d73642bbdcd39c9837b4e, type: 3}
+  m_Name: Music_Note_10
+  m_EditorClassIdentifier: 
+  resourceName: Music_Note_10
+  icon: {fileID: 1519967334, guid: 4152580319b09e84983f7cbad8cfc180, type: 3}
+  resourcePrefab: {fileID: 1116237097334872513, guid: c639b36e24a2f1f4595fcaa3fbda79d5, type: 3}

@@ -1,0 +1,17 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2cad58e9858d73642bbdcd39c9837b4e, type: 3}
+  m_Name: Mural_Comp_05
+  m_EditorClassIdentifier: 
+  resourceName: Mural_Comp_05
+  icon: {fileID: 21300000, guid: 7ade8235dbeff1b43917bba60bd7eecd, type: 3}
+  resourcePrefab: {fileID: 1116237097334872513, guid: e52eaa45600da1e48a0e1a4c095a3ddb, type: 3}
