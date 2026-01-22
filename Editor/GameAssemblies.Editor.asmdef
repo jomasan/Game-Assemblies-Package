@@ -1,9 +1,10 @@
 {
-    "name": "GameAssemblyLab.TestPackage.Editor",
-    "rootNamespace": "GameAssemblyLab.TestPackage.Editor",
+    "name": "GameAssemblyLab.GameAssemblies.Editor",
+    "rootNamespace": "GameAssemblyLab.GameAssemblies.Editor",
     "references": [
-        "GameAssemblyLab.TestPackage",
-        "Unity.TextMeshPro"
+        "GameAssemblyLab.GameAssemblies",
+        "Unity.TextMeshPro",
+        "Unity.InputSystem"
     ],
     "includePlatforms": [
         "Editor"

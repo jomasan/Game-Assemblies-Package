@@ -63,6 +63,4 @@ public class SA_CreateGoalWindow : EditorWindow
 
         Debug.Log("Goal created: " + goalName);
     }
-
-
-    }
+}
