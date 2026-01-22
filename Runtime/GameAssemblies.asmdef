@@ -1,7 +1,10 @@
 {
-    "name": "GameAssemblyLab.TestPackage",
-    "rootNamespace": "GameAssemblyLab.TestPackage",
-    "references": [],
+    "name": "GameAssemblyLab.GameAssemblies",
+    "rootNamespace": "GameAssemblyLab.GameAssemblies",
+    "references": [
+        "Unity.TextMeshPro",
+        "Unity.InputSystem"
+    ],
     "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
