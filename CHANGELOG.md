@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.3] - 2026-01-22
+
+### Removed
+- Removed legacy prefabs that are no longer needed
+
+### Fixed
+- Various bug fixes and improvements
+
 ## [1.0.2] - 2026-01-22
 
 ### Added
