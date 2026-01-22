@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-// using TMPro; // Commented out - Unity 6.3+ has TMPro integrated by default
+using TMPro;
 
 public class playerInfoManager : MonoBehaviour
 {

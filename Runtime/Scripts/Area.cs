@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI; // For Unity UI
-// using TMPro; // Commented out - Unity 6.3+ has TMPro integrated by default
+using TMPro;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;

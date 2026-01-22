@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
-// using TMPro; // Commented out - Unity 6.3+ has TMPro integrated by default
+using TMPro;
 
 public class GoalManager : MonoBehaviour
 {

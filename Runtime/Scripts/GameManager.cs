@@ -3,7 +3,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.HID;
 using UnityEngine.SceneManagement;
-// using TMPro; // Commented out - Unity 6.3+ has TMPro integrated by default
+using TMPro;
 using System.Collections.Generic;
 using System.Collections;
 
