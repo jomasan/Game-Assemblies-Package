@@ -631,7 +631,7 @@ In this tutorial, you learned:
 - Add capital systems to your stations
 - Connect stations to goals
 
-Check out the next tutorial to learn about Goals and how to create objectives for your players!
+Check out [Tutorial 03: Resource Manager and Goals](03-Resource-Manager-and-Goals.md) to set up resource tracking and UI, and [Tutorial 04: Goals and Goal Tracker](04-Goals-and-Goal-Tracker.md) for the Goals system and goal-completing stations.
 
 ---
 
