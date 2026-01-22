@@ -1,4 +1,4 @@
-# Test Package
+# Game Assemblies
 
 Brief description of your Unity package.
 

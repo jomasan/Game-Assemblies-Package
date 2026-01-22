@@ -1,11 +1,11 @@
 {
   "name": "com.gameassemblylab.testpackage",
   "version": "1.0.1",
-  "displayName": "Test Package",
-  "description": "Test Package description",
+  "displayName": "Game Assemblies",
+  "description": "Game Assemblies package description",
   "unity": "2021.3",
   "unityRelease": "0f1",
-  "documentationUrl": "",
+  "documentationUrl": "https://github.com/yourusername/your-repo/blob/main/Documentation/README.md",
   "changelogUrl": "",
   "licensesUrl": "",
   "keywords": [
