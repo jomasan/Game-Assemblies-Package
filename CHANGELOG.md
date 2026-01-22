@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.2] - 2026-01-22
+
+### Added
+- Included sample content in the package
+- Sample assets including 2D sprites, audio files, prefabs, materials, shaders, and example scenes
+- Example games demonstrating different use cases (Murals, Salvage, Cars, Music)
+- Tutorial scenes and example setups for getting started with the library
+
 ## [1.0.1] - 2026-01-21
 
 ### Fixed
