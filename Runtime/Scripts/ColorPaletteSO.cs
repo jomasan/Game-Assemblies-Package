@@ -1,6 +1,6 @@
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "New Color Palette", menuName = "Simulated Assemblies/Color Palette")]
+[CreateAssetMenu(fileName = "New Color Palette", menuName = "Game Assemblies/Color Palette")]
 public class ColorPaletteSO : ScriptableObject
 {
     public string paletteName;

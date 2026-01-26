@@ -14,7 +14,7 @@ public class PixelArtConverterWindow : EditorWindow
     private float minDisplaySize = 200f;
     private float maxDisplaySize = 600f;
     private Vector2 scrollPosition;
-    private string savePath = "Assets/Simulated Assemblies/2d Assets/Asset Tools Outputs/";
+    private string savePath = "Assets/Game Assemblies/2d Assets/Asset Tools Outputs/";
     private string fileName = "PixelArt";
     private bool needsUpdate = false;
 

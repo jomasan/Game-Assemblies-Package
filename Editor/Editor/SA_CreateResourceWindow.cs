@@ -43,9 +43,9 @@ public class SA_CreateResourceWindow : EditorWindow
         GUILayout.Space(20);
         GUILayout.Label("Welcome to the resource creator. Input the name of your resource. "); //TEXT LABEL
         GUILayout.Label("This panel will create a resource prefab as well as a scriptable object.");
-        GUILayout.Label("Prefab Path: Simulated Assemblies/Prefabs/Resources");
-        GUILayout.Label("Scriptable Object Path: Simulated Assemblies/Databases/Resources/");
-        //"Assets/Simulated Assemblies/Databases/Resources/Apples_data.asset"
+        GUILayout.Label("Prefab Path: Game Assemblies/Prefabs/Resources");
+        GUILayout.Label("Scriptable Object Path: Game Assemblies/Databases/Resources/");
+        //"Assets/Game Assemblies/Databases/Resources/Apples_data.asset"
         GUILayout.Space(20);
 
 
@@ -58,23 +58,23 @@ public class SA_CreateResourceWindow : EditorWindow
 
     private void OnEnable()
     {
-        tutorialImage = SA_AssetPathHelper.FindAsset<Texture2D>("Simulated Assemblies/2d Assets/Asset02b.png");
+        tutorialImage = SA_AssetPathHelper.FindAsset<Texture2D>("Samples/2d Assets/Asset02b.png");
     }
 
     private void CreateResource()
     {
-        GameObject templatePrefab = SA_AssetPathHelper.FindPrefab("Simulated Assemblies/Prefabs/Resources/resource_obj_template.prefab");
+        GameObject templatePrefab = SA_AssetPathHelper.FindPrefab("Samples/Prefabs/Resources/resource_obj_template.prefab");
         if (templatePrefab == null)
         {
-            Debug.LogError("Template prefab not found: Simulated Assemblies/Prefabs/Resources/resource_obj_template.prefab");
+            Debug.LogError("Template prefab not found: Samples/Prefabs/Resources/resource_obj_template.prefab");
             return;
         }
         string templatePrefabPath = AssetDatabase.GetAssetPath(templatePrefab);
 
-        SA_AssetPathHelper.EnsureAssetPathDirectories("Simulated Assemblies/Prefabs/Resources");
-        SA_AssetPathHelper.EnsureAssetPathDirectories("Simulated Assemblies/Databases/Resources");
+        SA_AssetPathHelper.EnsureAssetPathDirectories("Game Assemblies/Prefabs/Resources");
+        SA_AssetPathHelper.EnsureAssetPathDirectories("Game Assemblies/Databases/Resources");
 
-        string newPrefabPath = $"Assets/Simulated Assemblies/Prefabs/Resources/{resourceName}.prefab";
+        string newPrefabPath = $"Assets/Game Assemblies/Prefabs/Resources/{resourceName}.prefab";
 
         if (AssetDatabase.LoadAssetAtPath<GameObject>(newPrefabPath) != null)
         {
@@ -100,7 +100,7 @@ public class SA_CreateResourceWindow : EditorWindow
         newAsset.resourceName = resourceName;
         newAsset.icon = objectSprite;
 
-        string assetPath = $"Assets/Simulated Assemblies/Databases/Resources/{resourceName}.asset";
+        string assetPath = $"Assets/Game Assemblies/Databases/Resources/{resourceName}.asset";
         AssetDatabase.CreateAsset(newAsset, assetPath);
         AssetDatabase.SaveAssets();
 

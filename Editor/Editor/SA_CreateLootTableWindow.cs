@@ -32,7 +32,7 @@ public class SA_CreateLootTableWindow : EditorWindow
 
     private void OnEnable()
     {
-        tutorialImage = SA_AssetPathHelper.FindAsset<Texture2D>("Simulated Assemblies/2d Assets/Asset02b.png");
+        tutorialImage = SA_AssetPathHelper.FindAsset<Texture2D>("Samples/2d Assets/Asset02b.png");
 
         if (resourceEntries.Count == 0)
         {
@@ -45,7 +45,7 @@ public class SA_CreateLootTableWindow : EditorWindow
     private void RefreshExistingLootTables()
     {
         existingLootTables.Clear();
-        string[] searchFolders = SA_AssetPathHelper.GetAssetSearchFolders("Simulated Assemblies/Databases/LootTables");
+        string[] searchFolders = SA_AssetPathHelper.GetAssetSearchFolders("Game Assemblies/Databases/LootTables");
         string[] guids = AssetDatabase.FindAssets("t:LootTable", searchFolders);
 
         foreach (string guid in guids)
@@ -101,7 +101,7 @@ public class SA_CreateLootTableWindow : EditorWindow
 
         if (existingLootTables.Count == 0)
         {
-            EditorGUILayout.HelpBox("No loot tables found in Simulated Assemblies/Databases/LootTables (Assets or package).", MessageType.Info);
+            EditorGUILayout.HelpBox("No loot tables found in Game Assemblies/Databases/LootTables (Assets or package).", MessageType.Info);
             return;
         }
 
@@ -363,7 +363,7 @@ public class SA_CreateLootTableWindow : EditorWindow
         EditorGUILayout.Space(20);
 
         EditorGUILayout.HelpBox(
-            "This will create a new LootTable scriptable object at: Assets/Simulated Assemblies/Databases/LootTables/",
+            "This will create a new LootTable scriptable object at: Assets/Game Assemblies/Databases/LootTables/",
             MessageType.Info);
 
         if (GUILayout.Button("Create Loot Table", GUILayout.Height(30)))
@@ -417,8 +417,8 @@ public class SA_CreateLootTableWindow : EditorWindow
             return;
         }
 
-        SA_AssetPathHelper.EnsureAssetPathDirectories("Simulated Assemblies/Databases/LootTables");
-        string folderPath = "Assets/Simulated Assemblies/Databases/LootTables";
+        SA_AssetPathHelper.EnsureAssetPathDirectories("Game Assemblies/Databases/LootTables");
+        string folderPath = "Assets/Game Assemblies/Databases/LootTables";
 
         // Create the loot table asset
         string assetPath = $"{folderPath}/{lootTableName}.asset";

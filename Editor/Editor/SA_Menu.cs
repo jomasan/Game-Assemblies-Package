@@ -8,9 +8,9 @@ public static class SA_Menu
     [MenuItem("Game Assemblies/Systems/Create Resource Management System")]
     public static void CreateResourceManagementSystem()
     {
-        GameObject rm_prefab = SA_AssetPathHelper.FindPrefab("Simulated Assemblies/Prefabs/Managers/ResourceManager.prefab");
-        GameObject gm_prefab = SA_AssetPathHelper.FindPrefab("Simulated Assemblies/Prefabs/Managers/GoalManager.prefab");
-        GameObject rmc_prefab = SA_AssetPathHelper.FindPrefab("Simulated Assemblies/Prefabs/UI Prefabs/ResourceManager_Canvas.prefab");
+        GameObject rm_prefab = SA_AssetPathHelper.FindPrefab("Samples/Prefabs/Managers/ResourceManager.prefab");
+        GameObject gm_prefab = SA_AssetPathHelper.FindPrefab("Samples/Prefabs/Managers/GoalManager.prefab");
+        GameObject rmc_prefab = SA_AssetPathHelper.FindPrefab("Samples/Prefabs/UI Prefabs/ResourceManager_Canvas.prefab");
 
         if (rm_prefab == null)
         {
@@ -54,8 +54,8 @@ public static class SA_Menu
     [MenuItem("Game Assemblies/Systems/Create Levels System and Menu")]
     public static void CreateLevelGameSystem()
     {
-        GameObject lm_prefab = SA_AssetPathHelper.FindPrefab("Simulated Assemblies/Prefabs/Managers/LevelManager.prefab");
-        GameObject gsmc_prefab = SA_AssetPathHelper.FindPrefab("Simulated Assemblies/Prefabs/Managers/GameStateManagerAndCanvas.prefab");
+        GameObject lm_prefab = SA_AssetPathHelper.FindPrefab("Samples/Prefabs/Managers/LevelManager.prefab");
+        GameObject gsmc_prefab = SA_AssetPathHelper.FindPrefab("Samples/Prefabs/Managers/GameStateManagerAndCanvas.prefab");
 
         if (lm_prefab == null)
         {
@@ -92,7 +92,7 @@ public static class SA_Menu
     [MenuItem("Game Assemblies/Environment/Create White Canvas")]
     public static void CreateEmptyEnvironment()
     {
-        string relativePath = "Simulated Assemblies/Prefabs/Canvas/BackgroundPlane.prefab";
+        string relativePath = "Samples/Prefabs/Canvas/BackgroundPlane.prefab";
         GameObject prefab = SA_AssetPathHelper.FindPrefab(relativePath);
 
         if (prefab == null)
@@ -117,7 +117,7 @@ public static class SA_Menu
     [MenuItem("Game Assemblies/Environment/Create Stage Background")]
     public static void CreateBackgroundEnvironment()
     {
-        string relativePath = "Simulated Assemblies/Prefabs/Canvas/ScreenBackground.prefab";
+        string relativePath = "Samples/Prefabs/Canvas/ScreenBackground.prefab";
         GameObject prefab = SA_AssetPathHelper.FindPrefab(relativePath);
 
         if (prefab == null)
@@ -142,7 +142,7 @@ public static class SA_Menu
     [MenuItem("Game Assemblies/Environment/Create Ground Tile")]
     public static void CreateGroundTile()
     {
-        string relativePath = "Simulated Assemblies/Prefabs/Tile_template_01.prefab";
+        string relativePath = "Samples/Prefabs/Tile_template_01.prefab";
         GameObject prefab = SA_AssetPathHelper.FindPrefab(relativePath);
 
         if (prefab == null)
@@ -179,7 +179,7 @@ public static class SA_Menu
     [MenuItem("Game Assemblies/Environment/Create Bush")]
     public static void CreateBush()
     {
-        string relativePath = "Simulated Assemblies/Prefabs/Bush.prefab";
+        string relativePath = "Samples/Prefabs/Bush.prefab";
         GameObject prefab = SA_AssetPathHelper.FindPrefab(relativePath);
 
         if (prefab == null)
@@ -216,7 +216,7 @@ public static class SA_Menu
     [MenuItem("Game Assemblies/Stations/Create Automatic Station")]
     public static void CreateAutomaticStation()
     {
-        string relativePath = "Simulated Assemblies/Prefabs/Tutorial Objects/Automatic_Resources.prefab";
+        string relativePath = "Samples/Prefabs/Tutorial Objects/Automatic_Resources.prefab";
         GameObject prefab = SA_AssetPathHelper.FindPrefab(relativePath);
 
         if (prefab == null)
@@ -253,7 +253,7 @@ public static class SA_Menu
     [MenuItem("Game Assemblies/Stations/Create Resources When Worked Station")]
     public static void CreateResourcesWhenWorkedStation()
     {
-        string relativePath = "Simulated Assemblies/Prefabs/Tutorial Objects/Resources_when_Worked.prefab";
+        string relativePath = "Samples/Prefabs/Tutorial Objects/Resources_when_Worked.prefab";
         GameObject prefab = SA_AssetPathHelper.FindPrefab(relativePath);
 
         if (prefab == null)
@@ -290,7 +290,7 @@ public static class SA_Menu
     [MenuItem("Game Assemblies/Stations/Create Random Resources When Worked Station")]
     public static void CreateRandomResourcesWhenWorkedStation()
     {
-        string relativePath = "Simulated Assemblies/Prefabs/Tutorial Objects/Random_Resources_when_Worked.prefab";
+        string relativePath = "Samples/Prefabs/Tutorial Objects/Random_Resources_when_Worked.prefab";
         GameObject prefab = SA_AssetPathHelper.FindPrefab(relativePath);
 
         if (prefab == null)
@@ -327,7 +327,7 @@ public static class SA_Menu
     [MenuItem("Game Assemblies/Stations/Create Convert Resources on Work Station")]
     public static void CreateConvertOnWorkStation()
     {
-        string relativePath = "Simulated Assemblies/Prefabs/Tutorial Objects/Convert_Resources_On_Work.prefab";
+        string relativePath = "Samples/Prefabs/Tutorial Objects/Convert_Resources_On_Work.prefab";
         GameObject prefab = SA_AssetPathHelper.FindPrefab(relativePath);
 
         if (prefab == null)
@@ -364,7 +364,7 @@ public static class SA_Menu
     [MenuItem("Game Assemblies/Stations/Create Output Box")]
     public static void CreateOutputBox()
     {
-        string relativePath = "Simulated Assemblies/Prefabs/Tutorial Objects/Convert_Resources_To_Capital.prefab";
+        string relativePath = "Samples/Prefabs/Tutorial Objects/Convert_Resources_To_Capital.prefab";
         GameObject prefab = SA_AssetPathHelper.FindPrefab(relativePath);
 
         if (prefab == null)
@@ -401,7 +401,7 @@ public static class SA_Menu
     [MenuItem("Game Assemblies/Stations/Create Single Extract Station")]
     public static void CreateSingleExtractStation()
     {
-        string relativePath = "Simulated Assemblies/Prefabs/Tutorial Objects/Single_Use_Resource.prefab";
+        string relativePath = "Samples/Prefabs/Tutorial Objects/Single_Use_Resource.prefab";
         GameObject prefab = SA_AssetPathHelper.FindPrefab(relativePath);
 
         if (prefab == null)
@@ -438,7 +438,7 @@ public static class SA_Menu
     [MenuItem("Game Assemblies/Camera/Create Pixel Perfect Camera")]
     public static void CreateCameraSetup()
     {
-        string relativePath = "Simulated Assemblies/Prefabs/Cameras/Pixel Perfect Camera.prefab";
+        string relativePath = "Samples/Prefabs/Cameras/Pixel Perfect Camera.prefab";
         GameObject prefab = SA_AssetPathHelper.FindPrefab(relativePath);
 
         if (prefab == null)

@@ -16,7 +16,7 @@ public class CropImageWindow : EditorWindow
     private int cropHeight = 250;
 
     // Save parameters
-    private string savePath = "Assets/Simulated Assemblies/2d Assets/Asset Tools Outputs/";
+    private string savePath = "Assets/Game Assemblies/2d Assets/Asset Tools Outputs/";
     private string fileName = "cropped_image";
 
     // Category selection
@@ -40,7 +40,7 @@ public class CropImageWindow : EditorWindow
     private void OnEnable()
     {
         // Set default save path
-        savePath = "Assets/Simulated Assemblies/2d Assets/Asset Tools Outputs/";
+        savePath = "Assets/Game Assemblies/2d Assets/Asset Tools Outputs/";
     }
 
     private void OnGUI()

@@ -1,4 +1,4 @@
-Shader "Simulated Assemblies/2D Sprite Dual Fog"
+Shader "Game Assemblies/2D Sprite Dual Fog"
 {
     Properties
     {

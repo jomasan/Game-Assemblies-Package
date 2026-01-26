@@ -37,7 +37,7 @@ public class SA_CreateLevelWindow : EditorWindow
 
     private void OnEnable()
     {
-        tutorialImage = SA_AssetPathHelper.FindAsset<Texture2D>("Simulated Assemblies/2d Assets/Asset02b.png");
+        tutorialImage = SA_AssetPathHelper.FindAsset<Texture2D>("Samples/2d Assets/Asset02b.png");
     }
 
     private void OnGUI()
@@ -68,7 +68,7 @@ public class SA_CreateLevelWindow : EditorWindow
         GUILayout.Space(20);
         GUILayout.Label("Welcome to the level creator. Input the details of your level.");
         GUILayout.Label("This panel will create a level scriptable object.");
-        GUILayout.Label("Scriptable Object Path: Simulated Assemblies/Databases/Levels/");
+        GUILayout.Label("Scriptable Object Path: Game Assemblies/Databases/Levels/");
         GUILayout.Space(20);
 
         // Create button
@@ -177,8 +177,8 @@ public class SA_CreateLevelWindow : EditorWindow
 
     private void CreateLevel()
     {
-        SA_AssetPathHelper.EnsureAssetPathDirectories("Simulated Assemblies/Databases/Levels");
-        string assetPath = $"Assets/Simulated Assemblies/Databases/Levels/{levelName}.asset";
+        SA_AssetPathHelper.EnsureAssetPathDirectories("Game Assemblies/Databases/Levels");
+        string assetPath = $"Assets/Game Assemblies/Databases/Levels/{levelName}.asset";
 
         if (AssetDatabase.LoadAssetAtPath<LevelDataSO>(assetPath) != null)
         {

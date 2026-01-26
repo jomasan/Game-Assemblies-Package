@@ -1,6 +1,6 @@
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "New Resource", menuName = "Simulated Assemblies/Resource")]
+[CreateAssetMenu(fileName = "New Resource", menuName = "Game Assemblies/Resource")]
 public class Resource : ScriptableObject
 {
     public string resourceName;

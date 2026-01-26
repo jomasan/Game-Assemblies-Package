@@ -45,7 +45,7 @@ public class SA_CreatePlayersWindow : EditorWindow
 
     public void UpdateCharacterIcons()
     {
-        string relativePath = "Simulated Assemblies/Prefabs/Players/Player_Drawn.prefab";
+        string relativePath = "Samples/Prefabs/Players/Player_Drawn.prefab";
         GameObject playerPrefab = SA_AssetPathHelper.FindPrefab(relativePath);
 
         if (playerPrefab == null)
@@ -65,8 +65,8 @@ public class SA_CreatePlayersWindow : EditorWindow
 
     public void CreateEnvironment()
     {
-        string managerPath = "Simulated Assemblies/Prefabs/Managers/PlayerManager.prefab";
-        string playerPath = "Simulated Assemblies/Prefabs/Players/Player_Drawn.prefab";
+        string managerPath = "Samples/Prefabs/Managers/PlayerManager.prefab";
+        string playerPath = "Samples/Prefabs/Players/Player_Drawn.prefab";
 
         GameObject prefab = SA_AssetPathHelper.FindPrefab(managerPath);
         GameObject playerPrefab = SA_AssetPathHelper.FindPrefab(playerPath);

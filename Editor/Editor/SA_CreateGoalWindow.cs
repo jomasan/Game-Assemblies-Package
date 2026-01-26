@@ -38,7 +38,7 @@ public class SA_CreateGoalWindow : EditorWindow
         GUILayout.Space(20);
         GUILayout.Label("Welcome to the Goal creator. Input the name of your Goal. "); //TEXT LABEL
         GUILayout.Label("This panel will create a goal scriptable object and store it in the database.");
-        //"Assets/Simulated Assemblies/Databases/Resources/Apples_data.asset"
+        //"Assets/Game Assemblies/Databases/Resources/Apples_data.asset"
         GUILayout.Space(20);
 
 
@@ -51,14 +51,14 @@ public class SA_CreateGoalWindow : EditorWindow
 
     private void CreateGoal()
     {
-        SA_AssetPathHelper.EnsureAssetPathDirectories("Simulated Assemblies/Databases/Goals");
+        SA_AssetPathHelper.EnsureAssetPathDirectories("Game Assemblies/Databases/Goals");
 
         ResourceGoalSO newAsset = ScriptableObject.CreateInstance<ResourceGoalSO>();
         newAsset.name = goalName;
         newAsset.timeLimit = timeLimit;
         newAsset.resourceType = resourceType;
 
-        string assetPath = $"Assets/Simulated Assemblies/Databases/Goals/{goalName}.asset";
+        string assetPath = $"Assets/Game Assemblies/Databases/Goals/{goalName}.asset";
         AssetDatabase.CreateAsset(newAsset, assetPath);
         AssetDatabase.SaveAssets();
 
