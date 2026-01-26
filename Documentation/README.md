@@ -22,9 +22,16 @@ Start with the main [README.md](../README.md) in the root directory for installa
 
 If you're new to Unity or Game Assemblies concepts, we recommend starting with the **Basic Concepts** tutorials to understand foundational topics:
 
+**Core Concepts:**
 - **[Scriptable Objects](basic%20concepts/Scriptable-Objects.md)** — Understanding data assets and how they're used throughout Game Assemblies
 - **[Static References](basic%20concepts/Static-References.md)** — Learning about singletons and how managers are accessed globally
 - **[Editor Tools](basic%20concepts/Editor-Tools.md)** — Creating custom Unity editor windows and menu items
+
+**Programming Fundamentals:**
+- **[Basic C# Syntax](basic%20concepts/Basic-CSharp-Syntax.md)** — Essential C# concepts: variables, methods, classes, control flow, and common patterns
+- **[Prefabs](basic%20concepts/Prefabs.md)** — Understanding Unity prefabs: templates, instances, and reusable game objects
+- **[Common Data Structures](basic%20concepts/Common-Data-Structures.md)** — Working with Lists and Dictionaries for managing collections of data
+- **[Basic Vector Math](basic%20concepts/Basic-Vector-Math.md)** — Vector operations for positioning, movement, distances, and directions
 
 ### Step-by-Step Tutorials
 
@@ -36,11 +43,22 @@ Then follow the practical tutorials in order: begin with [Tutorial 01: Creating 
 
 Foundational tutorials that explain core Unity and Game Assemblies concepts. These are recommended reading before diving into the practical tutorials.
 
+### Core Concepts
+
 | Concept | Description |
 |---------|-------------|
 | [Scriptable Objects](basic%20concepts/Scriptable-Objects.md) | Learn what ScriptableObjects are, why they're used in Game Assemblies, and how to create and use them. Essential for understanding resources, goals, levels, and other data assets. |
 | [Static References](basic%20concepts/Static-References.md) | Understand the singleton pattern and how static references provide global access to managers like ResourceManager, GoalManager, and LevelManager. |
 | [Editor Tools](basic%20concepts/Editor-Tools.md) | Learn how to create custom Unity editor windows and menu items. Covers EditorWindow, menu items, GUI elements, and creating prefabs and ScriptableObjects programmatically. |
+
+### Programming Fundamentals
+
+| Concept | Description |
+|---------|-------------|
+| [Basic C# Syntax](basic%20concepts/Basic-CSharp-Syntax.md) | Essential C# programming concepts: variables, data types, methods, classes, control flow, operators, and common patterns used in Unity and Game Assemblies. |
+| [Prefabs](basic%20concepts/Prefabs.md) | Understanding Unity prefabs: what they are, how to create and use them, prefab instances, variants, and working with prefabs in code. Essential for reusable game objects. |
+| [Common Data Structures](basic%20concepts/Common-Data-Structures.md) | Working with Lists and Dictionaries: when to use each, common operations, iteration patterns, and practical examples from Game Assemblies code. |
+| [Basic Vector Math](basic%20concepts/Basic-Vector-Math.md) | Vector operations for game development: Vector2 and Vector3, basic operations, magnitude, normalization, distance calculations, and movement patterns. |
 
 ---
 
