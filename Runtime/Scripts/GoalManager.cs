@@ -61,7 +61,11 @@ public class GoalManager : MonoBehaviour
 
     private void Update()
     {
-        if (GameManager.Instance.CurrentState == GameState.Playing)
+        // Check if GameManager exists and if game state is Playing
+        // If GameManager doesn't exist, process goals anyway (for standalone Resource Management System)
+        bool shouldProcessGoals = GameManager.Instance == null || GameManager.Instance.CurrentState == GameState.Playing;
+        
+        if (shouldProcessGoals)
         {
 
             float dt = Time.deltaTime;

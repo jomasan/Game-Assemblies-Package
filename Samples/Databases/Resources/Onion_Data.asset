@@ -13,5 +13,5 @@ MonoBehaviour:
   m_Name: Onion_Data
   m_EditorClassIdentifier: 
   resourceName: ONION
-  icon: {fileID: 2010507399, guid: 3b9fdcf2d5ae1c74e8cd0dac924c072f, type: 3}
+  icon: {fileID: 1253720262, guid: 49577a8f92a058c468c23d3032455102, type: 3}
   resourcePrefab: {fileID: 1116237097334872513, guid: 5d8b2a06c91be7d4eac79c02f10e5830, type: 3}

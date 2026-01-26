@@ -13,6 +13,5 @@ MonoBehaviour:
   m_Name: Lumber
   m_EditorClassIdentifier: 
   resourceName: Lumber
-  icon: {fileID: -449017986, guid: abe4d804089fc3c458b74ec8da6deb30, type: 3}
-  resourcePrefab: {fileID: 1116237097334872513, guid: 7b85794b0ead15b4b8c44699e638ada6,
-    type: 3}
+  icon: {fileID: -42871108, guid: 49577a8f92a058c468c23d3032455102, type: 3}
+  resourcePrefab: {fileID: 1116237097334872513, guid: 7b85794b0ead15b4b8c44699e638ada6, type: 3}

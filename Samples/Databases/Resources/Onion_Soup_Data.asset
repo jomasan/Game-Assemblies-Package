@@ -13,6 +13,5 @@ MonoBehaviour:
   m_Name: Onion_Soup_Data
   m_EditorClassIdentifier: 
   resourceName: ONION SOUP
-  icon: {fileID: -889251249, guid: abe4d804089fc3c458b74ec8da6deb30, type: 3}
-  resourcePrefab: {fileID: 1116237097334872513, guid: 7670bbdf0061e954f9356017036fb167,
-    type: 3}
+  icon: {fileID: -1103591143, guid: fa7cdf6daef6acf4a80a54f32cd5edb2, type: 3}
+  resourcePrefab: {fileID: 1116237097334872513, guid: 7670bbdf0061e954f9356017036fb167, type: 3}
