@@ -23,6 +23,8 @@ public static class SA_DatabaseManager
         (typeof(ResourceGoalSO), "Resource Goals"),
         (typeof(ColorPaletteSO), "Color Palettes"),
         (typeof(ResourceManager_SO), "Resource Managers"),
+        (typeof(RuleSO), "Rules"),
+        (typeof(RulesSessionSO), "Rules Sessions"),
     };
 
     /// <summary>
