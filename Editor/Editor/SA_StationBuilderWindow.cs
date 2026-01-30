@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
 using UnityEngine.SceneManagement;
@@ -14,13 +15,13 @@ public class SA_StationBuilderWindow : EditorWindow
     private string stationName = "New Station";
     private Sprite stationGraphic;
 
-    // Resource consumption
+    // Resource consumption (list)
     private bool consumeResource;
-    private Resource consumeResourceSlot;
+    private List<Resource> consumeResources = new List<Resource>();
 
-    // Resource production
+    // Resource production (list)
     private bool produceResource;
-    private Resource produceResourceSlot;
+    private List<Resource> produceResources = new List<Resource>();
 
     // Lifespan
     private bool isSingleUse;
@@ -52,15 +53,15 @@ public class SA_StationBuilderWindow : EditorWindow
         "When enabled, this station requires physical resources (e.g., wood, ore) to be placed in its input area before it can operate. " +
         "Players must bring the required resource(s) into the station's input zone. This creates a conversion or crafting flow.");
     private static readonly GUIContent ConsumeResourceSlotTip = new GUIContent(
-        "Resource to Consume",
-        "The Resource ScriptableObject that this station accepts as input. Only resources of this type placed in the input area will be consumed.");
+        "Resource",
+        "A resource this station accepts as input. Add multiple resources for stations that require several inputs.");
     private static readonly GUIContent ProduceResourceTip = new GUIContent(
         "Produce Resources",
         "When enabled, this station creates and outputs physical resources (e.g., planks, ingots). " +
         "The produced resource spawns in the output area and can be picked up by players or used by other stations.");
     private static readonly GUIContent ProduceResourceSlotTip = new GUIContent(
-        "Resource to Produce",
-        "The Resource ScriptableObject that this station creates. The resource prefab will spawn in the output area when production completes.");
+        "Resource",
+        "A resource this station creates. Add multiple resources for stations that produce several outputs.");
     private static readonly GUIContent SingleUseTip = new GUIContent(
         "Single-Use Station",
         "When enabled, the station operates only once and then becomes inactive (or is destroyed). " +
@@ -124,39 +125,43 @@ public class SA_StationBuilderWindow : EditorWindow
 
     private void DrawHeader()
     {
-        EditorGUILayout.Space(8);
+        EditorGUILayout.Space(4);
         GUILayout.Label("Station Builder", EditorStyles.boldLabel);
         EditorGUILayout.HelpBox(
             "Configure your station as a flow: inputs on the left, station in the center, outputs on the right. " +
             "Hover over labels for detailed explanations.",
             MessageType.Info);
-        EditorGUILayout.Space(4);
+        EditorGUILayout.Space(2);
         stationName = EditorGUILayout.TextField("Station Name", stationName);
-        EditorGUILayout.Space(8);
+        EditorGUILayout.Space(4);
     }
 
     private void DrawFlowDiagram()
     {
         float arrowIconSize = 24f;
+        float centerBandHeight = StationPreviewSize + 24;
         var arrowStyle = new GUIStyle(EditorStyles.miniLabel) { alignment = TextAnchor.MiddleCenter, fontSize = 16 };
 
         EditorGUILayout.BeginHorizontal();
 
         // === LEFT: INPUTS ===
-        EditorGUILayout.BeginVertical(GUILayout.Width(FlowColumnWidth), GUILayout.ExpandHeight(true));
+        EditorGUILayout.BeginVertical(GUILayout.Width(FlowColumnWidth), GUILayout.MinHeight(centerBandHeight));
         DrawInputsPanel();
         EditorGUILayout.EndVertical();
 
-        // Arrow into station (centered between inputs and station)
-        EditorGUILayout.BeginVertical(GUILayout.Width(ArrowWidth), GUILayout.ExpandHeight(true));
+        // === CENTER BAND: Arrow | Station | Arrow (fixed height for alignment) ===
+        EditorGUILayout.BeginHorizontal(GUILayout.Height(centerBandHeight), GUILayout.ExpandHeight(false));
+
+        // Left arrow
+        EditorGUILayout.BeginVertical(GUILayout.Width(ArrowWidth));
         GUILayout.FlexibleSpace();
         var arrowRect = GUILayoutUtility.GetRect(arrowIconSize, arrowIconSize);
         GUI.Label(arrowRect, "→", arrowStyle);
         GUILayout.FlexibleSpace();
         EditorGUILayout.EndVertical();
 
-        // === CENTER: STATION ICON ===
-        EditorGUILayout.BeginVertical(GUILayout.Width(StationPreviewSize + 24), GUILayout.MinHeight(StationPreviewSize + 24), GUILayout.ExpandHeight(true));
+        // Station icon
+        EditorGUILayout.BeginVertical(GUILayout.Width(StationPreviewSize + 24));
         GUILayout.FlexibleSpace();
         var centerReserved = GUILayoutUtility.GetRect(StationPreviewSize, StationPreviewSize);
         var centerBgRect = new Rect(centerReserved.x - 6, centerReserved.y - 6, centerReserved.width + 12, centerReserved.height + 12);
@@ -198,21 +203,23 @@ public class SA_StationBuilderWindow : EditorWindow
         GUILayout.FlexibleSpace();
         EditorGUILayout.EndVertical();
 
-        // Arrow out of station (centered between station and outputs)
-        EditorGUILayout.BeginVertical(GUILayout.Width(ArrowWidth), GUILayout.ExpandHeight(true));
+        // Right arrow
+        EditorGUILayout.BeginVertical(GUILayout.Width(ArrowWidth));
         GUILayout.FlexibleSpace();
         var arrowOutRect = GUILayoutUtility.GetRect(arrowIconSize, arrowIconSize);
         GUI.Label(arrowOutRect, "→", arrowStyle);
         GUILayout.FlexibleSpace();
         EditorGUILayout.EndVertical();
 
+        EditorGUILayout.EndHorizontal();
+
         // === RIGHT: OUTPUTS ===
-        EditorGUILayout.BeginVertical(GUILayout.Width(FlowColumnWidth), GUILayout.ExpandHeight(true));
+        EditorGUILayout.BeginVertical(GUILayout.Width(FlowColumnWidth), GUILayout.MinHeight(centerBandHeight));
         DrawOutputsPanel();
         EditorGUILayout.EndVertical();
 
         EditorGUILayout.EndHorizontal();
-        EditorGUILayout.Space(12);
+        EditorGUILayout.Space(4);
     }
 
     private void DrawResourceIcon(Resource resource, float size)
@@ -251,11 +258,25 @@ public class SA_StationBuilderWindow : EditorWindow
         consumeResource = EditorGUI.ToggleLeft(r1, ConsumeResourceTip, consumeResource);
         if (consumeResource)
         {
+            if (consumeResources.Count == 0)
+                consumeResources.Add(null);
             EditorGUI.indentLevel = 1;
-            EditorGUILayout.BeginHorizontal();
-            consumeResourceSlot = (Resource)EditorGUILayout.ObjectField(ConsumeResourceSlotTip, consumeResourceSlot, typeof(Resource), false);
-            DrawResourceIcon(consumeResourceSlot, 28f);
-            EditorGUILayout.EndHorizontal();
+            for (int i = 0; i < consumeResources.Count; i++)
+            {
+                EditorGUILayout.BeginHorizontal();
+                consumeResources[i] = (Resource)EditorGUILayout.ObjectField(ConsumeResourceSlotTip, consumeResources[i], typeof(Resource), false);
+                DrawResourceIcon(consumeResources[i], 24f);
+                if (GUILayout.Button("−", GUILayout.Width(20)))
+                {
+                    consumeResources.RemoveAt(i);
+                    i--;
+                }
+                EditorGUILayout.EndHorizontal();
+            }
+            if (GUILayout.Button("+ Add Input Resource"))
+            {
+                consumeResources.Add(null);
+            }
         }
         EditorGUILayout.Space(2);
 
@@ -288,11 +309,25 @@ public class SA_StationBuilderWindow : EditorWindow
         produceResource = EditorGUI.ToggleLeft(r1, ProduceResourceTip, produceResource);
         if (produceResource)
         {
+            if (produceResources.Count == 0)
+                produceResources.Add(null);
             EditorGUI.indentLevel = 1;
-            EditorGUILayout.BeginHorizontal();
-            produceResourceSlot = (Resource)EditorGUILayout.ObjectField(ProduceResourceSlotTip, produceResourceSlot, typeof(Resource), false);
-            DrawResourceIcon(produceResourceSlot, 28f);
-            EditorGUILayout.EndHorizontal();
+            for (int i = 0; i < produceResources.Count; i++)
+            {
+                EditorGUILayout.BeginHorizontal();
+                produceResources[i] = (Resource)EditorGUILayout.ObjectField(ProduceResourceSlotTip, produceResources[i], typeof(Resource), false);
+                DrawResourceIcon(produceResources[i], 24f);
+                if (GUILayout.Button("−", GUILayout.Width(20)))
+                {
+                    produceResources.RemoveAt(i);
+                    i--;
+                }
+                EditorGUILayout.EndHorizontal();
+            }
+            if (GUILayout.Button("+ Add Output Resource"))
+            {
+                produceResources.Add(null);
+            }
         }
         EditorGUILayout.Space(2);
 
@@ -315,7 +350,7 @@ public class SA_StationBuilderWindow : EditorWindow
     private void DrawGeneralSettings()
     {
         GUILayout.Label("General Settings", EditorStyles.boldLabel);
-        EditorGUILayout.Space(4);
+        EditorGUILayout.Space(2);
 
         EditorGUILayout.BeginHorizontal();
         EditorGUILayout.BeginVertical(GUILayout.Width(FlowColumnWidth));
@@ -326,7 +361,7 @@ public class SA_StationBuilderWindow : EditorWindow
         EditorGUILayout.EndVertical();
         EditorGUILayout.EndHorizontal();
 
-        EditorGUILayout.Space(4);
+        EditorGUILayout.Space(2);
         EditorGUILayout.BeginHorizontal();
         EditorGUILayout.BeginVertical(GUILayout.Width(FlowColumnWidth));
         if (canBeWorked)
@@ -350,25 +385,19 @@ public class SA_StationBuilderWindow : EditorWindow
         }
         EditorGUILayout.EndVertical();
         EditorGUILayout.EndHorizontal();
-        EditorGUILayout.Space(8);
+        EditorGUILayout.Space(4);
     }
 
     private void DrawCreateButton()
     {
-        EditorGUILayout.Space(8);
+        EditorGUILayout.Space(4);
         var createRect = GUILayoutUtility.GetRect(0, 36);
         createRect.x += 20;
         createRect.width -= 40;
 
-        bool canCreate = true;
-        if (consumeResource && consumeResourceSlot == null)
-        {
-            canCreate = false;
-        }
-        if (produceResource && produceResourceSlot == null)
-        {
-            canCreate = false;
-        }
+        bool hasConsumeResources = !consumeResource || consumeResources.Exists(r => r != null);
+        bool hasProduceResources = !produceResource || produceResources.Exists(r => r != null);
+        bool canCreate = hasConsumeResources && hasProduceResources;
 
         EditorGUI.BeginDisabledGroup(!canCreate);
         if (GUI.Button(createRect, "Create Station"))
@@ -380,11 +409,11 @@ public class SA_StationBuilderWindow : EditorWindow
         if (!canCreate)
         {
             EditorGUILayout.HelpBox(
-                "Assign the required resource(s) before creating. Enable 'Consume Resources' or 'Produce Resources' only if you assign a resource.",
+                "When 'Consume Resources' or 'Produce Resources' is enabled, add at least one resource.",
                 MessageType.Warning);
         }
 
-        EditorGUILayout.Space(12);
+        EditorGUILayout.Space(6);
     }
 
     private void CreateStation()
@@ -427,11 +456,17 @@ public class SA_StationBuilderWindow : EditorWindow
         station.consumeResource = consumeResource;
         station.produceResource = produceResource;
         station.consumes.Clear();
-        if (consumeResource && consumeResourceSlot != null)
-            station.consumes.Add(consumeResourceSlot);
+        if (consumeResource)
+        {
+            foreach (var r in consumeResources)
+                if (r != null) station.consumes.Add(r);
+        }
         station.produces.Clear();
-        if (produceResource && produceResourceSlot != null)
-            station.produces.Add(produceResourceSlot);
+        if (produceResource)
+        {
+            foreach (var r in produceResources)
+                if (r != null) station.produces.Add(r);
+        }
 
         station.isSingleUse = isSingleUse;
         station.destroyAfterSingleUse = isSingleUse;
@@ -475,8 +510,11 @@ public class SA_StationBuilderWindow : EditorWindow
         if (station.inputArea != null)
         {
             station.inputArea.requirements.Clear();
-            if (consumeResource && consumeResourceSlot != null)
-                station.inputArea.requirements.Add(consumeResourceSlot);
+            if (consumeResource)
+            {
+                foreach (var r in consumeResources)
+                    if (r != null) station.inputArea.requirements.Add(r);
+            }
             station.inputArea.gameObject.SetActive(consumeResource);
         }
         if (station.outputArea != null)
