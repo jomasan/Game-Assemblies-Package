@@ -7,6 +7,10 @@ using System.Collections;
 
 public class Station : ResourceNode
 {
+    [Header("Station Data (SO)")]
+    [Tooltip("ScriptableObject containing this station's configuration. All behavior data is read from here.")]
+    public StationDataSO stationData;
+
     [Header("Managers")]
     public StationManager sManager;
     public ResourceManager rManager;
@@ -19,31 +23,27 @@ public class Station : ResourceNode
         LootTable
     }
     [Header("Consume (IN) - Produce (OUT)")]
-    public productionMode WhatToProduce = productionMode.Resource;
-
-    public bool produceResource = false;
-    public bool consumeResource = false;
-
-    public List<Resource> produces = new List<Resource>();
-    public List<Resource> consumes = new List<Resource>();
+    // --- Data from StationDataSO (getters read from stationData; hidden from inspector) ---
+    [HideInInspector] public productionMode WhatToProduce => stationData != null ? stationData.whatToProduce : productionMode.Resource;
+    [HideInInspector] public bool produceResource => stationData != null && stationData.produceResource;
+    [HideInInspector] public bool consumeResource => stationData != null && stationData.consumeResource;
+    [HideInInspector] public List<Resource> produces => stationData != null ? stationData.produces : new List<Resource>();
+    [HideInInspector] public List<Resource> consumes => stationData != null ? stationData.consumes : new List<Resource>();
 
     public List<Station> produces_stations = new List<Station>();
 
-    //public bool produceFromLootTable = false;
     public LootTable produceLootTable;
 
-    //public int productionAmount = 1;          // Amount produced per cycle
-    public float productionInterval = 5f;     // Time between production cycles in seconds
+    [HideInInspector] public float productionInterval => stationData != null ? stationData.productionInterval : 5f;
     private float productionTimer = 0f;       // count for the automatic production
-    public bool spawnResourcePrefab = true;
+    [HideInInspector] public bool spawnResourcePrefab => stationData != null && stationData.spawnResourcePrefab;
     private Vector3 spawnOffset = Vector3.zero;
-    public float spawnRadius = 1f;
+    [HideInInspector] public float spawnRadius => stationData != null ? stationData.spawnRadius : 1f;
 
-    [Header("Capital Consume (IN) - Capital Produce (OUT)")]
-    public bool capitalInput = false; // Does this station require capital to operate?
-    public bool capitalOutput = false; // Does this station produce capital?
-    public int capitalInputAmount = 0; // Amount of capital required to operate
-    public int capitalOutputAmount = 0; // Amount of capital produced
+    [HideInInspector] public bool capitalInput => stationData != null && stationData.capitalInput;
+    [HideInInspector] public bool capitalOutput => stationData != null && stationData.capitalOutput;
+    [HideInInspector] public int capitalInputAmount => stationData != null ? stationData.capitalInputAmount : 0;
+    [HideInInspector] public int capitalOutputAmount => stationData != null ? stationData.capitalOutputAmount : 0;
 
     [Header("Input/Output Areas")]
     public bool useInputArea = true;
@@ -51,8 +51,7 @@ public class Station : ResourceNode
     public Area inputArea;
     public Area outputArea;
 
-    [Header("Labor (INTERACTIONS)")]
-    public bool canBeWorked = false;
+    [HideInInspector] public bool canBeWorked => stationData != null && stationData.canBeWorked;
 
     public enum interactionType
     {
@@ -62,10 +61,9 @@ public class Station : ResourceNode
         whenResourcesConsumed,
         cycle
     }
-    public interactionType typeOfProduction = interactionType.None;
-    public interactionType typeOfConsumption = interactionType.None;
-
-    public float workDuration = 5f; // Time required to complete a work cycle in seconds
+    [HideInInspector] public interactionType typeOfProduction => stationData != null ? stationData.typeOfProduction : interactionType.None;
+    [HideInInspector] public interactionType typeOfConsumption => stationData != null ? stationData.typeOfConsumption : interactionType.None;
+    [HideInInspector] public float workDuration => stationData != null ? stationData.workDuration : 5f;
     public float workProgress = 0f; // Progress towards completing the work cycle
     public bool isBeingWorkedOn = false; // Is work currently being performed?
     public List<playerController> workerCount;
@@ -78,12 +76,12 @@ public class Station : ResourceNode
     public float decayTimer = 0f;
     public float decayCycle = 10.0f;
 
-    public bool isSingleUse = false;
-    public bool destroyAfterSingleUse = false;
+    [HideInInspector] public bool isSingleUse => stationData != null && stationData.isSingleUse;
+    [HideInInspector] public bool destroyAfterSingleUse => stationData != null && stationData.destroyAfterSingleUse;
     public bool isAlive = true;
     private SpriteRenderer spRender;
-    public Sprite normalSprite;
-    public Sprite deadSprite;
+    [HideInInspector] public Sprite normalSprite => stationData != null ? stationData.stationGraphic : null;
+    [HideInInspector] public Sprite deadSprite => stationData != null ? (stationData.deadSprite != null ? stationData.deadSprite : stationData.stationGraphic) : null;
     public int age = 0;
     private float ageTimer = 0f;
     public float growthRate = 1.0f; //every how many seconds grow older
@@ -99,9 +97,8 @@ public class Station : ResourceNode
     public GameObject upgradePrefab;
     private int flaggedToUpgrade = -1;
 
-    [Header("Goals (SCORE)")]
-    public bool completesGoals_production = false; //allows output to complete goals
-    public bool completesGoals_consumption = false;
+    [HideInInspector] public bool completesGoals_production => stationData != null && stationData.completesGoals_production;
+    [HideInInspector] public bool completesGoals_consumption => stationData != null && stationData.completesGoals_consumption;
 
     [Header("Property System (OWNER/WORKER)")]
     public playerController owner;
@@ -141,7 +138,7 @@ public class Station : ResourceNode
 
 
     // Start is called before the first frame update
-    void Start()   
+    protected void Start()   
     {
         workerCount = new List<playerController>();
 

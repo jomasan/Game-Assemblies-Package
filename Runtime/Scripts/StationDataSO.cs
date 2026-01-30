@@ -11,12 +11,20 @@ public class StationDataSO : ScriptableObject
     [Header("Identity")]
     public string stationName = "New Station";
     public Sprite stationGraphic;
+    [Tooltip("Sprite shown when the station is inactive/dead. If null, stationGraphic is used.")]
+    public Sprite deadSprite;
 
     [Header("Consume (IN) - Produce (OUT)")]
     public bool consumeResource;
     public bool produceResource;
     public List<Resource> consumes = new List<Resource>();
     public List<Resource> produces = new List<Resource>();
+    [Tooltip("What this station outputs: Resource, Station, or LootTable.")]
+    public Station.productionMode whatToProduce = Station.productionMode.Resource;
+    [Tooltip("When true, spawns physical resource prefabs in the output area.")]
+    public bool spawnResourcePrefab = true;
+    [Tooltip("Radius for random spawn offset when not using output area.")]
+    public float spawnRadius = 1f;
 
     [Header("Lifespan")]
     public bool isSingleUse;
@@ -40,47 +48,18 @@ public class StationDataSO : ScriptableObject
     public Station.interactionType typeOfConsumption = Station.interactionType.whenWorked;
 
     /// <summary>
-    /// Applies this data to a Station component.
+    /// Applies this data to a Station component. Assigns this SO as the station's data source
+    /// and performs one-time setup (input/output areas, sprite). The station reads all config
+    /// from stationData after this call.
     /// </summary>
     public void ApplyToStation(Station station)
     {
         if (station == null) return;
 
-        station.consumeResource = consumeResource;
-        station.produceResource = produceResource;
-        station.consumes.Clear();
-        foreach (var r in consumes)
-            if (r != null) station.consumes.Add(r);
-        station.produces.Clear();
-        foreach (var r in produces)
-            if (r != null) station.produces.Add(r);
-
-        station.isSingleUse = isSingleUse;
-        station.destroyAfterSingleUse = destroyAfterSingleUse;
-
-        station.capitalInput = capitalInput;
-        station.capitalOutput = capitalOutput;
-        station.capitalInputAmount = capitalInputAmount;
-        station.capitalOutputAmount = capitalOutputAmount;
-
-        station.completesGoals_consumption = completesGoals_consumption;
-        station.completesGoals_production = completesGoals_production;
-
-        station.canBeWorked = canBeWorked;
-        station.workDuration = workDuration;
-        station.productionInterval = productionInterval;
-        station.typeOfProduction = canBeWorked ? typeOfProduction : Station.interactionType.automatic;
-        station.typeOfConsumption = canBeWorked ? typeOfConsumption : Station.interactionType.automatic;
-
-        if (!canBeWorked)
-        {
-            station.typeOfProduction = Station.interactionType.automatic;
-            station.typeOfConsumption = Station.interactionType.automatic;
-        }
+        station.stationData = this;
 
         if (stationGraphic != null)
         {
-            station.normalSprite = stationGraphic;
             var sr = station.GetComponentInChildren<SpriteRenderer>();
             if (sr != null && sr.GetComponent<Canvas>() == null && sr.transform.GetComponentInParent<Canvas>() == null)
             {

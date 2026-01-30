@@ -433,30 +433,7 @@ public class SA_StationBuilderWindow : EditorWindow
     {
         SA_AssetPathHelper.EnsureAssetPathDirectories("Game Assemblies/Databases/Stations");
 
-        StationDataSO data = ScriptableObject.CreateInstance<StationDataSO>();
-        data.stationName = stationName;
-        data.stationGraphic = stationGraphic;
-        data.consumeResource = consumeResource;
-        data.produceResource = produceResource;
-        data.consumes = new List<Resource>();
-        foreach (var r in consumeResources)
-            if (r != null) data.consumes.Add(r);
-        data.produces = new List<Resource>();
-        foreach (var r in produceResources)
-            if (r != null) data.produces.Add(r);
-        data.isSingleUse = isSingleUse;
-        data.destroyAfterSingleUse = isSingleUse;
-        data.capitalInput = consumeCapital;
-        data.capitalOutput = produceCapital;
-        data.capitalInputAmount = capitalInputAmount;
-        data.capitalOutputAmount = capitalOutputAmount;
-        data.completesGoals_consumption = consumptionCompletesGoals;
-        data.completesGoals_production = productionCompletesGoals;
-        data.canBeWorked = canBeWorked;
-        data.workDuration = workDuration;
-        data.productionInterval = productionInterval;
-        data.typeOfProduction = typeOfProduction;
-        data.typeOfConsumption = typeOfConsumption;
+        StationDataSO data = CreateStationDataFromBuilderState();
 
         string assetPath = $"Assets/Game Assemblies/Databases/Stations/{stationName}.asset";
         AssetDatabase.CreateAsset(data, assetPath);
@@ -483,10 +460,16 @@ public class SA_StationBuilderWindow : EditorWindow
             return;
         }
 
+        SA_AssetPathHelper.EnsureAssetPathDirectories("Game Assemblies/Databases/Stations");
+
+        StationDataSO data = CreateStationDataFromBuilderState();
+        string assetPath = $"Assets/Game Assemblies/Databases/Stations/{stationName}.asset";
+        AssetDatabase.CreateAsset(data, assetPath);
+        AssetDatabase.SaveAssets();
+
         GameObject instance = (GameObject)PrefabUtility.InstantiatePrefab(templatePrefab, scene);
         instance.name = stationName;
 
-        // Parent under Stations
         GameObject stationsRoot = GameObject.Find("Stations");
         if (stationsRoot == null)
         {
@@ -503,80 +486,49 @@ public class SA_StationBuilderWindow : EditorWindow
             return;
         }
 
-        // Apply configuration
-        station.consumeResource = consumeResource;
-        station.produceResource = produceResource;
-        station.consumes.Clear();
-        if (consumeResource)
-        {
-            foreach (var r in consumeResources)
-                if (r != null) station.consumes.Add(r);
-        }
-        station.produces.Clear();
-        if (produceResource)
-        {
-            foreach (var r in produceResources)
-                if (r != null) station.produces.Add(r);
-        }
-
-        station.isSingleUse = isSingleUse;
-        station.destroyAfterSingleUse = isSingleUse;
-
-        station.capitalOutput = produceCapital;
-        station.capitalOutputAmount = produceCapital ? capitalOutputAmount : 0;
-        station.capitalInput = consumeCapital;
-        station.capitalInputAmount = consumeCapital ? capitalInputAmount : 0;
-
-        station.completesGoals_consumption = consumptionCompletesGoals;
-        station.completesGoals_production = productionCompletesGoals;
-
-        station.canBeWorked = canBeWorked;
-        station.workDuration = workDuration;
-        station.productionInterval = productionInterval;
-        station.typeOfProduction = canBeWorked ? typeOfProduction : Station.interactionType.automatic;
-        station.typeOfConsumption = canBeWorked ? typeOfConsumption : Station.interactionType.automatic;
-
-        if (!canBeWorked)
-        {
-            station.typeOfProduction = Station.interactionType.automatic;
-            station.typeOfConsumption = Station.interactionType.automatic;
-        }
-
-        // Station graphic
-        if (stationGraphic != null)
-        {
-            var renderers = instance.GetComponentsInChildren<SpriteRenderer>(true);
-            foreach (var r in renderers)
-            {
-                if (r.GetComponent<Canvas>() == null && r.transform.GetComponentInParent<Canvas>() == null)
-                {
-                    r.sprite = stationGraphic;
-                    station.normalSprite = stationGraphic;
-                    break;
-                }
-            }
-        }
-
-        // Wire input/output areas
-        if (station.inputArea != null)
-        {
-            station.inputArea.requirements.Clear();
-            if (consumeResource)
-            {
-                foreach (var r in consumeResources)
-                    if (r != null) station.inputArea.requirements.Add(r);
-            }
-            station.inputArea.gameObject.SetActive(consumeResource);
-        }
-        if (station.outputArea != null)
-        {
-            station.outputArea.gameObject.SetActive(produceResource);
-        }
+        data.ApplyToStation(station);
 
         Selection.activeGameObject = instance;
         EditorGUIUtility.PingObject(instance);
         SceneView.lastActiveSceneView?.FrameSelected();
 
-        Debug.Log($"Station Builder: Created '{stationName}' in scene.");
+        Debug.Log($"Station Builder: Created '{stationName}' in scene with StationDataSO at {assetPath}");
+    }
+
+    private StationDataSO CreateStationDataFromBuilderState()
+    {
+        StationDataSO data = ScriptableObject.CreateInstance<StationDataSO>();
+        data.stationName = stationName;
+        data.stationGraphic = stationGraphic;
+        data.consumeResource = consumeResource;
+        data.produceResource = produceResource;
+        data.consumes = new List<Resource>();
+        foreach (var r in consumeResources)
+            if (r != null) data.consumes.Add(r);
+        data.produces = new List<Resource>();
+        foreach (var r in produceResources)
+            if (r != null) data.produces.Add(r);
+        data.whatToProduce = Station.productionMode.Resource;
+        data.spawnResourcePrefab = true;
+        data.spawnRadius = 1f;
+        data.isSingleUse = isSingleUse;
+        data.destroyAfterSingleUse = isSingleUse;
+        data.capitalInput = consumeCapital;
+        data.capitalOutput = produceCapital;
+        data.capitalInputAmount = consumeCapital ? capitalInputAmount : 0;
+        data.capitalOutputAmount = produceCapital ? capitalOutputAmount : 0;
+        data.completesGoals_consumption = consumptionCompletesGoals;
+        data.completesGoals_production = productionCompletesGoals;
+        data.canBeWorked = canBeWorked;
+        data.workDuration = workDuration;
+        data.productionInterval = productionInterval;
+        data.typeOfProduction = canBeWorked ? typeOfProduction : Station.interactionType.automatic;
+        data.typeOfConsumption = canBeWorked ? typeOfConsumption : Station.interactionType.automatic;
+        if (!canBeWorked)
+        {
+            data.typeOfProduction = Station.interactionType.automatic;
+            data.typeOfConsumption = Station.interactionType.automatic;
+        }
+        return data;
     }
 }
