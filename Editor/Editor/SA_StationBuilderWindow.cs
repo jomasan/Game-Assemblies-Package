@@ -47,6 +47,10 @@ public class SA_StationBuilderWindow : EditorWindow
     private Rect previewRect;
     private Vector2 scrollPosition;
 
+    // Output mode: ScriptableObject only or full prefab in scene
+    private enum CreateMode { ScriptableObject, PrefabInScene }
+    private CreateMode createMode = CreateMode.PrefabInScene;
+
     // Tooltips
     private static readonly GUIContent ConsumeResourceTip = new GUIContent(
         "Consume Resources",
@@ -391,6 +395,11 @@ public class SA_StationBuilderWindow : EditorWindow
     private void DrawCreateButton()
     {
         EditorGUILayout.Space(4);
+        createMode = (CreateMode)EditorGUILayout.EnumPopup(
+            new GUIContent("Create As", "ScriptableObject: saves station data as an asset. Prefab in Scene: creates a full station GameObject in the scene."),
+            createMode);
+
+        EditorGUILayout.Space(2);
         var createRect = GUILayoutUtility.GetRect(0, 36);
         createRect.x += 20;
         createRect.width -= 40;
@@ -400,9 +409,13 @@ public class SA_StationBuilderWindow : EditorWindow
         bool canCreate = hasConsumeResources && hasProduceResources;
 
         EditorGUI.BeginDisabledGroup(!canCreate);
-        if (GUI.Button(createRect, "Create Station"))
+        string buttonLabel = createMode == CreateMode.ScriptableObject ? "Create Station Data (SO)" : "Create Station Prefab in Scene";
+        if (GUI.Button(createRect, buttonLabel))
         {
-            CreateStation();
+            if (createMode == CreateMode.ScriptableObject)
+                CreateStationDataSO();
+            else
+                CreateStationPrefab();
         }
         EditorGUI.EndDisabledGroup();
 
@@ -416,7 +429,45 @@ public class SA_StationBuilderWindow : EditorWindow
         EditorGUILayout.Space(6);
     }
 
-    private void CreateStation()
+    private void CreateStationDataSO()
+    {
+        SA_AssetPathHelper.EnsureAssetPathDirectories("Game Assemblies/Databases/Stations");
+
+        StationDataSO data = ScriptableObject.CreateInstance<StationDataSO>();
+        data.stationName = stationName;
+        data.stationGraphic = stationGraphic;
+        data.consumeResource = consumeResource;
+        data.produceResource = produceResource;
+        data.consumes = new List<Resource>();
+        foreach (var r in consumeResources)
+            if (r != null) data.consumes.Add(r);
+        data.produces = new List<Resource>();
+        foreach (var r in produceResources)
+            if (r != null) data.produces.Add(r);
+        data.isSingleUse = isSingleUse;
+        data.destroyAfterSingleUse = isSingleUse;
+        data.capitalInput = consumeCapital;
+        data.capitalOutput = produceCapital;
+        data.capitalInputAmount = capitalInputAmount;
+        data.capitalOutputAmount = capitalOutputAmount;
+        data.completesGoals_consumption = consumptionCompletesGoals;
+        data.completesGoals_production = productionCompletesGoals;
+        data.canBeWorked = canBeWorked;
+        data.workDuration = workDuration;
+        data.productionInterval = productionInterval;
+        data.typeOfProduction = typeOfProduction;
+        data.typeOfConsumption = typeOfConsumption;
+
+        string assetPath = $"Assets/Game Assemblies/Databases/Stations/{stationName}.asset";
+        AssetDatabase.CreateAsset(data, assetPath);
+        AssetDatabase.SaveAssets();
+
+        Selection.activeObject = data;
+        EditorGUIUtility.PingObject(data);
+        Debug.Log($"Station Builder: Created Station Data SO '{stationName}' at {assetPath}");
+    }
+
+    private void CreateStationPrefab()
     {
         GameObject templatePrefab = SA_AssetPathHelper.FindPrefab(TemplatePrefabPath);
         if (templatePrefab == null)

@@ -25,6 +25,7 @@ public static class SA_DatabaseManager
         (typeof(ResourceManager_SO), "Resource Managers"),
         (typeof(RuleSO), "Rules"),
         (typeof(RulesSessionSO), "Rules Sessions"),
+        (typeof(StationDataSO), "Station Data"),
     };
 
     /// <summary>
