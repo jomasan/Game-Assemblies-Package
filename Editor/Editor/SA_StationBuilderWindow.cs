@@ -9,7 +9,7 @@ using UnityEngine.SceneManagement;
 /// </summary>
 public class SA_StationBuilderWindow : EditorWindow
 {
-    private const string TemplatePrefabPath = "Samples/Prefabs/Tutorial Objects/Convert_Resources_On_Work.prefab";
+    private const string TemplatePrefabPath = "Samples/Prefabs/Stations/station_template.prefab";
 
     // Station identity
     private string stationName = "New Station";
@@ -46,10 +46,6 @@ public class SA_StationBuilderWindow : EditorWindow
     // Preview
     private Rect previewRect;
     private Vector2 scrollPosition;
-
-    // Output mode: ScriptableObject only or full prefab in scene
-    private enum CreateMode { ScriptableObject, PrefabInScene }
-    private CreateMode createMode = CreateMode.PrefabInScene;
 
     // Tooltips
     private static readonly GUIContent ConsumeResourceTip = new GUIContent(
@@ -108,6 +104,16 @@ public class SA_StationBuilderWindow : EditorWindow
     private const float StationPreviewSize = 100f;
     private const float ArrowWidth = 36f;
 
+    private enum StationTemplate
+    {
+        None,
+        AutomaticStation,
+        ConvertOnWork,
+        OutputBox,
+        SingleExtract
+    }
+    private StationTemplate selectedTemplate = StationTemplate.None;
+
     [MenuItem("Game Assemblies/Stations/Station Builder")]
     public static void ShowWindow()
     {
@@ -120,6 +126,7 @@ public class SA_StationBuilderWindow : EditorWindow
         scrollPosition = EditorGUILayout.BeginScrollView(scrollPosition);
 
         DrawHeader();
+        DrawTemplates();
         DrawFlowDiagram();
         DrawGeneralSettings();
         DrawCreateButton();
@@ -138,6 +145,127 @@ public class SA_StationBuilderWindow : EditorWindow
         EditorGUILayout.Space(2);
         stationName = EditorGUILayout.TextField("Station Name", stationName);
         EditorGUILayout.Space(4);
+    }
+
+    private static readonly string[] TemplateDisplayNames = new[]
+    {
+        "None",
+        "Automatic Station (produces every 2s)",
+        "Convert on Work (consume + produce when worked)",
+        "Output Box (consume + complete goal)",
+        "Single Extract (one-time use, produces resources)"
+    };
+
+    private static readonly string[] TemplateDescriptions = new[]
+    {
+        "",
+        "Source node in the chain: continuously generates resources without player input. Use for mines, trees, wells—anything that \"spawns\" raw materials. Players gather the output to feed into Convert on Work stations.",
+        "Transformation node: players bring input resources, work at the station, and receive output resources. The core of crafting—e.g. wood → planks, ore → ingots. Connects gathering (Automatic/Single Extract) to delivery (Output Box) or further conversion.",
+        "Sink node in the chain: players deliver resources here to complete goals. No output—the resource is \"consumed\" for progress. Use for drop-off points, quest turn-ins, or win-condition checkpoints.",
+        "Limited source node: produces resources once when worked, then becomes inactive. Use for one-time harvests (e.g. a fruit bush that depletes) or extractors that create a burst of resources. Good for risk/reward or scarce resources."
+    };
+
+    private void DrawTemplates()
+    {
+        EditorGUILayout.BeginVertical(EditorStyles.helpBox);
+        GUILayout.Label("Templates", EditorStyles.boldLabel);
+        EditorGUILayout.HelpBox(
+            "Resource chains flow: Source (gather) → Transform (craft) → Sink (deliver). Select a template to pre-fill; you can customize all values after applying.",
+            MessageType.None);
+        EditorGUILayout.BeginHorizontal();
+        int templateIndex = EditorGUILayout.Popup(
+            new GUIContent("Template", "Predefined configurations for different station behaviors."),
+            (int)selectedTemplate,
+            TemplateDisplayNames);
+        selectedTemplate = (StationTemplate)templateIndex;
+        if (GUILayout.Button("Apply Template", GUILayout.Width(120)))
+        {
+            ApplyTemplate(selectedTemplate);
+        }
+        EditorGUILayout.EndHorizontal();
+        if (selectedTemplate != StationTemplate.None && (int)selectedTemplate < TemplateDescriptions.Length)
+        {
+            EditorGUILayout.Space(2);
+            EditorGUILayout.HelpBox(TemplateDescriptions[(int)selectedTemplate], MessageType.None);
+        }
+        EditorGUILayout.EndVertical();
+        EditorGUILayout.Space(4);
+    }
+
+    private void ApplyTemplate(StationTemplate template)
+    {
+        if (template == StationTemplate.None) return;
+
+        switch (template)
+        {
+            case StationTemplate.AutomaticStation:
+                consumeResource = false;
+                produceResource = true;
+                consumeResources.Clear();
+                if (produceResources.Count == 0) produceResources.Add(null);
+                isSingleUse = false;
+                produceCapital = false;
+                consumeCapital = false;
+                consumptionCompletesGoals = false;
+                productionCompletesGoals = false;
+                canBeWorked = false;
+                productionInterval = 2f;
+                workDuration = 5f;
+                typeOfProduction = Station.interactionType.automatic;
+                typeOfConsumption = Station.interactionType.automatic;
+                break;
+
+            case StationTemplate.ConvertOnWork:
+                consumeResource = true;
+                produceResource = true;
+                if (consumeResources.Count == 0) consumeResources.Add(null);
+                if (produceResources.Count == 0) produceResources.Add(null);
+                isSingleUse = false;
+                produceCapital = false;
+                consumeCapital = false;
+                consumptionCompletesGoals = false;
+                productionCompletesGoals = false;
+                canBeWorked = true;
+                productionInterval = 5f;
+                workDuration = 5f;
+                typeOfProduction = Station.interactionType.whenWorked;
+                typeOfConsumption = Station.interactionType.whenWorked;
+                break;
+
+            case StationTemplate.OutputBox:
+                consumeResource = true;
+                produceResource = false;
+                if (consumeResources.Count == 0) consumeResources.Add(null);
+                produceResources.Clear();
+                isSingleUse = false;
+                produceCapital = false;
+                consumeCapital = false;
+                consumptionCompletesGoals = true;
+                productionCompletesGoals = false;
+                canBeWorked = false;
+                productionInterval = 5f;
+                workDuration = 5f;
+                typeOfProduction = Station.interactionType.None;
+                typeOfConsumption = Station.interactionType.whenResourcesConsumed;
+                break;
+
+            case StationTemplate.SingleExtract:
+                consumeResource = false;
+                produceResource = true;
+                consumeResources.Clear();
+                if (produceResources.Count == 0) produceResources.Add(null);
+                isSingleUse = true;
+                produceCapital = false;
+                consumeCapital = false;
+                consumptionCompletesGoals = false;
+                productionCompletesGoals = false;
+                canBeWorked = true;
+                productionInterval = 5f;
+                workDuration = 5f;
+                typeOfProduction = Station.interactionType.whenWorked;
+                typeOfConsumption = Station.interactionType.None;
+                break;
+        }
     }
 
     private void DrawFlowDiagram()
@@ -378,15 +506,12 @@ public class SA_StationBuilderWindow : EditorWindow
         }
         EditorGUILayout.EndVertical();
         EditorGUILayout.BeginVertical();
-        if (canBeWorked)
-        {
-            typeOfProduction = (Station.interactionType)EditorGUILayout.EnumPopup(
-                new GUIContent("Production Trigger", "whenWorked / whenResourcesConsumed / cycle / automatic"),
-                typeOfProduction);
-            typeOfConsumption = (Station.interactionType)EditorGUILayout.EnumPopup(
-                new GUIContent("Consumption Trigger", "whenWorked / whenResourcesConsumed / cycle / automatic"),
-                typeOfConsumption);
-        }
+        typeOfProduction = (Station.interactionType)EditorGUILayout.EnumPopup(
+            new GUIContent("Production Trigger", "whenWorked / whenResourcesConsumed / cycle / automatic"),
+            typeOfProduction);
+        typeOfConsumption = (Station.interactionType)EditorGUILayout.EnumPopup(
+            new GUIContent("Consumption Trigger", "whenWorked / whenResourcesConsumed / cycle / automatic"),
+            typeOfConsumption);
         EditorGUILayout.EndVertical();
         EditorGUILayout.EndHorizontal();
         EditorGUILayout.Space(4);
@@ -395,11 +520,6 @@ public class SA_StationBuilderWindow : EditorWindow
     private void DrawCreateButton()
     {
         EditorGUILayout.Space(4);
-        createMode = (CreateMode)EditorGUILayout.EnumPopup(
-            new GUIContent("Create As", "ScriptableObject: saves station data as an asset. Prefab in Scene: creates a full station GameObject in the scene."),
-            createMode);
-
-        EditorGUILayout.Space(2);
         var createRect = GUILayoutUtility.GetRect(0, 36);
         createRect.x += 20;
         createRect.width -= 40;
@@ -409,13 +529,9 @@ public class SA_StationBuilderWindow : EditorWindow
         bool canCreate = hasConsumeResources && hasProduceResources;
 
         EditorGUI.BeginDisabledGroup(!canCreate);
-        string buttonLabel = createMode == CreateMode.ScriptableObject ? "Create Station Data (SO)" : "Create Station Prefab in Scene";
-        if (GUI.Button(createRect, buttonLabel))
+        if (GUI.Button(createRect, "Create Station"))
         {
-            if (createMode == CreateMode.ScriptableObject)
-                CreateStationDataSO();
-            else
-                CreateStationPrefab();
+            CreateStation();
         }
         EditorGUI.EndDisabledGroup();
 
@@ -426,25 +542,14 @@ public class SA_StationBuilderWindow : EditorWindow
                 MessageType.Warning);
         }
 
+        EditorGUILayout.HelpBox(
+            "Creates the StationDataSO asset, a new prefab (from station_template), and instantiates it in the scene with all data assigned.",
+            MessageType.None);
+
         EditorGUILayout.Space(6);
     }
 
-    private void CreateStationDataSO()
-    {
-        SA_AssetPathHelper.EnsureAssetPathDirectories("Game Assemblies/Databases/Stations");
-
-        StationDataSO data = CreateStationDataFromBuilderState();
-
-        string assetPath = $"Assets/Game Assemblies/Databases/Stations/{stationName}.asset";
-        AssetDatabase.CreateAsset(data, assetPath);
-        AssetDatabase.SaveAssets();
-
-        Selection.activeObject = data;
-        EditorGUIUtility.PingObject(data);
-        Debug.Log($"Station Builder: Created Station Data SO '{stationName}' at {assetPath}");
-    }
-
-    private void CreateStationPrefab()
+    private void CreateStation()
     {
         GameObject templatePrefab = SA_AssetPathHelper.FindPrefab(TemplatePrefabPath);
         if (templatePrefab == null)
@@ -461,14 +566,17 @@ public class SA_StationBuilderWindow : EditorWindow
         }
 
         SA_AssetPathHelper.EnsureAssetPathDirectories("Game Assemblies/Databases/Stations");
+        SA_AssetPathHelper.EnsureAssetPathDirectories("Game Assemblies/Databases/Stations/Prefabs");
 
         StationDataSO data = CreateStationDataFromBuilderState();
-        string assetPath = $"Assets/Game Assemblies/Databases/Stations/{stationName}.asset";
-        AssetDatabase.CreateAsset(data, assetPath);
+        string dataAssetPath = $"Assets/Game Assemblies/Databases/Stations/{stationName}.asset";
+        AssetDatabase.CreateAsset(data, dataAssetPath);
         AssetDatabase.SaveAssets();
 
         GameObject instance = (GameObject)PrefabUtility.InstantiatePrefab(templatePrefab, scene);
         instance.name = stationName;
+
+        PrefabUtility.UnpackPrefabInstance(instance, PrefabUnpackMode.Completely, InteractionMode.AutomatedAction);
 
         GameObject stationsRoot = GameObject.Find("Stations");
         if (stationsRoot == null)
@@ -483,16 +591,26 @@ public class SA_StationBuilderWindow : EditorWindow
         if (station == null)
         {
             Debug.LogError("Station Builder: Template prefab has no Station component.");
+            Object.DestroyImmediate(instance);
             return;
         }
 
         data.ApplyToStation(station);
 
+        string prefabPath = $"Assets/Game Assemblies/Databases/Stations/Prefabs/{stationName}.prefab";
+        GameObject newPrefab = PrefabUtility.SaveAsPrefabAssetAndConnect(instance, prefabPath, InteractionMode.AutomatedAction);
+        if (newPrefab != null)
+        {
+            data.stationPrefab = newPrefab;
+            EditorUtility.SetDirty(data);
+            AssetDatabase.SaveAssets();
+        }
+
         Selection.activeGameObject = instance;
         EditorGUIUtility.PingObject(instance);
         SceneView.lastActiveSceneView?.FrameSelected();
 
-        Debug.Log($"Station Builder: Created '{stationName}' in scene with StationDataSO at {assetPath}");
+        Debug.Log($"Station Builder: Created '{stationName}' - StationDataSO at {dataAssetPath}, prefab at {prefabPath}, instance in scene.");
     }
 
     private StationDataSO CreateStationDataFromBuilderState()

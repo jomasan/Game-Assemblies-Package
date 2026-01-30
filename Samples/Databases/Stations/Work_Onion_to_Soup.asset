@@ -10,19 +10,21 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 0c3dcfb3376eb4d02834bd63a7b90587, type: 3}
-  m_Name: Automatic_Onion
+  m_Name: Work_Onion_to_Soup
   m_EditorClassIdentifier: GameAssemblyLab.GameAssemblies::StationDataSO
   stationName: Automatic_Onion
   stationGraphic: {fileID: -2110591605, guid: 49577a8f92a058c468c23d3032455102, type: 3}
   deadSprite: {fileID: 0}
+  stationPrefab: {fileID: 0}
   consumeResource: 0
   produceResource: 1
-  consumes: []
+  consumes:
+  - {fileID: 11400000, guid: 56dc7caac8dde4c499393d44c38546ae, type: 2}
   produces:
-  - {fileID: 11400000, guid: 96c9bdfa22a89da4a9243173868e08eb, type: 2}
+  - {fileID: 11400000, guid: b6e68d6e127d75a49abf8a6a41bdc3b2, type: 2}
   whatToProduce: 0
   spawnResourcePrefab: 1
-  spawnRadius: 5
+  spawnRadius: 3
   isSingleUse: 0
   destroyAfterSingleUse: 0
   capitalInput: 0
@@ -32,7 +34,7 @@ MonoBehaviour:
   completesGoals_consumption: 0
   completesGoals_production: 0
   canBeWorked: 0
-  workDuration: 5
+  workDuration: 2
   productionInterval: 1
-  typeOfProduction: 1
+  typeOfProduction: 2
   typeOfConsumption: 0

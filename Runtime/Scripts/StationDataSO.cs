@@ -13,6 +13,8 @@ public class StationDataSO : ScriptableObject
     public Sprite stationGraphic;
     [Tooltip("Sprite shown when the station is inactive/dead. If null, stationGraphic is used.")]
     public Sprite deadSprite;
+    [Tooltip("Reference to the prefab representing this station.")]
+    public GameObject stationPrefab;
 
     [Header("Consume (IN) - Produce (OUT)")]
     public bool consumeResource;
