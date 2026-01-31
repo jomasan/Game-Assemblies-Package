@@ -22,6 +22,8 @@ public class grabRegion : MonoBehaviour
     private void OnTriggerEnter2D(Collider2D  other)
     {
         if (debug) Debug.Log("In Trigger with: " + other);
+        // When absorbing (Y held), playerConsumeArea handles multigrab—don't add here to avoid double-add
+        if (pController.isAbsorbingResources) return;
         if (pController.isCarryingObject != true)
         //if(pController.listobjectsToGrab.Count < pController.maxObjectsToCarry)
         {
@@ -62,8 +64,9 @@ public class grabRegion : MonoBehaviour
 
     private void OnTriggerExit2D(Collider2D other)
     {
-        
         if (debug) Debug.Log("Trigger edit with: " + other);
+        // When absorbing, playerConsumeArea owns the list—don't remove here
+        if (pController.isAbsorbingResources) return;
         if (pController.isCarryingObject != true)
         //if (pController.listobjectsToGrab.Count < pController.maxObjectsToCarry)
         {

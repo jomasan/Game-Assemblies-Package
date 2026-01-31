@@ -61,6 +61,8 @@ public class playerController : MonoBehaviour
     public Vector3 grabPoint = Vector3.zero;
     public Vector3 grabAreaOffset = Vector3.zero;
     public GameObject grabArea;
+    [Tooltip("Vertical offset between stacked objects when carrying multiple.")]
+    public float multigrabStackOffset = 0.25f;
     public GameObject grabGraphic;
     private Vector3 normFwd = Vector2.zero;
 
@@ -343,35 +345,11 @@ public class playerController : MonoBehaviour
     public void calculateGrabPoint(Vector2 movement)
     {
         // Calculate the position at the specified distance in the player's forward direction
-        if(movement != Vector2.zero) normFwd = movement.normalized;
+        if (movement != Vector2.zero) normFwd = movement.normalized;
         grabPoint = transform.position + grabAreaOffset + (normFwd * distanceFromPlayer);
         grabArea.transform.position = grabPoint;
         grabGraphic.transform.position = grabPoint;
-
-        if (objectToInspect != null)
-        {
-            if(objectToInspect.GetComponent<Station>() != null)
-            {   
-                if(objectToInspect.GetComponent<Station>().inspectionPoint != null)
-                {
-                    Vector3 inspPoint = objectToInspect.GetComponent<Station>().inspectionPoint.position;
-                    grabGraphic.transform.position = inspPoint; //magnetic graphic to collision objects
-                    grabGraphicAnimation();
-
-                } else
-                {
-                    Vector3 inspPoint = objectToInspect.GetComponent<Station>().transform.position;
-                    grabGraphic.transform.position = inspPoint; //magnetic graphic to collision objects
-                    grabGraphicAnimation();
-                }
-            } 
-            else if (objectToInspect.GetComponent<ResourceObject>() != null)
-            {
-                Vector3 inspPoint = objectToInspect.GetComponent<ResourceObject>().transform.position;
-                grabGraphic.transform.position = inspPoint; //magnetic graphic to collision objects
-                grabGraphicAnimation();
-            }
-        }
+        // Grab point icon always stays near the player; no magnetic snap to inspected objects
     }
     public void grabGraphicAnimation()
     {
@@ -670,6 +648,7 @@ public class playerController : MonoBehaviour
     {
         foreach (GameObject obj in listobjectsToGrab)
         {
+            if (obj == null) continue;
             obj.transform.SetParent(null);
             Rigidbody2D objectRb = obj.GetComponent<Rigidbody2D>();
             if (objectRb != null)
@@ -677,18 +656,26 @@ public class playerController : MonoBehaviour
                 objectRb.isKinematic = false;
                 objectRb.simulated = true;
             }
-            obj.GetComponent<dynamicSortingOrder>().invertOrder = false;
+            var dynSort = obj.GetComponent<dynamicSortingOrder>();
+            if (dynSort != null) dynSort.invertOrder = false;
         }
         listobjectsToGrab.Clear();
+        objectToGrab = null;
     }
     public void sortObsorbedObject(GameObject obj)
     {
-        //obj.transform.parent = transform;
-        //obj.transform.position = transform.position;
-        if(listobjectsToGrab.Count >= maxObjectsToCarry)
+        if (obj == null) return;
+        if (listobjectsToGrab.Contains(obj)) return;
+        if (listobjectsToGrab.Count >= maxObjectsToCarry) return;
+
+        // When carrying one (normal grab) but absorbing more: merge into multigrab
+        if (isCarryingObject && objectToGrab != null && !listobjectsToGrab.Contains(objectToGrab))
         {
-            return;
+            listobjectsToGrab.Add(objectToGrab);
+            isCarryingObject = false;
+            RepositionMultigrabStack();
         }
+
         listobjectsToGrab.Add(obj);
 
         Rigidbody2D objectRb = obj.GetComponent<Rigidbody2D>();
@@ -700,14 +687,29 @@ public class playerController : MonoBehaviour
             objectRb.angularVelocity = 0f;
         }
 
-        // Calculate the local offset between the object and the carry position
-        //grabOffset = grabArea.transform.InverseTransformPoint(obj.transform.position);
-        int index = listobjectsToGrab.Count-1;
-        // Parent the object to the carry position
         obj.transform.SetParent(grabArea.transform);
-        obj.transform.localPosition = new Vector3(0, index / 2.0f * 1.5f, 0);// grabArea.transform.position;// + new Vector3(0, index/2.0f *1.5f, 0);
-        obj.GetComponent<dynamicSortingOrder>().invertOrder = true;
-        //obj.transform.localPosition = transform.position + new Vector3(0,index,0);
+        RepositionMultigrabStack();
+    }
+
+    private void RepositionMultigrabStack()
+    {
+        for (int i = 0; i < listobjectsToGrab.Count; i++)
+        {
+            var obj = listobjectsToGrab[i];
+            if (obj == null) continue;
+
+            // First object at grab point (0,0,0), consecutive with small offset above
+            float yOffset = i * multigrabStackOffset;
+            obj.transform.localPosition = new Vector3(0, yOffset, 0);
+
+            // Lowest sprite behind, consecutive in front: use sortingOrderOffset so index 0 = lowest
+            var dynSort = obj.GetComponent<dynamicSortingOrder>();
+            if (dynSort != null)
+            {
+                dynSort.invertOrder = true;
+                dynSort.sortingOrderOffset = i;
+            }
+        }
     }
     public GameObject GetObjectToGrab()
     {   
