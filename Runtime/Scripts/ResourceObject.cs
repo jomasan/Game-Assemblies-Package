@@ -7,15 +7,7 @@ public class ResourceObject : MonoBehaviour
     public playerController owner;
 
     public ResourceManager rManager;
-    public enum resourceBehavior
-    {
-        Static,
-        Decays,
-        Consumable
-    }
-    public resourceBehavior typeOfBehavior = resourceBehavior.Static;
     public bool hasOwner = true; //is common?
-    public float lifespan = 2f;
     public float currentLife = 0;
 
     public GameObject particlePrefab;
@@ -27,7 +19,7 @@ public class ResourceObject : MonoBehaviour
     }
     public void Update()
     {
-        if (typeOfBehavior == resourceBehavior.Decays) growOldandDie(); 
+        if (resourceType != null && resourceType.typeOfBehavior == Resource.ResourceBehavior.Decays) growOldandDie(); 
     }
 
     public void OnDestroy()
@@ -60,6 +52,7 @@ public class ResourceObject : MonoBehaviour
     public void growOldandDie()
     {
         currentLife += Time.deltaTime;
+        float lifespan = resourceType != null ? resourceType.lifespan : 2f;
         if (currentLife > lifespan)
         {
             Destroy(gameObject);
