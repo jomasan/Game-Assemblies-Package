@@ -15,7 +15,27 @@ public class ResourceObject : MonoBehaviour
     public void Start()
     {
         rManager = GameObject.FindAnyObjectByType<ResourceManager>();
-        if(rManager != null) rManager.AddResource(this);
+        if (rManager != null) rManager.AddResource(this);
+
+        // Sync MultiTag to match Resource.typeOfBehavior so tag-based logic stays consistent.
+        if (resourceType != null)
+        {
+            var multiTag = GetComponent<MultiTag>();
+            if (multiTag != null)
+            {
+                multiTag.AddTag(TagType.Resource);
+                if (resourceType.typeOfBehavior == Resource.ResourceBehavior.Consumable)
+                {
+                    multiTag.AddTag(TagType.Consumable);
+                    multiTag.RemoveTag(TagType.Grabbable);
+                }
+                else
+                {
+                    multiTag.AddTag(TagType.Grabbable);
+                    multiTag.RemoveTag(TagType.Consumable);
+                }
+            }
+        }
     }
     public void Update()
     {

@@ -25,11 +25,18 @@ public class grabRegion : MonoBehaviour
         if (pController.isCarryingObject != true)
         //if(pController.listobjectsToGrab.Count < pController.maxObjectsToCarry)
         {
-            if(TagUtilities.HasTag(other.gameObject, TagType.Grabbable))
+            if (TagUtilities.HasTag(other.gameObject, TagType.Grabbable))
             {
-                if (debug) Debug.Log("GRABABBLE OBJECT DEFINED: " + other);
-                pController.objectToGrab = other.gameObject; //STORE GRABABBLE OBJECT
-                pController.listobjectsToGrab.Add(other.gameObject); //add to list of objects to grab
+                // Don't grab Consumable resources—they're instant-collect on contact.
+                var resourceObj = other.GetComponent<ResourceObject>();
+                bool isConsumable = resourceObj != null && resourceObj.resourceType != null
+                    && resourceObj.resourceType.typeOfBehavior == Resource.ResourceBehavior.Consumable;
+                if (!isConsumable)
+                {
+                    if (debug) Debug.Log("GRABABBLE OBJECT DEFINED: " + other);
+                    pController.objectToGrab = other.gameObject; //STORE GRABABBLE OBJECT
+                    pController.listobjectsToGrab.Add(other.gameObject); //add to list of objects to grab
+                }
             }
             if (TagUtilities.HasTag(other.gameObject, TagType.Workable))
             {

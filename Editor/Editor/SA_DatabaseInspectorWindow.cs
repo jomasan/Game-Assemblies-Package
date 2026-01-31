@@ -364,6 +364,13 @@ public class SA_DatabaseInspectorWindow : EditorWindow
             // Header with large thumbnail
             EditorGUILayout.Space(8);
             DrawInspectorHeader();
+
+            // Resource-specific tools
+            if (_selectedAsset is Resource resource)
+            {
+                DrawResourceAssetTools(resource);
+            }
+
             EditorGUILayout.Space(8);
 
             // Inspector
@@ -405,6 +412,108 @@ public class SA_DatabaseInspectorWindow : EditorWindow
         EditorGUILayout.LabelField(ObjectNames.NicifyVariableName(_selectedAsset.GetType().Name), EditorStyles.miniLabel);
         EditorGUILayout.EndVertical();
         EditorGUILayout.EndHorizontal();
+    }
+
+    private void DrawResourceAssetTools(Resource resource)
+    {
+        EditorGUILayout.BeginVertical(EditorStyles.helpBox);
+        EditorGUILayout.LabelField("Prefab Tools", EditorStyles.boldLabel);
+        EditorGUILayout.BeginHorizontal();
+
+        bool hasPrefab = resource.resourcePrefab != null;
+        EditorGUI.BeginDisabledGroup(!hasPrefab);
+
+        if (GUILayout.Button(new GUIContent("Update Sprite", "Copies the Resource icon to the SpriteRenderer on the linked prefab.")))
+        {
+            UpdateResourcePrefabSprite(resource);
+        }
+        if (GUILayout.Button(new GUIContent("Update Collider", "Resizes the prefab's Collider2D to match the sprite bounds.")))
+        {
+            UpdateResourcePrefabCollider(resource);
+        }
+
+        EditorGUI.EndDisabledGroup();
+        EditorGUILayout.EndHorizontal();
+
+        if (!hasPrefab)
+            EditorGUILayout.HelpBox("Assign a prefab to this resource to use these tools.", MessageType.Info);
+
+        EditorGUILayout.EndVertical();
+    }
+
+    private void UpdateResourcePrefabSprite(Resource resource)
+    {
+        if (resource == null || resource.resourcePrefab == null)
+        {
+            Debug.LogWarning("Database Inspector: Resource has no prefab assigned.");
+            return;
+        }
+        if (resource.icon == null)
+        {
+            Debug.LogWarning("Database Inspector: Resource has no icon assigned.");
+            return;
+        }
+
+        var sr = resource.resourcePrefab.GetComponentInChildren<SpriteRenderer>();
+        if (sr == null)
+        {
+            Debug.LogWarning($"Database Inspector: Prefab '{resource.resourcePrefab.name}' has no SpriteRenderer.");
+            return;
+        }
+
+        Undo.RecordObject(sr, "Update Resource Prefab Sprite");
+        sr.sprite = resource.icon;
+        EditorUtility.SetDirty(resource.resourcePrefab);
+        AssetDatabase.SaveAssets();
+        Debug.Log($"Database Inspector: Updated sprite on prefab '{resource.resourcePrefab.name}' to match resource icon.");
+    }
+
+    private void UpdateResourcePrefabCollider(Resource resource)
+    {
+        if (resource == null || resource.resourcePrefab == null)
+        {
+            Debug.LogWarning("Database Inspector: Resource has no prefab assigned.");
+            return;
+        }
+
+        var sr = resource.resourcePrefab.GetComponentInChildren<SpriteRenderer>();
+        if (sr == null || sr.sprite == null)
+        {
+            Debug.LogWarning($"Database Inspector: Prefab '{resource.resourcePrefab.name}' has no SpriteRenderer with a sprite.");
+            return;
+        }
+
+        var bounds = sr.sprite.bounds;
+        var collider = resource.resourcePrefab.GetComponentInChildren<Collider2D>();
+        if (collider == null)
+        {
+            Debug.LogWarning($"Database Inspector: Prefab '{resource.resourcePrefab.name}' has no Collider2D.");
+            return;
+        }
+
+        if (collider is CircleCollider2D circle)
+        {
+            Undo.RecordObject(circle, "Update Resource Prefab Collider");
+            circle.offset = bounds.center;
+            float radius = Mathf.Sqrt(bounds.extents.x * bounds.extents.x + bounds.extents.y * bounds.extents.y);
+            circle.radius = radius;
+            EditorUtility.SetDirty(resource.resourcePrefab);
+        }
+        else if (collider is BoxCollider2D box)
+        {
+            Undo.RecordObject(box, "Update Resource Prefab Collider");
+            box.offset = bounds.center;
+            box.size = bounds.size;
+            EditorUtility.SetDirty(resource.resourcePrefab);
+        }
+        else
+        {
+            Debug.LogWarning($"Database Inspector: Collider type '{collider.GetType().Name}' is not supported. Use CircleCollider2D or BoxCollider2D.");
+            return;
+        }
+
+        AssetDatabase.SaveAssets();
+        Debug.Log($"Database Inspector: Updated collider on prefab '{resource.resourcePrefab.name}' to match sprite bounds.");
     }
 
     private string[] GetDisplayNames()

@@ -15,12 +15,21 @@ public class playerConsumeArea : MonoBehaviour
     {
         if (debug) Debug.Log("In Trigger with: " + other);
 
-        if (TagUtilities.HasTag(other.gameObject, TagType.Resource) && TagUtilities.HasTag(other.gameObject, TagType.Consumable))
+        // Consumable: instant collect. Source of truth is Resource.typeOfBehavior (fallback to tag for non-ResourceObject).
+        bool isConsumable = false;
+        var resourceObj = other.GetComponent<ResourceObject>();
+        if (resourceObj != null && resourceObj.resourceType != null)
+            isConsumable = resourceObj.resourceType.typeOfBehavior == Resource.ResourceBehavior.Consumable;
+        else
+            isConsumable = TagUtilities.HasTag(other.gameObject, TagType.Resource) && TagUtilities.HasTag(other.gameObject, TagType.Consumable);
+
+        if (isConsumable)
         {
             if (debug) Debug.Log("Consumed: " + other);
             Destroy(other.gameObject);
             pController.capital += 1;
-        }else if(pController.isAbsorbingResources && TagUtilities.HasTag(other.gameObject, TagType.Resource) && TagUtilities.HasTag(other.gameObject, TagType.Grabbable))
+        }
+        else if (pController.isAbsorbingResources && TagUtilities.HasTag(other.gameObject, TagType.Resource) && TagUtilities.HasTag(other.gameObject, TagType.Grabbable))
         {
             if (debug) Debug.Log("Absorbed: " + other);
             

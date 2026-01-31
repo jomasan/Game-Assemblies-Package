@@ -228,6 +228,21 @@ public class SA_ResourceBuilderWindow : EditorWindow
             var sr = newPrefab.GetComponent<SpriteRenderer>();
             if (sr != null && resourceIcon != null) sr.sprite = resourceIcon;
             newAsset.resourcePrefab = newPrefab;
+
+            // Set MultiTag to match typeOfBehavior so prefab behaves as Resource data specifies.
+            var multiTag = newPrefab.GetComponent<MultiTag>();
+            if (multiTag != null)
+            {
+                multiTag.RemoveTag(TagType.Consumable);
+                multiTag.RemoveTag(TagType.Grabbable);
+                multiTag.AddTag(TagType.Resource);
+                if (typeOfBehavior == Resource.ResourceBehavior.Consumable)
+                    multiTag.AddTag(TagType.Consumable);
+                else
+                    multiTag.AddTag(TagType.Grabbable);
+            }
+
+            EditorUtility.SetDirty(newPrefab);
             EditorUtility.SetDirty(newAsset);
             AssetDatabase.SaveAssets();
         }
