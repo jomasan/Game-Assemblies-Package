@@ -23,7 +23,7 @@ public class SA_CreateLootTableWindow : EditorWindow
         public float dropPercentage = 0f;
     }
 
-    // Adds a menu item under Detroit at Play -> Loot Tables
+    // Adds a menu item under Game Assemblies -> Loot Tables
     [MenuItem("Game Assemblies/Resources/Create Loot Table")]
     public static void ShowWindow()
     {

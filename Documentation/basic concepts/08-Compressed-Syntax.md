@@ -375,5 +375,5 @@ bool shouldDecay = resourceType != null && resourceType.typeOfBehavior == Resour
 
 ## Related Documentation
 
-- [Basic C# Syntax](./Basic-CSharp-Syntax.md) — Core C# concepts
-- [Common Data Structures](./Common-Data-Structures.md) — Lists and lambdas in context
+- [03 – Syntax](./03-Syntax.md) — Core C# concepts
+- [05 – Data Structures](./05-Data-Structures.md) — Lists and lambdas in context

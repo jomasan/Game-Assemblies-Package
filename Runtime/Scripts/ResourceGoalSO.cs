@@ -1,6 +1,6 @@
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "NewResourceGoal", menuName = "Detroit at Play/Goals/Create Resource Goal")]
+[CreateAssetMenu(fileName = "NewResourceGoal", menuName = "Game Assemblies/Goals/Create Resource Goal")]
 
 public class ResourceGoalSO : ScriptableObject
 {

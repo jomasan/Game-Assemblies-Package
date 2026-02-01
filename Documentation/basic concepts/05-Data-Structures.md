@@ -665,6 +665,6 @@ Player player = players["Alice"];  // Fast lookup!
 
 ## Related Documentation
 
-- [Basic C# Syntax](./Basic-CSharp-Syntax.md) — Understanding C# fundamentals
-- [Static References](./Static-References.md) — How managers use lists and dictionaries
+- [03 – Syntax](./03-Syntax.md) — Understanding C# fundamentals
+- [06 – Static References](./06-Static-References.md) — How managers use lists and dictionaries
 - [Tutorial 03: Resource Manager and Goals](../tutorials/03-Resource-Manager-and-Goals.md) — Using lists in ResourceManager

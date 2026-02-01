@@ -20,17 +20,19 @@ Start with the main [README.md](../README.md) in the root directory for installa
 
 ### Learning Path
 
-**New to Unity or C#?** Start with the **Programming Fundamentals** tutorials to build a solid foundation:
-1. [GameObjects and Components](basic%20concepts/GameObjects-and-Components.md) — Understand Unity's fundamental building blocks
-2. [Basic C# Syntax](basic%20concepts/Basic-CSharp-Syntax.md) — Learn essential C# programming concepts
-3. [Prefabs](basic%20concepts/Prefabs.md) — Understand Unity's prefab system
-4. [Common Data Structures](basic%20concepts/Common-Data-Structures.md) — Master Lists and Dictionaries
-5. [Basic Vector Math](basic%20concepts/Basic-Vector-Math.md) — Learn vector operations for game development
+**New to Unity or C#?** Start with the **Programming Fundamentals** (01–05) to build a solid foundation:
+1. [01 – Game Objects and Components](basic%20concepts/01-GameObjects-and-Components.md) — Understand Unity's fundamental building blocks
+2. [02 – Prefabs](basic%20concepts/02-Prefabs.md) — Understand Unity's prefab system
+3. [03 – Syntax](basic%20concepts/03-Syntax.md) — Learn essential C# programming concepts
+4. [04 – Vector Math](basic%20concepts/04-Vector-Math.md) — Learn vector operations for game development
+5. [05 – Data Structures](basic%20concepts/05-Data-Structures.md) — Master Lists and Dictionaries
 
-**Familiar with Unity?** Jump to the **Core Concepts** tutorials:
-1. [Scriptable Objects](basic%20concepts/Scriptable-Objects.md) — Understanding data assets used throughout Game Assemblies
-2. [Static References](basic%20concepts/Static-References.md) — Learn about singletons and global manager access
-3. [Editor Tools](basic%20concepts/Editor-Tools.md) — Create custom Unity editor windows and menu items
+**Familiar with Unity?** Jump to the **Core Concepts** (06–10):
+1. [06 – Static References](basic%20concepts/06-Static-References.md) — Learn about singletons and global manager access
+2. [07 – Scriptable Objects](basic%20concepts/07-Scriptable-Objects.md) — Understanding data assets used throughout Game Assemblies
+3. [08 – Compressed Syntax](basic%20concepts/08-Compressed-Syntax.md) — Advanced C# patterns and shorthand
+4. [09 – Input System](basic%20concepts/09-Input-System.md) — Create Input Actions assets, bindings, and connect to PlayerInput
+5. [10 – Editor Tools](basic%20concepts/10-Editor-Tools.md) — Create custom Unity editor windows and menu items
 
 **Ready to build?** Follow the **Step-by-Step Tutorials** in order:
 1. [Tutorial 01: Creating a Character and Canvas](tutorials/01-Creating-Character-and-Canvas.md) — Set up your scene
@@ -43,29 +45,31 @@ Start with the main [README.md](../README.md) in the root directory for installa
 
 ## Basic Concepts
 
-Foundational tutorials that explain core Unity and Game Assemblies concepts. These are recommended reading before diving into the practical tutorials.
+Foundational tutorials that explain core Unity and Game Assemblies concepts. Read in order (01–10) for the best learning experience.
 
-### Programming Fundamentals
+### Programming Fundamentals (01–05)
 
 Essential programming concepts for Unity and C# development. Start here if you're new to programming or Unity.
 
-| Concept | Description |
-|---------|-------------|
-| [GameObjects and Components](basic%20concepts/GameObjects-and-Components.md) | Understanding Unity's fundamental building blocks: what GameObjects are, how components add functionality, why Transform is mandatory, and common component patterns. Essential for working with Unity. |
-| [Basic C# Syntax](basic%20concepts/Basic-CSharp-Syntax.md) | Essential C# programming concepts: variables, data types, methods, classes, control flow, operators, and common patterns used in Unity and Game Assemblies. |
-| [Prefabs](basic%20concepts/Prefabs.md) | Understanding Unity prefabs: what they are, how to create and use them, prefab instances, variants, and working with prefabs in code. Essential for reusable game objects. |
-| [Common Data Structures](basic%20concepts/Common-Data-Structures.md) | Working with Lists and Dictionaries: when to use each, common operations, iteration patterns, and practical examples from Game Assemblies code. |
-| [Basic Vector Math](basic%20concepts/Basic-Vector-Math.md) | Vector operations for game development: Vector2 and Vector3, basic operations, magnitude, normalization, distance calculations, and movement patterns. |
+| # | Concept | Description |
+|---|---------|-------------|
+| 01 | [Game Objects and Components](basic%20concepts/01-GameObjects-and-Components.md) | Understanding Unity's fundamental building blocks: what GameObjects are, how components add functionality, why Transform is mandatory, and common component patterns. Essential for working with Unity. |
+| 02 | [Prefabs](basic%20concepts/02-Prefabs.md) | Understanding Unity prefabs: what they are, how to create and use them, prefab instances, variants, and working with prefabs in code. Essential for reusable game objects. |
+| 03 | [Syntax](basic%20concepts/03-Syntax.md) | Essential C# programming concepts: variables, data types, methods, classes, control flow, operators, and common patterns used in Unity and Game Assemblies. |
+| 04 | [Vector Math](basic%20concepts/04-Vector-Math.md) | Vector operations for game development: Vector2 and Vector3, basic operations, magnitude, normalization, distance calculations, and movement patterns. |
+| 05 | [Data Structures](basic%20concepts/05-Data-Structures.md) | Working with Lists and Dictionaries: when to use each, common operations, iteration patterns, and practical examples from Game Assemblies code. |
 
-### Core Concepts
+### Core Concepts (06–10)
 
 Game Assemblies-specific concepts and Unity editor tools. Read these to understand how the library works.
 
-| Concept | Description |
-|---------|-------------|
-| [Scriptable Objects](basic%20concepts/Scriptable-Objects.md) | Learn what ScriptableObjects are, why they're used in Game Assemblies, and how to create and use them. Essential for understanding resources, goals, levels, and other data assets. |
-| [Static References](basic%20concepts/Static-References.md) | Understand the singleton pattern and how static references provide global access to managers like ResourceManager, GoalManager, and LevelManager. |
-| [Editor Tools](basic%20concepts/Editor-Tools.md) | Learn how to create custom Unity editor windows and menu items. Covers EditorWindow, menu items, GUI elements, and creating prefabs and ScriptableObjects programmatically. |
+| # | Concept | Description |
+|---|---------|-------------|
+| 06 | [Static References](basic%20concepts/06-Static-References.md) | Understand the singleton pattern and how static references provide global access to managers like ResourceManager, GoalManager, and LevelManager. |
+| 07 | [Scriptable Objects](basic%20concepts/07-Scriptable-Objects.md) | Learn what ScriptableObjects are, why they're used in Game Assemblies, and how to create and use them. Essential for understanding resources, goals, levels, and other data assets. |
+| 08 | [Compressed Syntax](basic%20concepts/08-Compressed-Syntax.md) | Advanced C# patterns: lambdas, LINQ, null-conditional operators, and shorthand used in Game Assemblies. |
+| 09 | [Input System](basic%20concepts/09-Input-System.md) | Create Input Actions assets, define actions and bindings, connect to PlayerInput, and control your player with the new Input System. Covers action maps, Invoke Unity Events, and action map switching. |
+| 10 | [Editor Tools](basic%20concepts/10-Editor-Tools.md) | Learn how to create custom Unity editor windows and menu items. Covers EditorWindow, menu items, GUI elements, and creating prefabs and ScriptableObjects programmatically. |
 
 ---
 
@@ -86,8 +90,8 @@ Step-by-step guides for common workflows. Work through them in order for the bes
 ## Documentation Structure
 
 - **`README.md`** — This file; overview and navigation
-- **`basic concepts/`** — Foundational tutorials explaining core concepts (see [Basic Concepts](#basic-concepts) above)
-- **`tutorials/`** — Step-by-step tutorials (see [Tutorials](#tutorials) above)
+- **`basic concepts/`** — Foundational tutorials (01–10) explaining core concepts
+- **`tutorials/`** — Step-by-step tutorials (01–05) for common workflows
 - **`API/`** — API reference documentation
 - **`Guides/`** — Detailed guides for specific features
 
@@ -97,7 +101,7 @@ Step-by-step guides for common workflows. Work through them in order for the bes
 
 When adding new documentation:
 
-- Use clear, descriptive filenames
-- Include code examples where applicable
+- Use numbered filenames for ordering (e.g., `01-Topic.md`, `02-Topic.md`)
+- Include code examples when applicable
 - Keep tutorials focused on specific tasks
 - Update this README when adding new sections or tutorials

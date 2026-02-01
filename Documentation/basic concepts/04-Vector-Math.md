@@ -609,6 +609,6 @@ if (toTarget.sqrMagnitude > 0.001f)
 
 ## Related Documentation
 
-- [Basic C# Syntax](./Basic-CSharp-Syntax.md) — Understanding C# fundamentals
-- [Prefabs](./Prefabs.md) — Positioning prefabs in scenes
+- [03 – Syntax](./03-Syntax.md) — Understanding C# fundamentals
+- [02 – Prefabs](./02-Prefabs.md) — Positioning prefabs in scenes
 - [Tutorial 01: Creating a Character and Canvas](../tutorials/01-Creating-Character-and-Canvas.md) — Using vectors for player movement

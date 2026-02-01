@@ -1009,8 +1009,8 @@ public static void CustomAction(MenuCommand command)
 
 ## Related Documentation
 
-- [Scriptable Objects](./Scriptable-Objects.md) — Creating ScriptableObject assets
-- [Static References](./Static-References.md) — Accessing singletons from editor tools
+- [07 – Scriptable Objects](./07-Scriptable-Objects.md) — Creating ScriptableObject assets
+- [06 – Static References](./06-Static-References.md) — Accessing singletons from editor tools
 - [Tutorial 02: Stations and Resources](../tutorials/02-Stations-and-Resources.md) — Using Create Resource tool
 - [Tutorial 04: Goals and Goal Tracker](../tutorials/04-Goals-and-Goal-Tracker.md) — Using Create Goal tool
 - [Tutorial 05: Levels and Level Editor](../tutorials/05-Levels-and-Level-Editor.md) — Using Create Level tool

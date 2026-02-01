@@ -665,7 +665,7 @@ gTracker.transform.parent = goalTrackerGrid.transform;  // Parent-child relation
 
 ## Related Documentation
 
-- [Prefabs](./Prefabs.md) — Understanding prefabs (saved GameObjects)
-- [Basic C# Syntax](./Basic-CSharp-Syntax.md) — Writing MonoBehaviour scripts
-- [Static References](./Static-References.md) — How manager GameObjects work
+- [02 – Prefabs](./02-Prefabs.md) — Understanding prefabs (saved GameObjects)
+- [03 – Syntax](./03-Syntax.md) — Writing MonoBehaviour scripts
+- [06 – Static References](./06-Static-References.md) — How manager GameObjects work
 - [Tutorial 01: Creating a Character and Canvas](../tutorials/01-Creating-Character-and-Canvas.md) — Creating GameObjects in Game Assemblies

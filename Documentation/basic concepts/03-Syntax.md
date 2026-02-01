@@ -738,6 +738,6 @@ if (Mathf.Abs(time) < 0.001f) { }
 
 ## Related Documentation
 
-- [Static References](./Static-References.md) — Understanding static properties and singletons
-- [Common Data Structures](./Common-Data-Structures.md) — Lists and Dictionaries in detail
-- [Prefabs](./Prefabs.md) — Working with Unity prefabs
+- [06 – Static References](./06-Static-References.md) — Understanding static properties and singletons
+- [05 – Data Structures](./05-Data-Structures.md) — Lists and Dictionaries in detail
+- [02 – Prefabs](./02-Prefabs.md) — Working with Unity prefabs

@@ -59,7 +59,7 @@ A **ResourceGoalSO** is a ScriptableObject that defines a single objective: **co
    - **Reward Points** — e.g. `10`.
    - **Penalty** — e.g. `5`.
 
-You can also create goals via **Assets → Create → Detroit at Play → Goals → Create Resource Goal** and then move or edit them as needed.
+You can also create goals via **Assets → Create → Game Assemblies → Goals → Create Resource Goal** and then move or edit them as needed.
 
 ---
 

@@ -7,6 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.6] - 2026-02-01
+
+### Changed
+- **Documentation – Basic Concepts ordering**: Renamed all basic concepts tutorials with numbered prefixes (01–10) for inherent reading order
+  - 01 – Game Objects and Components (was GameObjects-and-Components.md)
+  - 02 – Prefabs (was Prefabs.md)
+  - 03 – Syntax (was Basic-CSharp-Syntax.md)
+  - 04 – Vector Math (was Basic-Vector-Math.md)
+  - 05 – Data Structures (was Common-Data-Structures.md)
+  - 06 – Static References (was Static-References.md)
+  - 07 – Scriptable Objects (was Scriptable-Objects.md)
+  - 08 – Compressed Syntax (was Compressed-CSharp-Syntax.md)
+  - 09 – Input System (was Unity-Input-System.md)
+  - 10 – Editor Tools (was Editor-Tools.md)
+- **Documentation README**: Updated learning path and Basic Concepts tables to reflect new order and filenames; updated all cross-references between docs
+
 ## [1.0.5] - 2026-01-22
 
 ### Added

@@ -90,7 +90,7 @@ public class Resource : ScriptableObject
 **Purpose**: Defines a goal objective (e.g., "Collect 3 Bread in 30 seconds")
 
 ```csharp
-[CreateAssetMenu(fileName = "NewResourceGoal", menuName = "Detroit at Play/Goals/Create Resource Goal")]
+[CreateAssetMenu(fileName = "NewResourceGoal", menuName = "Game Assemblies/Goals/Create Resource Goal")]
 public class ResourceGoalSO : ScriptableObject
 {
     public Resource resourceType;
@@ -116,7 +116,7 @@ public class ResourceGoalSO : ScriptableObject
 **Purpose**: Defines level structure and goal sequencing
 
 ```csharp
-[CreateAssetMenu(fileName = "New Level", menuName = "Detroit at Play/Level Data")]
+[CreateAssetMenu(fileName = "New Level", menuName = "Game Assemblies/Level Data")]
 public class LevelDataSO : ScriptableObject
 {
     public string levelName = "New Level";
@@ -491,4 +491,4 @@ public class LevelManager : MonoBehaviour
 - [Tutorial 02: Stations and Resources](../tutorials/02-Stations-and-Resources.md) — Creating and using Resource ScriptableObjects
 - [Tutorial 04: Goals and Goal Tracker](../tutorials/04-Goals-and-Goal-Tracker.md) — Working with ResourceGoalSO
 - [Tutorial 05: Levels and Level Editor](../tutorials/05-Levels-and-Level-Editor.md) — Creating LevelDataSO assets
-- [Static References](./Static-References.md) — How ScriptableObjects work with singleton managers
+- [06 – Static References](./06-Static-References.md) — How ScriptableObjects work with singleton managers

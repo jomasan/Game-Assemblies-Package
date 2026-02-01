@@ -10,7 +10,7 @@ public class LootEntry
     public float dropPercentage;
 }
 
-[CreateAssetMenu(fileName = "New Loot Table", menuName = "Detroit at Play/Loot Table")]
+[CreateAssetMenu(fileName = "New Loot Table", menuName = "Game Assemblies/Loot Table")]
 public class LootTable : ScriptableObject
 {
     [SerializeField]

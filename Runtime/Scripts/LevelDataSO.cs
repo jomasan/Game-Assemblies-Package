@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "New Level", menuName = "Detroit at Play/Level Data")]
+[CreateAssetMenu(fileName = "New Level", menuName = "Game Assemblies/Level Data")]
 public class LevelDataSO : ScriptableObject
 {
     [Header("Level Information")]

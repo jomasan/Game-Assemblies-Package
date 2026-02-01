@@ -576,6 +576,6 @@ GameObject prefab = SA_AssetPathHelper.FindPrefab("Path/To/Prefab.prefab");
 
 ## Related Documentation
 
-- [Basic C# Syntax](./Basic-CSharp-Syntax.md) — Understanding C# code structure
-- [Editor Tools](./Editor-Tools.md) — Creating prefabs programmatically
+- [03 – Syntax](./03-Syntax.md) — Understanding C# code structure
+- [10 – Editor Tools](./10-Editor-Tools.md) — Creating prefabs programmatically
 - [Tutorial 01: Creating a Character and Canvas](../tutorials/01-Creating-Character-and-Canvas.md) — Using prefabs in Game Assemblies

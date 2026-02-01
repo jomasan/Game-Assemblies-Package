@@ -720,6 +720,6 @@ public class Station : MonoBehaviour
 
 ## Related Documentation
 
-- [Scriptable Objects](./Scriptable-Objects.md) — How ScriptableObjects work with singleton managers
+- [07 – Scriptable Objects](./07-Scriptable-Objects.md) — How ScriptableObjects work with singleton managers
 - [Tutorial 03: Resource Manager and Goals](../tutorials/03-Resource-Manager-and-Goals.md) — Setting up ResourceManager singleton
 - [Tutorial 04: Goals and Goal Tracker](../tutorials/04-Goals-and-Goal-Tracker.md) — Using GoalManager singleton

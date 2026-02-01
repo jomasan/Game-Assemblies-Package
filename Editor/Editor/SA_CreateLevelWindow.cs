@@ -27,7 +27,7 @@ public class SA_CreateLevelWindow : EditorWindow
     private Vector2 sequentialGoalsScroll = Vector2.zero;
     private Vector2 randomGoalsScroll = Vector2.zero;
 
-    // Adds a menu item under Detroit at Play -> Levels -> Create Level
+    // Adds a menu item under Game Assemblies -> Levels -> Create Level
     [MenuItem("Game Assemblies/Levels/Create Level")]
     public static void ShowWindow()
     {
