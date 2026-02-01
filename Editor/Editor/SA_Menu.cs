@@ -104,14 +104,14 @@ public static class SA_Menu
         // Use PrefabUtility.InstantiatePrefab to properly instantiate in Editor/Scene
         GameObject instance = (GameObject)PrefabUtility.InstantiatePrefab(prefab, SceneManager.GetActiveScene());
 
-        // Set its position to (0,0,0)
-        instance.transform.position = Vector3.zero;
+        // Set its position to (0,0,1) to avoid collision conflicts with sprites at z=0
+        instance.transform.position = new Vector3(0, 0, 1);
 
         // Optionally, you can select the newly created object automatically
         Selection.activeObject = instance;
 
         // Log success (optional)
-        Debug.Log("White Canvas created at (0,0,0).");
+        Debug.Log("White Canvas created at (0,0,1).");
     }
 
     [MenuItem("Game Assemblies/Environment/Create Stage Background")]
