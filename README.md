@@ -18,7 +18,7 @@ The library is built around the concept of **resource conversion chains** — pl
 
 ## Documentation
 
-**[📚 Full Documentation](Documentation/README.md)** — Tutorials, basic concepts, and step-by-step guides.
+**[Full Documentation](Documentation/README.md)** — Tutorials, basic concepts, and step-by-step guides.
 
 ### Quick Links
 
@@ -52,19 +52,19 @@ The library includes **21 dedicated editor tools** accessible from the **Game As
 
 ## System Index
 
-### 🎮 Player Systems
+### Player Systems
 - **Player Controller** — Core player movement, interaction, and input handling
 - **Player Info Manager** — Manages player data, colors, and identification
 - **Multi-Input Support** — Gamepad and keyboard input via Unity's Input System
 
-### 📦 Resource Management System
+### Resource Management System
 - **Resource Manager** — Central hub for tracking all resources in the game
 - **Resource Objects** — Physical items that players can grab, carry, and deliver
 - **Resource Nodes** — Base class for resource-producing entities
 - **Resource Pools** — Object pooling for efficient resource spawning
 - **Resource UI Binding** — Connect resources to UI displays
 
-### 🏭 Station & Production System
+### Station & Production System
 - **Station** — Interactive workstations that convert resources
 - **Station Manager** — Manages station states and interactions
 - **Resource Producer** — Automated resource generation
@@ -72,39 +72,39 @@ The library includes **21 dedicated editor tools** accessible from the **Game As
 - **Consume Area** — Input zones for resource delivery
 - **Production Modes** — Resource, Station, or LootTable outputs
 
-### 🎯 Goal System
+### Goal System
 - **Goal Manager** — Tracks and manages active goals
 - **Resource Goals** — Time-based or resource-count objectives
 - **Goal Tracker UI** — Visual display of goal progress
 - **Goal ScriptableObjects** — Data-driven goal configuration
 
-### 📊 Level Management
+### Level Management
 - **Level Manager** — Controls level progression and timing
 - **Level Data** — ScriptableObject-based level configuration
 - **Sequential & Random Goals** — Different goal spawning patterns
 - **Score Brackets** — Star rating system based on performance
 
-### 🎨 Game Management
+### Game Management
 - **Game Manager** — State machine for game flow (Menu, Playing, Paused, Results)
 - **Creation Manager** — Handles object spawning and creation
 - **Soundtrack Manager** — Manages background music and audio
 
-### 🗺️ Area & Region System
+### Area & Region System
 - **Area** — Spatial zones for triggering events
 - **Grab Region** — Detection zones for object interaction
 - **Region Events** — Event-driven area interactions
 
-### 🎲 Loot & Randomization
+### Loot & Randomization
 - **Loot Tables** — Weighted random resource generation
 - **Random Populate** — Spawn objects randomly within bounds
 
-### 🎨 Visual & UI Systems
+### Visual & UI Systems
 - **Progress Bar Controller** — Visual feedback for work progress
 - **Info Window** — Display information panels
 - **Dynamic Sorting Order** — 2D depth sorting for sprites
 - **Color Palette System** — Themed color management
 
-### 🔧 Utility Systems
+### Utility Systems
 - **Tag System** — MultiTag component for flexible object tagging
 - **Tween System** — Animation and easing functions
 - **Camera Shake** — Screen effects
@@ -138,13 +138,13 @@ The package includes sample content in the **Samples** folder:
 
 ## Key Features
 
-✅ **Local Multiplayer Ready** — Built-in support for multiple players with gamepad/keyboard  
-✅ **21 Editor Tools** — Dedicated windows for creating resources, stations, goals, levels, loot tables, and more  
-✅ **Modular Architecture** — Use only the systems you need  
-✅ **ScriptableObject Driven** — Data-driven design for easy iteration  
-✅ **Extensible** — Easy to add custom behaviors and systems  
-✅ **UI Integration** — Pre-built UI components for common needs  
-✅ **Event-Driven** — UnityEvents for flexible system communication  
+- **Local Multiplayer Ready** — Built-in support for multiple players with gamepad/keyboard  
+- **21 Editor Tools** — Dedicated windows for creating resources, stations, goals, levels, loot tables, and more  
+- **Modular Architecture** — Use only the systems you need  
+- **ScriptableObject Driven** — Data-driven design for easy iteration  
+- **Extensible** — Easy to add custom behaviors and systems  
+- **UI Integration** — Pre-built UI components for common needs  
+- **Event-Driven** — UnityEvents for flexible system communication  
 
 ---
 
@@ -183,4 +183,4 @@ For questions, issues, or contributions, please [add your contact/support inform
 
 ---
 
-**Happy Game Making! 🎮**
+**Happy Game Making!**
