@@ -1,6 +1,6 @@
 # Game Assemblies - Local Multiplayer Game Library
 
-A Unity-based game development library for creating local multiplayer games centered around resource conversion and goal achievement mechanics. Inspired by games like **Overcooked**, this library provides a comprehensive set of systems for building cooperative and competitive multiplayer experiences where players work together (or compete) to convert resources and complete objectives.
+The library currently provides a multiplayer framework for building resource production chains, where players participate in interconnected systems of extraction, transformation, and exchange. At this stage, the focus is on modeling material flows and interdependencies between player actions, enabling the emergence of micro-economies through cooperation, competition, and logistical coordination. The next phase of development expands this foundation toward the simulation of automation rule systems, where players will not only operate within production networks but also shape the underlying logic that governs them. This shift moves the library from simulating economies to simulating automation ecologies—systems in which value is produced through programmable processes whose ownership, access, delegation, and control can be negotiated among players. Ultimately, the goal is to support experiments in how different rule structures generate different social, economic, and organizational outcomes, turning the library into a sandbox for exploring the political and collective dimensions of automated production.
 
 ## Overview
 
