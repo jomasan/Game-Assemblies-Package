@@ -173,7 +173,13 @@ This library is designed to be extended. When adding new systems:
 
 ## License
 
-[Specify your license here]
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+---
+
+## Credits
+
+Currently developed and maintained by Jose Sanchez - Cornell Tech.
 
 ---
 
@@ -181,6 +187,3 @@ This library is designed to be extended. When adding new systems:
 
 For questions, issues, or contributions, please [add your contact/support information here].
 
----
-
-**Happy Game Making!**
