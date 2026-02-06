@@ -25,6 +25,10 @@ public class StationDataSO : ScriptableObject
     public Station.productionMode whatToProduce = Station.productionMode.Resource;
     [Tooltip("When true, spawns physical resource prefabs in the output area.")]
     public bool spawnResourcePrefab = true;
+    [Tooltip("When true, the InputArea child object is enabled. Use for stations that accept physical resources.")]
+    public bool useInputArea = true;
+    [Tooltip("When true, the OutputArea child object is enabled. Use for stations that spawn resources.")]
+    public bool useOutputArea = true;
     [Tooltip("Radius for random spawn offset when not using output area.")]
     public float spawnRadius = 1f;
 
@@ -69,16 +73,40 @@ public class StationDataSO : ScriptableObject
             }
         }
 
+        station.useInputArea = useInputArea;
+        station.useOutputArea = useOutputArea;
+
         if (station.inputArea != null)
         {
             station.inputArea.requirements.Clear();
             foreach (var r in consumes)
                 if (r != null) station.inputArea.requirements.Add(r);
-            station.inputArea.gameObject.SetActive(consumeResource);
+            station.inputArea.gameObject.SetActive(useInputArea);
+        }
+        else
+        {
+            var inputAreaObj = FindChildRecursive(station.transform, "InputArea");
+            if (inputAreaObj != null) inputAreaObj.gameObject.SetActive(useInputArea);
         }
         if (station.outputArea != null)
         {
-            station.outputArea.gameObject.SetActive(produceResource);
+            station.outputArea.gameObject.SetActive(useOutputArea);
         }
+        else
+        {
+            var outputAreaObj = FindChildRecursive(station.transform, "OutputArea");
+            if (outputAreaObj != null) outputAreaObj.gameObject.SetActive(useOutputArea);
+        }
+    }
+
+    private static Transform FindChildRecursive(Transform parent, string name)
+    {
+        if (parent.name == name) return parent;
+        foreach (Transform child in parent)
+        {
+            var found = FindChildRecursive(child, name);
+            if (found != null) return found;
+        }
+        return null;
     }
 }

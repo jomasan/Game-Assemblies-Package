@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
 
@@ -7,10 +8,13 @@ using UnityEditor;
 /// </summary>
 public class SA_ResourceBuilderWindow : EditorWindow
 {
-    private const string TemplatePrefabPath = "Samples/Prefabs/Resources/resource_obj_template.prefab";
+    private const string DefaultTemplatePrefabPath = "Samples/Prefabs/Resources/resource_obj_template.prefab";
 
+    private GameObject prefabTemplate;
     private string resourceName = "New Resource";
     private Sprite resourceIcon;
+    private Color resourceColor = Color.white;
+    private float resourceScale = 0.4f;
     private Resource.ResourceBehavior typeOfBehavior = Resource.ResourceBehavior.Static;
     private float lifespan = 10f;
     private Vector2 scrollPosition;
@@ -45,6 +49,14 @@ public class SA_ResourceBuilderWindow : EditorWindow
     {
         var window = GetWindow<SA_ResourceBuilderWindow>("Resource Builder");
         window.minSize = new Vector2(450, 420);
+    }
+
+    private void OnEnable()
+    {
+        if (prefabTemplate == null)
+        {
+            prefabTemplate = SA_AssetPathHelper.FindPrefab(DefaultTemplatePrefabPath);
+        }
     }
 
     private void OnGUI()
@@ -133,6 +145,18 @@ public class SA_ResourceBuilderWindow : EditorWindow
     private void DrawFields()
     {
         EditorGUILayout.BeginVertical(EditorStyles.helpBox);
+        GUILayout.Label("Prefab Template", EditorStyles.boldLabel);
+        prefabTemplate = (GameObject)EditorGUILayout.ObjectField(
+            new GUIContent("Resource Prefab Template", "Prefab used as the base for new resources. Must have ResourceObject and SpriteRenderer."),
+            prefabTemplate,
+            typeof(GameObject),
+            false);
+        if (prefabTemplate == null)
+        {
+            EditorGUILayout.HelpBox("No template selected. The default resource_obj_template prefab will be used.", MessageType.Warning);
+        }
+        EditorGUILayout.Space(4);
+
         GUILayout.Label("Resource Details", EditorStyles.boldLabel);
         resourceName = EditorGUILayout.TextField(
             new GUIContent("Resource Name", "Display name used in stations, goals, and UI."),
@@ -142,6 +166,17 @@ public class SA_ResourceBuilderWindow : EditorWindow
             resourceIcon,
             typeof(Sprite),
             false);
+        resourceColor = EditorGUILayout.ColorField(
+            new GUIContent("Sprite Color", "Color tint applied to the resource sprite. Use white for no tint."),
+            resourceColor);
+        resourceScale = EditorGUILayout.Slider(
+            new GUIContent("Scale", "Uniform scale applied to the resource prefab. Helps reduce pixelation of pixel-art sprites on screen."),
+            resourceScale,
+            0.1f,
+            2f);
+        EditorGUILayout.HelpBox(
+            "A scale of 0.4 helps reduce pixelation of pixel-art sprites when displayed on screen.",
+            MessageType.Info);
         typeOfBehavior = (Resource.ResourceBehavior)EditorGUILayout.EnumPopup(
             new GUIContent("Behavior", "Static: permanent, grab & move. Decays: expires after lifespan. Consumable: instant collect on contact."),
             typeOfBehavior);
@@ -184,10 +219,14 @@ public class SA_ResourceBuilderWindow : EditorWindow
 
     private void CreateResource()
     {
-        GameObject templatePrefab = SA_AssetPathHelper.FindPrefab(TemplatePrefabPath);
+        GameObject templatePrefab = prefabTemplate;
         if (templatePrefab == null)
         {
-            Debug.LogError($"Resource Builder: Template prefab not found at {TemplatePrefabPath}");
+            templatePrefab = SA_AssetPathHelper.FindPrefab(DefaultTemplatePrefabPath);
+        }
+        if (templatePrefab == null)
+        {
+            Debug.LogError($"Resource Builder: Template prefab not found at {DefaultTemplatePrefabPath}");
             return;
         }
 
@@ -225,8 +264,17 @@ public class SA_ResourceBuilderWindow : EditorWindow
         {
             var resourceObj = newPrefab.GetComponent<ResourceObject>();
             if (resourceObj != null) resourceObj.resourceType = newAsset;
-            var sr = newPrefab.GetComponent<SpriteRenderer>();
-            if (sr != null && resourceIcon != null) sr.sprite = resourceIcon;
+            var sr = newPrefab.GetComponent<SpriteRenderer>() ?? newPrefab.GetComponentInChildren<SpriteRenderer>();
+            if (sr != null)
+            {
+                if (resourceIcon != null)
+                {
+                    sr.sprite = resourceIcon;
+                    ResizeCollidersToSprite(newPrefab, resourceIcon, sr);
+                }
+                sr.color = resourceColor;
+            }
+            newPrefab.transform.localScale = new Vector3(resourceScale, resourceScale, resourceScale);
             newAsset.resourcePrefab = newPrefab;
 
             // Set MultiTag to match typeOfBehavior so prefab behaves as Resource data specifies.
@@ -250,5 +298,47 @@ public class SA_ResourceBuilderWindow : EditorWindow
         Selection.activeObject = newAsset;
         EditorGUIUtility.PingObject(newAsset);
         Debug.Log($"Resource Builder: Created '{resourceName}' - SO at {assetPath}, prefab at {newPrefabPath}");
+    }
+
+    private static void ResizeCollidersToSprite(GameObject prefab, Sprite sprite, SpriteRenderer spriteRenderer)
+    {
+        Bounds bounds = sprite.bounds;
+        Vector2 size = bounds.size;
+        Vector2 center = bounds.center;
+
+        foreach (var collider in prefab.GetComponentsInChildren<Collider2D>())
+        {
+            if (collider is BoxCollider2D box)
+            {
+                box.size = size;
+                box.offset = center;
+            }
+            else if (collider is CircleCollider2D circle)
+            {
+                float radius = Mathf.Min(size.x, size.y) * 0.5f;
+                circle.radius = radius;
+                circle.offset = center;
+            }
+            else if (collider is PolygonCollider2D poly)
+            {
+                List<Vector2> physicsShape = new List<Vector2>();
+                if (sprite.GetPhysicsShapeCount() > 0)
+                {
+                    sprite.GetPhysicsShape(0, physicsShape);
+                    poly.points = physicsShape.ToArray();
+                }
+                else
+                {
+                    Vector2 extents = size * 0.5f;
+                    poly.points = new Vector2[]
+                    {
+                        center + new Vector2(-extents.x, -extents.y),
+                        center + new Vector2(extents.x, -extents.y),
+                        center + new Vector2(extents.x, extents.y),
+                        center + new Vector2(-extents.x, extents.y)
+                    };
+                }
+            }
+        }
     }
 }

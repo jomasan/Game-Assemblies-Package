@@ -9,7 +9,9 @@ using UnityEngine.SceneManagement;
 /// </summary>
 public class SA_StationBuilderWindow : EditorWindow
 {
-    private const string TemplatePrefabPath = "Samples/Prefabs/Stations/station_template.prefab";
+    private const string DefaultTemplatePrefabPath = "Samples/Prefabs/Stations/station_template.prefab";
+
+    private GameObject stationPrefabTemplate;
 
     // Station identity
     private string stationName = "New Station";
@@ -35,6 +37,11 @@ public class SA_StationBuilderWindow : EditorWindow
     // Goals
     private bool consumptionCompletesGoals;
     private bool productionCompletesGoals;
+
+    // Input/Output areas & spawn
+    private bool useInputArea = true;
+    private bool useOutputArea = true;
+    private float spawnRadius = 1f;
 
     // Timing & interaction
     private float productionInterval = 5f;
@@ -99,6 +106,15 @@ public class SA_StationBuilderWindow : EditorWindow
         "Requires Player Work",
         "When enabled, a player must interact with the station to trigger consumption/production. " +
         "When disabled, the station operates automatically (if configured for automatic mode).");
+    private static readonly GUIContent UseInputAreaTip = new GUIContent(
+        "Use Input Area",
+        "When enabled, the InputArea child object is active. Players place resources here for stations that consume them.");
+    private static readonly GUIContent UseOutputAreaTip = new GUIContent(
+        "Use Output Area",
+        "When enabled, the OutputArea child object is active. Produced resources spawn here when the station outputs.");
+    private static readonly GUIContent SpawnRadiusTip = new GUIContent(
+        "Spawn Radius",
+        "When not using the output area, resources spawn within this radius around the station. Used for random spawn offset.");
 
     private const float FlowColumnWidth = 300f;
     private const float StationPreviewSize = 100f;
@@ -119,6 +135,14 @@ public class SA_StationBuilderWindow : EditorWindow
     {
         var window = GetWindow<SA_StationBuilderWindow>("Station Builder");
         window.minSize = new Vector2(700, 520);
+    }
+
+    private void OnEnable()
+    {
+        if (stationPrefabTemplate == null)
+        {
+            stationPrefabTemplate = SA_AssetPathHelper.FindPrefab(DefaultTemplatePrefabPath);
+        }
     }
 
     private void OnGUI()
@@ -144,6 +168,18 @@ public class SA_StationBuilderWindow : EditorWindow
             MessageType.Info);
         EditorGUILayout.Space(2);
         stationName = EditorGUILayout.TextField("Station Name", stationName);
+        EditorGUILayout.Space(4);
+
+        EditorGUILayout.LabelField("Prefab Template", EditorStyles.boldLabel);
+        stationPrefabTemplate = (GameObject)EditorGUILayout.ObjectField(
+            new GUIContent("Station Prefab Template", "Prefab used as the base for new stations. Must have a Station component."),
+            stationPrefabTemplate,
+            typeof(GameObject),
+            false);
+        if (stationPrefabTemplate == null)
+        {
+            EditorGUILayout.HelpBox("No template selected. The default station_template prefab will be used.", MessageType.Warning);
+        }
         EditorGUILayout.Space(4);
     }
 
@@ -201,6 +237,9 @@ public class SA_StationBuilderWindow : EditorWindow
             case StationTemplate.AutomaticStation:
                 consumeResource = false;
                 produceResource = true;
+                useInputArea = false;
+                useOutputArea = false;
+                spawnRadius = 0.2f;
                 consumeResources.Clear();
                 if (produceResources.Count == 0) produceResources.Add(null);
                 isSingleUse = false;
@@ -218,6 +257,8 @@ public class SA_StationBuilderWindow : EditorWindow
             case StationTemplate.ConvertOnWork:
                 consumeResource = true;
                 produceResource = true;
+                useInputArea = true;
+                useOutputArea = true;
                 if (consumeResources.Count == 0) consumeResources.Add(null);
                 if (produceResources.Count == 0) produceResources.Add(null);
                 isSingleUse = false;
@@ -235,6 +276,8 @@ public class SA_StationBuilderWindow : EditorWindow
             case StationTemplate.OutputBox:
                 consumeResource = true;
                 produceResource = false;
+                useInputArea = true;
+                useOutputArea = false;
                 if (consumeResources.Count == 0) consumeResources.Add(null);
                 produceResources.Clear();
                 isSingleUse = false;
@@ -252,6 +295,8 @@ public class SA_StationBuilderWindow : EditorWindow
             case StationTemplate.SingleExtract:
                 consumeResource = false;
                 produceResource = true;
+                useInputArea = false;
+                useOutputArea = true;
                 consumeResources.Clear();
                 if (produceResources.Count == 0) produceResources.Add(null);
                 isSingleUse = true;
@@ -487,6 +532,9 @@ public class SA_StationBuilderWindow : EditorWindow
         EditorGUILayout.BeginHorizontal();
         EditorGUILayout.BeginVertical(GUILayout.Width(FlowColumnWidth));
         isSingleUse = EditorGUILayout.Toggle(SingleUseTip, isSingleUse);
+        useInputArea = EditorGUILayout.Toggle(UseInputAreaTip, useInputArea);
+        useOutputArea = EditorGUILayout.Toggle(UseOutputAreaTip, useOutputArea);
+        spawnRadius = EditorGUILayout.FloatField(SpawnRadiusTip, Mathf.Max(0.01f, spawnRadius));
         EditorGUILayout.EndVertical();
         EditorGUILayout.BeginVertical();
         canBeWorked = EditorGUILayout.Toggle(CanBeWorkedTip, canBeWorked);
@@ -551,10 +599,14 @@ public class SA_StationBuilderWindow : EditorWindow
 
     private void CreateStation()
     {
-        GameObject templatePrefab = SA_AssetPathHelper.FindPrefab(TemplatePrefabPath);
+        GameObject templatePrefab = stationPrefabTemplate;
         if (templatePrefab == null)
         {
-            Debug.LogError($"Station Builder: Template prefab not found at {TemplatePrefabPath}");
+            templatePrefab = SA_AssetPathHelper.FindPrefab(DefaultTemplatePrefabPath);
+        }
+        if (templatePrefab == null)
+        {
+            Debug.LogError($"Station Builder: Template prefab not found at {DefaultTemplatePrefabPath}");
             return;
         }
 
@@ -628,7 +680,9 @@ public class SA_StationBuilderWindow : EditorWindow
             if (r != null) data.produces.Add(r);
         data.whatToProduce = Station.productionMode.Resource;
         data.spawnResourcePrefab = true;
-        data.spawnRadius = 1f;
+        data.useInputArea = useInputArea;
+        data.useOutputArea = useOutputArea;
+        data.spawnRadius = spawnRadius;
         data.isSingleUse = isSingleUse;
         data.destroyAfterSingleUse = isSingleUse;
         data.capitalInput = consumeCapital;
