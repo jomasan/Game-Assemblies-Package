@@ -14,8 +14,10 @@ public class SA_StationBuilderWindow : EditorWindow
     private GameObject stationPrefabTemplate;
 
     // Station identity
+    private bool showAdvancedOptions;
     private string stationName = "New Station";
     private Sprite stationGraphic;
+    private Sprite deadSprite;
     private Color stationSpriteTint = Color.white;
     private float stationScale = 1f;
 
@@ -29,6 +31,7 @@ public class SA_StationBuilderWindow : EditorWindow
 
     // Lifespan
     private bool isSingleUse;
+    private bool destroyAfterSingleUse;
 
     // Capital
     private bool produceCapital;
@@ -75,6 +78,9 @@ public class SA_StationBuilderWindow : EditorWindow
         "Single-Use Station",
         "When enabled, the station operates only once and then becomes inactive (or is destroyed). " +
         "Useful for one-time conversions, extractors that deplete, or consumable stations.");
+    private static readonly GUIContent DestroyAfterSingleUseTip = new GUIContent(
+        "Destroy After Single Use",
+        "When enabled, the station is removed from the scene after its first use. When disabled, it stays visible with the dead sprite.");
     private static readonly GUIContent ProduceCapitalTip = new GUIContent(
         "Produces Capital",
         "When enabled, this station adds points (capital) to the global score when it completes a cycle. " +
@@ -168,6 +174,8 @@ public class SA_StationBuilderWindow : EditorWindow
             "Configure your station as a flow: inputs on the left, station in the center, outputs on the right. " +
             "Hover over labels for detailed explanations.",
             MessageType.Info);
+        EditorGUILayout.Space(2);
+        showAdvancedOptions = EditorGUILayout.Toggle("Show advanced options", showAdvancedOptions);
         EditorGUILayout.Space(2);
         stationName = EditorGUILayout.TextField("Station Name", stationName);
         stationSpriteTint = EditorGUILayout.ColorField(new GUIContent("Sprite Tint", "Tint color for the main station sprite. Use white for no tint."), stationSpriteTint);
@@ -305,6 +313,7 @@ public class SA_StationBuilderWindow : EditorWindow
                 consumeResources.Clear();
                 if (produceResources.Count == 0) produceResources.Add(null);
                 isSingleUse = true;
+                destroyAfterSingleUse = false;
                 produceCapital = false;
                 consumeCapital = false;
                 consumptionCompletesGoals = false;
@@ -322,6 +331,8 @@ public class SA_StationBuilderWindow : EditorWindow
     {
         float arrowIconSize = 24f;
         float centerBandHeight = StationPreviewSize + 24;
+        if (showAdvancedOptions || isSingleUse)
+            centerBandHeight += 4 + 12 + 2 + StationPreviewSize;
         var arrowStyle = new GUIStyle(EditorStyles.miniLabel) { alignment = TextAnchor.MiddleCenter, fontSize = 16 };
 
         EditorGUILayout.BeginHorizontal();
@@ -380,6 +391,42 @@ public class SA_StationBuilderWindow : EditorWindow
         {
             var style = new GUIStyle(GUI.skin.label) { alignment = TextAnchor.MiddleCenter, fontSize = 10 };
             GUI.Label(previewRect, "Drop sprite\nhere", style);
+        }
+
+        if (showAdvancedOptions || isSingleUse)
+        {
+            EditorGUILayout.Space(4);
+            var deadLabelRect = GUILayoutUtility.GetRect(StationPreviewSize, 12);
+            GUI.Label(deadLabelRect, "Dead Sprite", EditorStyles.miniLabel);
+            EditorGUILayout.Space(2);
+            var deadReserved = GUILayoutUtility.GetRect(StationPreviewSize, StationPreviewSize);
+            var deadBgRect = new Rect(deadReserved.x - 6, deadReserved.y - 6, deadReserved.width + 12, deadReserved.height + 12);
+            EditorGUI.DrawRect(deadBgRect, new Color(0.25f, 0.25f, 0.28f, 0.8f));
+            deadSprite = (Sprite)EditorGUI.ObjectField(deadReserved, deadSprite, typeof(Sprite), false);
+            if (deadSprite != null)
+            {
+                Texture deadPreviewTex = AssetPreview.GetAssetPreview(deadSprite);
+                if (deadPreviewTex != null)
+                {
+                    GUI.DrawTexture(deadReserved, deadPreviewTex, ScaleMode.ScaleToFit, true, 0, Color.white, 0, 0);
+                }
+                else if (deadSprite.texture != null)
+                {
+                    Texture tex = deadSprite.texture;
+                    Rect texCoords = new Rect(
+                        deadSprite.textureRect.x / tex.width,
+                        (tex.height - deadSprite.textureRect.y - deadSprite.textureRect.height) / tex.height,
+                        deadSprite.textureRect.width / tex.width,
+                        deadSprite.textureRect.height / tex.height);
+                    GUI.DrawTextureWithTexCoords(deadReserved, tex, texCoords, true);
+                    Repaint();
+                }
+            }
+            else
+            {
+                var deadStyle = new GUIStyle(GUI.skin.label) { alignment = TextAnchor.MiddleCenter, fontSize = 10 };
+                GUI.Label(deadReserved, "Drop sprite\nhere", deadStyle);
+            }
         }
 
         GUILayout.FlexibleSpace();
@@ -537,6 +584,10 @@ public class SA_StationBuilderWindow : EditorWindow
         EditorGUILayout.BeginHorizontal();
         EditorGUILayout.BeginVertical(GUILayout.Width(FlowColumnWidth));
         isSingleUse = EditorGUILayout.Toggle(SingleUseTip, isSingleUse);
+        if (isSingleUse)
+        {
+            destroyAfterSingleUse = EditorGUILayout.Toggle(DestroyAfterSingleUseTip, destroyAfterSingleUse);
+        }
         useInputArea = EditorGUILayout.Toggle(UseInputAreaTip, useInputArea);
         useOutputArea = EditorGUILayout.Toggle(UseOutputAreaTip, useOutputArea);
         spawnRadius = EditorGUILayout.FloatField(SpawnRadiusTip, Mathf.Max(0.01f, spawnRadius));
@@ -686,6 +737,7 @@ public class SA_StationBuilderWindow : EditorWindow
         data.stationGraphic = stationGraphic;
         data.stationSpriteTint = stationSpriteTint;
         data.stationScale = stationScale;
+        data.deadSprite = deadSprite;
         data.consumeResource = consumeResource;
         data.produceResource = produceResource;
         data.consumes = new List<Resource>();
@@ -700,7 +752,7 @@ public class SA_StationBuilderWindow : EditorWindow
         data.useOutputArea = useOutputArea;
         data.spawnRadius = spawnRadius;
         data.isSingleUse = isSingleUse;
-        data.destroyAfterSingleUse = isSingleUse;
+        data.destroyAfterSingleUse = destroyAfterSingleUse;
         data.capitalInput = consumeCapital;
         data.capitalOutput = produceCapital;
         data.capitalInputAmount = consumeCapital ? capitalInputAmount : 0;
