@@ -495,7 +495,7 @@ public class SA_CreateLootTableWindow : EditorWindow
             ? $"Loot table '{lootTableName}' created successfully with proper percentages (sum: {totalPercentage:F2}%)."
             : $"Loot table created, but percentages may need adjustment (sum: {totalPercentage:F2}%).";
 
-        EditorUtility.DisplayDialog("Success", verificationMsg + $"\nPath: {assetPath}", "OK");
+        Debug.Log($"{verificationMsg} Path: {assetPath}");
 
         // Reset form for new entry
         lootTableName = "NewLootTable";

@@ -5,52 +5,6 @@ using TMPro;
 
 public static class SA_Menu
 {
-    [MenuItem("Game Assemblies/Systems/Create Resource Management System")]
-    public static void CreateResourceManagementSystem()
-    {
-        GameObject rm_prefab = SA_AssetPathHelper.FindPrefab("Samples/Prefabs/Managers/ResourceManager.prefab");
-        GameObject gm_prefab = SA_AssetPathHelper.FindPrefab("Samples/Prefabs/Managers/GoalManager.prefab");
-        GameObject rmc_prefab = SA_AssetPathHelper.FindPrefab("Samples/Prefabs/UI Prefabs/ResourceManager_Canvas.prefab");
-
-        if (rm_prefab == null)
-        {
-            Debug.LogError($"Prefab not found: ResourceManager.prefab");
-            return;
-        }
-
-        if (gm_prefab == null)
-        {
-            Debug.LogError($"Prefab not found: GoalManager.prefab");
-            return;
-        }
-
-        if (rmc_prefab == null)
-        {
-            Debug.LogError($"Prefab not found: ResourceManager_Canvas.prefab");
-            return;
-        }
-
-        // Use PrefabUtility.InstantiatePrefab to properly instantiate in Editor/Scene
-        GameObject gm_instance = (GameObject)PrefabUtility.InstantiatePrefab(gm_prefab, SceneManager.GetActiveScene());
-        GameObject rm_instance = (GameObject)PrefabUtility.InstantiatePrefab(rm_prefab, SceneManager.GetActiveScene());
-        GameObject rmc_instance = (GameObject)PrefabUtility.InstantiatePrefab(rmc_prefab, SceneManager.GetActiveScene());
-
-        // Set its position to (0,0,0)
-        gm_instance.transform.position = Vector3.zero;
-        rm_instance.transform.position = Vector3.zero;
-        rmc_instance.transform.position = Vector3.zero;
-
-        GameObject gtg = rmc_instance.GetComponent<resourceManagerCanvas>().goalTrackerModule;
-        TMP_Text gs = rmc_instance.GetComponent<resourceManagerCanvas>().globalScoreModule;
-
-        gm_instance.GetComponent<GoalManager>().goalTrackerGrid = gtg;
-        gm_instance.GetComponent<GoalManager>().scoreText = gs;
-
-        // Log success (optional)
-        Debug.Log("Resource Management System Created");
-
-    }
-
     [MenuItem("Game Assemblies/Systems/Create Levels System and Menu")]
     public static void CreateLevelGameSystem()
     {
