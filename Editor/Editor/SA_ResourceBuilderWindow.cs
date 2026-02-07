@@ -252,6 +252,7 @@ public class SA_ResourceBuilderWindow : EditorWindow
         newAsset.name = resourceName;
         newAsset.resourceName = resourceName;
         newAsset.icon = resourceIcon;
+        newAsset.iconTint = resourceColor;
         newAsset.typeOfBehavior = typeOfBehavior;
         newAsset.lifespan = lifespan;
 

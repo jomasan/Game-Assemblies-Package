@@ -361,7 +361,7 @@ public class Station : ResourceNode
         sliderBar.SetActive(true);
         if (manualSliderPosition)
         {
-            Vector3 screenPosition = Camera.main.WorldToScreenPoint(transform.position + Vector3.up * offsetY + Vector3.up * -0.46f);
+            Vector3 screenPosition = Camera.main.WorldToScreenPoint(transform.position + Vector3.up * offsetY + Vector3.up * (stationData != null ? stationData.sliderOffsetY : -0.46f));
             progressSlider.transform.position = screenPosition;
         }
         float sliderValue = decayTimer / decayCycle;
@@ -374,7 +374,7 @@ public class Station : ResourceNode
             sliderBar.SetActive(true);
             if (manualSliderPosition)
             {
-                Vector3 screenPosition = Camera.main.WorldToScreenPoint(transform.position + Vector3.up * offsetY + Vector3.up * -0.46f);
+                Vector3 screenPosition = Camera.main.WorldToScreenPoint(transform.position + Vector3.up * offsetY + Vector3.up * (stationData != null ? stationData.sliderOffsetY : -0.46f));
                 progressSlider.transform.position = screenPosition;
             }
             float sliderValue = workProgress / workDuration;

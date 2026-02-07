@@ -23,6 +23,12 @@ public class InfoWindow : MonoBehaviour
         
     }
 
+    private static Color GetIconTint(Resource r)
+    {
+        if (r == null) return Color.white;
+        return r.iconTint.a < 0.01f ? Color.white : r.iconTint;
+    }
+
     public void InitializeResources(List<Resource> produces, List<Resource> consumes)
     {
         if(inputResource == null || outputResource == null) return;
@@ -30,20 +36,24 @@ public class InfoWindow : MonoBehaviour
         foreach (Resource c in consumes) //input
         {
             GameObject inputObjects = Instantiate(inputResource);
-            inputObjects.transform.parent = inputPanel.transform;
-            if (c.icon != null)
+            inputObjects.transform.SetParent(inputPanel.transform, false);
+            var inputImage = inputObjects.GetComponentInChildren<Image>(true);
+            if (inputImage != null)
             {
-                inputObjects.GetComponent<Image>().sprite = c.icon;
+                if (c.icon != null) inputImage.sprite = c.icon;
+                inputImage.color = GetIconTint(c);
             }
         }
 
         foreach (Resource p in produces) //output
         {
             GameObject outputObjects = Instantiate(outputResource);
-            outputObjects.transform.parent = outputPanel.transform;
-            if (p.icon != null)
+            outputObjects.transform.SetParent(outputPanel.transform, false);
+            var outputImage = outputObjects.GetComponentInChildren<Image>(true);
+            if (outputImage != null)
             {
-                outputObjects.GetComponent<Image>().sprite = p.icon;
+                if (p.icon != null) outputImage.sprite = p.icon;
+                outputImage.color = GetIconTint(p);
             }
         }
     }

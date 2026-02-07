@@ -19,7 +19,11 @@ public class SA_StationBuilderWindow : EditorWindow
     private Sprite stationGraphic;
     private Sprite deadSprite;
     private Color stationSpriteTint = Color.white;
-    private float stationScale = 1f;
+    private float stationScale = 0.5f;
+    private float uiOffsetY = 0.5f;
+    private float uiScale = 0.5f;
+    private bool manualSliderPosition = false;
+    private float sliderOffsetY = -0.46f;
 
     // Resource consumption (list)
     private bool consumeResource;
@@ -81,6 +85,18 @@ public class SA_StationBuilderWindow : EditorWindow
     private static readonly GUIContent DestroyAfterSingleUseTip = new GUIContent(
         "Destroy After Single Use",
         "When enabled, the station is removed from the scene after its first use. When disabled, it stays visible with the dead sprite.");
+    private static readonly GUIContent UIOffsetYTip = new GUIContent(
+        "UI Offset Y",
+        "Determines how high the info panel pop-up will appear above the station when inspected.");
+    private static readonly GUIContent UIScaleTip = new GUIContent(
+        "UI Scale",
+        "Scale factor for the station's Canvas Scaler. Controls the size of the info panel and progress UI.");
+    private static readonly GUIContent ManualSliderPositionTip = new GUIContent(
+        "Manual Slider Position",
+        "When enabled, the progress bar position is set manually relative to the station. When disabled, the slider uses its prefab layout.");
+    private static readonly GUIContent SliderOffsetYTip = new GUIContent(
+        "Slider Offset Y",
+        "Y offset for the progress bar when manual slider position is enabled. Negative values place it below the info panel.");
     private static readonly GUIContent ProduceCapitalTip = new GUIContent(
         "Produces Capital",
         "When enabled, this station adds points (capital) to the global score when it completes a cycle. " +
@@ -180,6 +196,13 @@ public class SA_StationBuilderWindow : EditorWindow
         stationName = EditorGUILayout.TextField("Station Name", stationName);
         stationSpriteTint = EditorGUILayout.ColorField(new GUIContent("Sprite Tint", "Tint color for the main station sprite. Use white for no tint."), stationSpriteTint);
         stationScale = EditorGUILayout.Slider(new GUIContent("Scale", "Overall scale of the station."), stationScale, 0.1f, 3f);
+        uiOffsetY = EditorGUILayout.Slider(UIOffsetYTip, uiOffsetY, 0f, 5f);
+        uiScale = EditorGUILayout.Slider(UIScaleTip, uiScale, 0.1f, 2f);
+        manualSliderPosition = EditorGUILayout.Toggle(ManualSliderPositionTip, manualSliderPosition);
+        if (manualSliderPosition)
+        {
+            sliderOffsetY = EditorGUILayout.Slider(SliderOffsetYTip, sliderOffsetY, -2f, 2f);
+        }
         EditorGUILayout.Space(4);
 
         EditorGUILayout.LabelField("Prefab Template", EditorStyles.boldLabel);
@@ -737,6 +760,10 @@ public class SA_StationBuilderWindow : EditorWindow
         data.stationGraphic = stationGraphic;
         data.stationSpriteTint = stationSpriteTint;
         data.stationScale = stationScale;
+        data.offsetY = uiOffsetY;
+        data.uiScale = uiScale;
+        data.manualSliderPosition = manualSliderPosition;
+        data.sliderOffsetY = sliderOffsetY;
         data.deadSprite = deadSprite;
         data.consumeResource = consumeResource;
         data.produceResource = produceResource;

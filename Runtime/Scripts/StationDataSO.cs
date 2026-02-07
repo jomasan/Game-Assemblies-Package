@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 /// <summary>
 /// ScriptableObject containing the key configuration data for a station.
@@ -15,11 +16,19 @@ public class StationDataSO : ScriptableObject
     public Color stationSpriteTint = Color.white;
     [Tooltip("Overall scale of the station. Affects transform.localScale.")]
     [Range(0.1f, 3f)]
-    public float stationScale = 1f;
+    public float stationScale = 0.5f;
     [Tooltip("Sprite shown when the station is inactive/dead. If null, stationGraphic is used.")]
     public Sprite deadSprite;
     [Tooltip("Reference to the prefab representing this station.")]
     public GameObject stationPrefab;
+    [Tooltip("Vertical offset for the info panel pop-up. Higher values position the UI higher above the station.")]
+    public float offsetY = 0.5f;
+    [Tooltip("Scale factor for the station's Canvas Scaler. Controls the size of the info panel and progress UI.")]
+    public float uiScale = 0.5f;
+    [Tooltip("When true, the progress bar position is set manually relative to the station. When false, the slider uses its prefab layout.")]
+    public bool manualSliderPosition = false;
+    [Tooltip("Y offset for the progress bar when manual slider position is enabled. Negative values place it below the info panel.")]
+    public float sliderOffsetY = -0.46f;
 
     [Header("Consume (IN) - Produce (OUT)")]
     public bool consumeResource;
@@ -80,6 +89,12 @@ public class StationDataSO : ScriptableObject
         }
 
         station.transform.localScale = new Vector3(stationScale, stationScale, 1f);
+        station.offsetY = offsetY;
+
+        var canvasScaler = station.GetComponentInChildren<CanvasScaler>();
+        if (canvasScaler != null) canvasScaler.scaleFactor = uiScale;
+
+        station.manualSliderPosition = manualSliderPosition;
 
         station.useInputArea = useInputArea;
         station.useOutputArea = useOutputArea;

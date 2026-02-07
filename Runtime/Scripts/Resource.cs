@@ -5,6 +5,8 @@ public class Resource : ScriptableObject
 {
     public string resourceName;
     public Sprite icon;
+    [Tooltip("Color tint applied to the icon sprite in UI. Use white for no tint.")]
+    public Color iconTint = Color.white;
     public GameObject resourcePrefab; // Reference to the prefab representing the resource
 
     public enum ResourceBehavior
