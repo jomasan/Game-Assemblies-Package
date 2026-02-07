@@ -13,7 +13,10 @@ public class SA_CreatePlayersWindow : EditorWindow
 
     private string newPlayerPrefabName = "Player_Custom";
     private float spriteScaleFactor = 0.4f;
-    private float playerSpeed = 2.0f;
+    private float playerSpeed = 1f;
+    private bool useSnapTarget = true;
+    private float snapRadius = 0.1f;
+    private float snapAimBias = 0f;
     private GameObject playerPrefabTemplate;
     private const string DEFAULT_PLAYER_PREFAB_PATH = "Samples/Prefabs/Players/Player_Drawn_Small.prefab";
     private const string PLAYER_PREFAB_OUTPUT_FOLDER = "Game Assemblies/Prefabs/Players";
@@ -59,6 +62,13 @@ public class SA_CreatePlayersWindow : EditorWindow
         EditorGUILayout.LabelField("Player Speed", EditorStyles.boldLabel);
         playerSpeed = Mathf.Max(0.1f, EditorGUILayout.FloatField("Speed", playerSpeed));
         EditorGUILayout.HelpBox("Movement speed for the player (playerController.playerSpeed).", MessageType.None);
+
+        GUILayout.Space(10);
+        EditorGUILayout.LabelField("Snap Target", EditorStyles.boldLabel);
+        useSnapTarget = EditorGUILayout.Toggle("Use Snap Target", useSnapTarget);
+        snapRadius = Mathf.Max(0f, EditorGUILayout.FloatField("Snap Radius", snapRadius));
+        snapAimBias = EditorGUILayout.Slider("Snap Aim Bias", snapAimBias, 0f, 1f);
+        EditorGUILayout.HelpBox("When enabled, the grab area snaps to the nearest grabbable/workable. Snap radius and aim bias control detection range and direction preference.", MessageType.None);
 
         GUILayout.Space(10);
         EditorGUILayout.LabelField("Sprite Scale Factor", EditorStyles.boldLabel);
@@ -182,6 +192,9 @@ public class SA_CreatePlayersWindow : EditorWindow
             pc.sprite3 = player_3_Sprite;
             pc.sprite4 = player_4_Sprite;
             pc.playerSpeed = playerSpeed;
+            pc.useSnapTarget = useSnapTarget;
+            pc.snapRadius = snapRadius;
+            pc.snapAimBias = snapAimBias;
         }
 
         // Apply scale to sprite transform and resize colliders to match the displayed size

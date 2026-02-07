@@ -27,7 +27,7 @@ public class playerController : MonoBehaviour
     private bool facingRight = true;
 
     [Header("Speed / Motion")]
-    public float playerSpeed = 2.0f;
+    public float playerSpeed = 1f;
     public Rigidbody2D rb;
     private Vector2 playerVelocity;
     private Vector2 movementInput = Vector2.zero;
@@ -50,8 +50,19 @@ public class playerController : MonoBehaviour
     private Vector3 grabOffset;
 
     public GameObject objectToLabor;
+    public List<GameObject> listObjectsToLabor = new List<GameObject>();
     public GameObject objectToInspect;
+    public List<GameObject> listObjectsToInspect = new List<GameObject>();
     public bool performingLabor = false;
+
+    [Header("Snap Target")]
+    [Tooltip("When enabled, the grab area snaps to the nearest grabbable/workable within range, making grabbing and working easier.")]
+    public bool useSnapTarget = true;
+    [Tooltip("Radius within which the grab area snaps to the nearest grabbable/workable. Larger values make grabbing easier.")]
+    public float snapRadius = 0.1f;
+    [Tooltip("Bias toward targets in front of the player. Higher values prefer targets in the aim direction.")]
+    [Range(0f, 1f)]
+    public float snapAimBias = 0f;
 
     public int capital = 0;
     public List<GameObject> properties = new List<GameObject>();
@@ -191,6 +202,7 @@ public class playerController : MonoBehaviour
             if (debug) Debug.Log("No GameManager found in Start(). Ensuring PlayerInput is set to 'Player' action map.");
         }
 
+        calculateGrabPoint(facingRight ? Vector2.right : Vector2.left);
     }
     //OUTLINE OF PLAYER ACTIONS:
     //-MOVE -> JOYSTICK             WORKING 
@@ -210,7 +222,214 @@ public class playerController : MonoBehaviour
         if(performingLabor)  PerformLabor();
         if(isAbsorbingResources) AbsorbResources();
 
+        if (!isCarryingObject && !performingLabor && !isAbsorbingResources)
+        {
+            if (useSnapTarget)
+                UpdateSnapTarget();
+            else
+                UpdateTargetFromLists();
+        }
+
         if (b_button != null) displayButtons();
+    }
+
+    /// <summary>
+    /// Legacy behavior when snap is disabled: use last item in trigger lists.
+    /// </summary>
+    private void UpdateTargetFromLists()
+    {
+        objectToGrab = listobjectsToGrab != null && listobjectsToGrab.Count > 0 ? listobjectsToGrab[listobjectsToGrab.Count - 1] : null;
+
+        GameObject newLabor = listObjectsToLabor != null && listObjectsToLabor.Count > 0 ? listObjectsToLabor[listObjectsToLabor.Count - 1] : null;
+        if (objectToLabor != newLabor)
+        {
+            if (objectToLabor != null)
+            {
+                var prevStation = objectToLabor.GetComponent<Station>();
+                if (prevStation != null && objectToInspect != objectToLabor)
+                    prevStation.isBeingInspected = false;
+            }
+            objectToLabor = newLabor;
+            if (objectToLabor != null)
+            {
+                var station = objectToLabor.GetComponent<Station>();
+                if (station != null)
+                {
+                    station.isBeingInspected = true;
+                    station.doUpdate = true;
+                }
+            }
+        }
+
+        GameObject newInspect = listObjectsToInspect != null && listObjectsToInspect.Count > 0 ? listObjectsToInspect[listObjectsToInspect.Count - 1] : null;
+        if (objectToInspect != newInspect)
+        {
+            if (objectToInspect != null)
+            {
+                var prevStation = objectToInspect.GetComponent<Station>();
+                if (prevStation != null && objectToLabor != objectToInspect)
+                    prevStation.isBeingInspected = false;
+            }
+            objectToInspect = newInspect;
+            if (objectToInspect != null)
+            {
+                var station = objectToInspect.GetComponent<Station>();
+                if (station != null)
+                {
+                    station.isBeingInspected = true;
+                    station.doUpdate = true;
+                }
+                doUpdate = true;
+            }
+        }
+
+        Vector2 fwd = normFwd;
+        if (fwd.sqrMagnitude < 0.01f) fwd = facingRight ? Vector2.right : Vector2.left;
+        UpdateSnapGraphic(grabPoint, fwd);
+    }
+
+    /// <summary>
+    /// Picks the closest grabbable/workable/inspectable within snap radius.
+    /// Uses aim bias to prefer targets in front of the player.
+    /// Searches via Physics2D.OverlapCircle for reliable detection beyond the grab trigger.
+    /// </summary>
+    private void UpdateSnapTarget()
+    {
+        Vector2 searchCenter = grabPoint;
+        Vector2 fwd = normFwd;
+
+        if (searchCenter == Vector2.zero && grabArea != null)
+            searchCenter = grabArea.transform.position;
+        if (searchCenter == Vector2.zero)
+            searchCenter = transform.position;
+
+        objectToGrab = GetClosestInRadius(listobjectsToGrab, TagType.Grabbable, searchCenter, fwd);
+
+        GameObject newLabor = GetClosestInRadius(listObjectsToLabor, TagType.Workable, searchCenter, fwd);
+        if (objectToLabor != newLabor)
+        {
+            if (objectToLabor != null)
+            {
+                var prevStation = objectToLabor.GetComponent<Station>();
+                if (prevStation != null && objectToInspect != objectToLabor)
+                    prevStation.isBeingInspected = false;
+            }
+            objectToLabor = newLabor;
+            if (objectToLabor != null)
+            {
+                var station = objectToLabor.GetComponent<Station>();
+                if (station != null)
+                {
+                    station.isBeingInspected = true;
+                    station.doUpdate = true;
+                }
+            }
+        }
+
+        GameObject newInspect = GetClosestInRadius(listObjectsToInspect, TagType.Inspectable, searchCenter, fwd);
+        if (objectToInspect != newInspect)
+        {
+            if (objectToInspect != null)
+            {
+                var prevStation = objectToInspect.GetComponent<Station>();
+                if (prevStation != null && objectToLabor != objectToInspect)
+                    prevStation.isBeingInspected = false;
+            }
+            objectToInspect = newInspect;
+            if (objectToInspect != null)
+            {
+                var station = objectToInspect.GetComponent<Station>();
+                if (station != null)
+                {
+                    station.isBeingInspected = true;
+                    station.doUpdate = true;
+                }
+                doUpdate = true;
+            }
+        }
+
+        UpdateSnapGraphic(searchCenter, fwd);
+    }
+
+    private void UpdateSnapGraphic(Vector2 searchCenter, Vector2 fwd)
+    {
+        GameObject snapTarget = useSnapTarget ? (objectToGrab ?? objectToLabor ?? objectToInspect) : null;
+        Vector3 graphicPos;
+
+        if (useSnapTarget && snapTarget != null && grabArea != null && grabGraphic != null)
+        {
+            graphicPos = snapTarget.transform.position;
+        }
+        else
+        {
+            graphicPos = transform.position + grabAreaOffset + (Vector3)(fwd.sqrMagnitude > 0.01f ? fwd * distanceFromPlayer : (facingRight ? Vector2.right : Vector2.left) * distanceFromPlayer);
+        }
+
+        grabPoint = graphicPos;
+        if (grabArea != null) grabArea.transform.position = graphicPos;
+        if (grabGraphic != null) grabGraphic.transform.position = graphicPos;
+    }
+
+    private GameObject GetClosestInRadius(List<GameObject> existingList, TagType requiredTag, Vector2 searchCenter, Vector2 aimDir)
+    {
+        GameObject closest = null;
+        float bestScore = float.MaxValue;
+
+        var hits = Physics2D.OverlapCircleAll(searchCenter, snapRadius);
+        foreach (var col in hits)
+        {
+            if (col == null || col.gameObject == null) continue;
+            if (!TagUtilities.HasTag(col.gameObject, requiredTag)) continue;
+
+            if (requiredTag == TagType.Grabbable)
+            {
+                var resourceObj = col.GetComponent<ResourceObject>();
+                if (resourceObj != null && resourceObj.resourceType != null
+                    && resourceObj.resourceType.typeOfBehavior == Resource.ResourceBehavior.Consumable)
+                    continue;
+            }
+
+            var obj = col.gameObject;
+            Vector2 toTarget = (Vector2)obj.transform.position - searchCenter;
+            float dist = toTarget.magnitude;
+            if (dist < 0.001f) dist = 0.001f;
+
+            float aimBias = aimDir.sqrMagnitude > 0.01f
+                ? Vector2.Dot(aimDir, toTarget / dist) * snapAimBias * dist
+                : 0f;
+            float score = dist - aimBias;
+
+            if (score < bestScore)
+            {
+                bestScore = score;
+                closest = obj;
+            }
+        }
+
+        if (closest == null && existingList != null)
+        {
+            foreach (var obj in existingList)
+            {
+                if (obj == null || !TagUtilities.HasTag(obj, requiredTag)) continue;
+                float d = Vector2.Distance(searchCenter, obj.transform.position);
+                if (d > snapRadius) continue;
+
+                Vector2 toTarget = (Vector2)obj.transform.position - searchCenter;
+                float dist = toTarget.magnitude;
+                if (dist < 0.001f) dist = 0.001f;
+                float aimBias = aimDir.sqrMagnitude > 0.01f
+                    ? Vector2.Dot(aimDir, toTarget / dist) * snapAimBias * dist
+                    : 0f;
+                float score = dist - aimBias;
+                if (score < bestScore)
+                {
+                    bestScore = score;
+                    closest = obj;
+                }
+            }
+        }
+
+        return closest;
     }
 
     public void setUpPlayerIDOffset(int offset)
@@ -369,7 +588,7 @@ public class playerController : MonoBehaviour
     {
         movementInput = context.ReadValue<Vector2>();
 
-        calculateGrabPoint(context.ReadValue<Vector2>());
+        calculateGrabPoint(movementInput);
 
         FlipCharacter(movementInput.x);
     }

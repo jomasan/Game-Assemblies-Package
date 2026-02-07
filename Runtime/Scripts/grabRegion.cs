@@ -36,27 +36,21 @@ public class grabRegion : MonoBehaviour
                 if (!isConsumable)
                 {
                     if (debug) Debug.Log("GRABABBLE OBJECT DEFINED: " + other);
-                    pController.objectToGrab = other.gameObject; //STORE GRABABBLE OBJECT
-                    pController.listobjectsToGrab.Add(other.gameObject); //add to list of objects to grab
+                    if (!pController.listobjectsToGrab.Contains(other.gameObject))
+                        pController.listobjectsToGrab.Add(other.gameObject);
                 }
             }
             if (TagUtilities.HasTag(other.gameObject, TagType.Workable))
             {
                 if (debug) Debug.Log("LABOR OBJECT DEFINED: " + other);
-                pController.objectToLabor = other.gameObject; //STORE LABOR OBJECT
-                //other.gameObject.GetComponent<Station>().worker = pController;
-                other.gameObject.GetComponent<Station>().isBeingInspected = true;
-                other.gameObject.GetComponent<Station>().doUpdate = true;
+                if (!pController.listObjectsToLabor.Contains(other.gameObject))
+                    pController.listObjectsToLabor.Add(other.gameObject);
             }
             if (TagUtilities.HasTag(other.gameObject, TagType.Inspectable))
             {
                 if (debug) Debug.Log("INSPECTABLE OBJECT DEFINED");
-                pController.objectToInspect = other.gameObject; //STORE INSPECTABLE OBJECT
-                if(other.gameObject.GetComponent<Station>() != null)
-                {
-                    other.gameObject.GetComponent<Station>().isBeingInspected = true;
-                    other.gameObject.GetComponent<Station>().doUpdate = true;
-                }
+                if (!pController.listObjectsToInspect.Contains(other.gameObject))
+                    pController.listObjectsToInspect.Add(other.gameObject);
                 pController.doUpdate = true;
             }
         }
@@ -73,26 +67,33 @@ public class grabRegion : MonoBehaviour
             if (TagUtilities.HasTag(other.gameObject, TagType.Grabbable))
             {
                 if (debug) Debug.Log("GRABABBLE OBJECT RELEASED");
-                pController.objectToGrab = null; //RELEASE GRABABBLE OBJECT
-                pController.listobjectsToGrab.Remove(other.gameObject); //remove to list of objects to grab
+                pController.listobjectsToGrab.Remove(other.gameObject);
+                if (pController.objectToGrab == other.gameObject)
+                    pController.objectToGrab = null;
             }
 
         }
             if (TagUtilities.HasTag(other.gameObject, TagType.Workable))
             {
                 if (debug) Debug.Log("LABOR OBJECT RELEASED");
-                pController.cancelLabor();
-                pController.objectToLabor = null; //RELEASE LABOR OBJECT
-                other.gameObject.GetComponent<Station>().isBeingInspected = false;
-
+                pController.listObjectsToLabor.Remove(other.gameObject);
+                if (pController.objectToLabor == other.gameObject)
+                {
+                    pController.cancelLabor();
+                    pController.objectToLabor = null;
+                    var station = other.gameObject.GetComponent<Station>();
+                    if (station != null) station.isBeingInspected = false;
+                }
             }
             if (TagUtilities.HasTag(other.gameObject, TagType.Inspectable))
             {
                 if (debug) Debug.Log("INSPECTABLE OBJECT RELEASED");
-                pController.objectToInspect = null; //RELEASE INSPECTABLE OBJECT
-                if (other.gameObject.GetComponent<Station>() != null)
+                pController.listObjectsToInspect.Remove(other.gameObject);
+                if (pController.objectToInspect == other.gameObject)
                 {
-                    other.gameObject.GetComponent<Station>().isBeingInspected = false;
+                    pController.objectToInspect = null;
+                    var station = other.gameObject.GetComponent<Station>();
+                    if (station != null) station.isBeingInspected = false;
                 }
             }
        // }
