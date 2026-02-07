@@ -16,6 +16,8 @@ public class SA_StationBuilderWindow : EditorWindow
     // Station identity
     private string stationName = "New Station";
     private Sprite stationGraphic;
+    private Color stationSpriteTint = Color.white;
+    private float stationScale = 1f;
 
     // Resource consumption (list)
     private bool consumeResource;
@@ -168,6 +170,8 @@ public class SA_StationBuilderWindow : EditorWindow
             MessageType.Info);
         EditorGUILayout.Space(2);
         stationName = EditorGUILayout.TextField("Station Name", stationName);
+        stationSpriteTint = EditorGUILayout.ColorField(new GUIContent("Sprite Tint", "Tint color for the main station sprite. Use white for no tint."), stationSpriteTint);
+        stationScale = EditorGUILayout.Slider(new GUIContent("Scale", "Overall scale of the station."), stationScale, 0.1f, 3f);
         EditorGUILayout.Space(4);
 
         EditorGUILayout.LabelField("Prefab Template", EditorStyles.boldLabel);
@@ -251,7 +255,7 @@ public class SA_StationBuilderWindow : EditorWindow
                 productionInterval = 2f;
                 workDuration = 5f;
                 typeOfProduction = Station.interactionType.automatic;
-                typeOfConsumption = Station.interactionType.automatic;
+                typeOfConsumption = Station.interactionType.None;
                 break;
 
             case StationTemplate.ConvertOnWork:
@@ -268,8 +272,8 @@ public class SA_StationBuilderWindow : EditorWindow
                 productionCompletesGoals = false;
                 canBeWorked = true;
                 productionInterval = 5f;
-                workDuration = 5f;
-                typeOfProduction = Station.interactionType.whenWorked;
+                workDuration = 1f;
+                typeOfProduction = Station.interactionType.whenResourcesConsumed;
                 typeOfConsumption = Station.interactionType.whenWorked;
                 break;
 
@@ -296,7 +300,8 @@ public class SA_StationBuilderWindow : EditorWindow
                 consumeResource = false;
                 produceResource = true;
                 useInputArea = false;
-                useOutputArea = true;
+                useOutputArea = false;
+                spawnRadius = 0.2f;
                 consumeResources.Clear();
                 if (produceResources.Count == 0) produceResources.Add(null);
                 isSingleUse = true;
@@ -306,7 +311,7 @@ public class SA_StationBuilderWindow : EditorWindow
                 productionCompletesGoals = false;
                 canBeWorked = true;
                 productionInterval = 5f;
-                workDuration = 5f;
+                workDuration = 2f;
                 typeOfProduction = Station.interactionType.whenWorked;
                 typeOfConsumption = Station.interactionType.None;
                 break;
@@ -679,6 +684,8 @@ public class SA_StationBuilderWindow : EditorWindow
         StationDataSO data = ScriptableObject.CreateInstance<StationDataSO>();
         data.stationName = stationName;
         data.stationGraphic = stationGraphic;
+        data.stationSpriteTint = stationSpriteTint;
+        data.stationScale = stationScale;
         data.consumeResource = consumeResource;
         data.produceResource = produceResource;
         data.consumes = new List<Resource>();

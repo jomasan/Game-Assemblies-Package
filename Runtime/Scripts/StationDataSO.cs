@@ -11,6 +11,11 @@ public class StationDataSO : ScriptableObject
     [Header("Identity")]
     public string stationName = "New Station";
     public Sprite stationGraphic;
+    [Tooltip("Tint color applied to the main station sprite. Use white for no tint.")]
+    public Color stationSpriteTint = Color.white;
+    [Tooltip("Overall scale of the station. Affects transform.localScale.")]
+    [Range(0.1f, 3f)]
+    public float stationScale = 1f;
     [Tooltip("Sprite shown when the station is inactive/dead. If null, stationGraphic is used.")]
     public Sprite deadSprite;
     [Tooltip("Reference to the prefab representing this station.")]
@@ -70,8 +75,11 @@ public class StationDataSO : ScriptableObject
             if (sr != null && sr.GetComponent<Canvas>() == null && sr.transform.GetComponentInParent<Canvas>() == null)
             {
                 sr.sprite = stationGraphic;
+                sr.color = stationSpriteTint;
             }
         }
+
+        station.transform.localScale = new Vector3(stationScale, stationScale, 1f);
 
         station.useInputArea = useInputArea;
         station.useOutputArea = useOutputArea;
