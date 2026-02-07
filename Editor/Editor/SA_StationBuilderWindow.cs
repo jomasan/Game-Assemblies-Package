@@ -649,6 +649,15 @@ public class SA_StationBuilderWindow : EditorWindow
 
         data.ApplyToStation(station);
 
+        if (stationGraphic != null)
+        {
+            var sr = instance.GetComponentInChildren<SpriteRenderer>();
+            if (sr != null && sr.GetComponent<Canvas>() == null && sr.transform.GetComponentInParent<Canvas>() == null)
+            {
+                ResizeCollidersToSprite(sr.gameObject, stationGraphic, sr);
+            }
+        }
+
         string prefabPath = $"Assets/Game Assemblies/Databases/Stations/Prefabs/{stationName}.prefab";
         GameObject newPrefab = PrefabUtility.SaveAsPrefabAssetAndConnect(instance, prefabPath, InteractionMode.AutomatedAction);
         if (newPrefab != null)
@@ -702,5 +711,50 @@ public class SA_StationBuilderWindow : EditorWindow
             data.typeOfConsumption = Station.interactionType.automatic;
         }
         return data;
+    }
+
+    private static void ResizeCollidersToSprite(GameObject gameObject, Sprite sprite, SpriteRenderer spriteRenderer)
+    {
+        Bounds bounds = sprite.bounds;
+        Vector2 size = bounds.size;
+        Vector2 center = bounds.center;
+
+        foreach (var collider in gameObject.GetComponents<Collider2D>())
+        {
+            if (collider is BoxCollider2D box)
+            {
+                Undo.RecordObject(box, "Resize Station Collider");
+                box.size = size;
+                box.offset = center;
+            }
+            else if (collider is CircleCollider2D circle)
+            {
+                Undo.RecordObject(circle, "Resize Station Collider");
+                float radius = Mathf.Min(size.x, size.y) * 0.5f;
+                circle.radius = radius;
+                circle.offset = center;
+            }
+            else if (collider is PolygonCollider2D poly)
+            {
+                Undo.RecordObject(poly, "Resize Station Collider");
+                var physicsShape = new List<Vector2>();
+                if (sprite.GetPhysicsShapeCount() > 0)
+                {
+                    sprite.GetPhysicsShape(0, physicsShape);
+                    poly.points = physicsShape.ToArray();
+                }
+                else
+                {
+                    Vector2 extents = size * 0.5f;
+                    poly.points = new Vector2[]
+                    {
+                        center + new Vector2(-extents.x, -extents.y),
+                        center + new Vector2(extents.x, -extents.y),
+                        center + new Vector2(extents.x, extents.y),
+                        center + new Vector2(-extents.x, extents.y)
+                    };
+                }
+            }
+        }
     }
 }

@@ -13,6 +13,7 @@ public class SA_CreatePlayersWindow : EditorWindow
 
     private string newPlayerPrefabName = "Player_Custom";
     private float spriteScaleFactor = 0.4f;
+    private float playerSpeed = 2.0f;
     private GameObject playerPrefabTemplate;
     private const string DEFAULT_PLAYER_PREFAB_PATH = "Samples/Prefabs/Players/Player_Drawn_Small.prefab";
     private const string PLAYER_PREFAB_OUTPUT_FOLDER = "Game Assemblies/Prefabs/Players";
@@ -53,6 +54,11 @@ public class SA_CreatePlayersWindow : EditorWindow
 
         GUILayout.Space(5);
         newPlayerPrefabName = EditorGUILayout.TextField("New Prefab Name", newPlayerPrefabName);
+
+        GUILayout.Space(10);
+        EditorGUILayout.LabelField("Player Speed", EditorStyles.boldLabel);
+        playerSpeed = Mathf.Max(0.1f, EditorGUILayout.FloatField("Speed", playerSpeed));
+        EditorGUILayout.HelpBox("Movement speed for the player (playerController.playerSpeed).", MessageType.None);
 
         GUILayout.Space(10);
         EditorGUILayout.LabelField("Sprite Scale Factor", EditorStyles.boldLabel);
@@ -167,7 +173,7 @@ public class SA_CreatePlayersWindow : EditorWindow
             return;
         }
 
-        // Assign sprites to playerController
+        // Assign sprites and speed to playerController
         var pc = newPlayerPrefab.GetComponent<playerController>();
         if (pc != null)
         {
@@ -175,6 +181,7 @@ public class SA_CreatePlayersWindow : EditorWindow
             pc.sprite2 = player_2_Sprite;
             pc.sprite3 = player_3_Sprite;
             pc.sprite4 = player_4_Sprite;
+            pc.playerSpeed = playerSpeed;
         }
 
         // Apply scale to sprite transform and resize colliders to match the displayed size
