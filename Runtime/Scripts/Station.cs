@@ -461,7 +461,8 @@ public class Station : ResourceNode
             inputArea.RemoveMatchingResources();
             resourcesConsumed = true;
 
-            if (completesGoals_consumption) gManager.goalContribution(consumes[0]); //IF IT CONTRIBUTES TO GOALS - CHECK AND PASS INFO TO THE GLOBAL SCORE
+            if (completesGoals_consumption && gManager != null && consumes.Count > 0 && consumes[0] != null)
+                gManager.goalContribution(consumes[0]); //IF IT CONTRIBUTES TO GOALS - CHECK AND PASS INFO TO THE GLOBAL SCORE
 
             if (canBeUpgraded) flaggedToUpgrade = 2;//upgradeStation();
         }
@@ -527,7 +528,8 @@ public class Station : ResourceNode
                     InstantiateResourcePrefabs(produces[i]);// Instantiate the resource prefab
                 }
 
-                if (completesGoals_production) gManager.goalContribution(produces[0]); //CONTRIBUTES TO GOALS THROUGH PRODUCTION
+                if (completesGoals_production && gManager != null && produces.Count > 0 && produces[0] != null)
+                    gManager.goalContribution(produces[0]); //CONTRIBUTES TO GOALS THROUGH PRODUCTION
 
 
                 //AUDIO:
