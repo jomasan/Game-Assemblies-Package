@@ -315,6 +315,8 @@ public class Station : ResourceNode
         {
             spRender.sprite = deadSprite;
             sliderBar.SetActive(false);
+            isBeingInspected = false;
+            if (infoWindow != null) infoWindow.SetActive(false);
 
             if (destroyAfterSingleUse) Destroy(this.gameObject);
         }
@@ -553,22 +555,24 @@ public class Station : ResourceNode
         {
             if(produceLootTable != null)
             {
-                Resource output = produceLootTable.GetRandomDrop();
-                AddResource(output, 1);
-                if (debug) Debug.Log($"{gameObject.name}: Produced {1} of {output.resourceName}");
-                if (spawnResourcePrefab)
-                {     
-                    InstantiateResourcePrefabs(output);// Instantiate the resource prefab
-                }
-
-                //AUDIO:
-                playProductionSound();
-
-                if (isSingleUse)
+                var (output, qty) = produceLootTable.GetRandomDrop();
+                if (output != null)
                 {
-                    isAlive = false;
-                    swapSprite();
-                    
+                    AddResource(output, qty);
+                    if (debug) Debug.Log($"{gameObject.name}: Produced {qty} of {output.resourceName}");
+                    if (spawnResourcePrefab)
+                    {
+                        for (int i = 0; i < qty; i++)
+                            InstantiateResourcePrefabs(output);
+                    }
+
+                    playProductionSound();
+
+                    if (isSingleUse)
+                    {
+                        isAlive = false;
+                        swapSprite();
+                    }
                 }
             } else
             {

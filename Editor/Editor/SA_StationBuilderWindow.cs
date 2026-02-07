@@ -31,6 +31,8 @@ public class SA_StationBuilderWindow : EditorWindow
 
     // Resource production (list)
     private bool produceResource;
+    private bool produceFromLootTable;
+    private LootTable produceLootTable;
     private List<Resource> produceResources = new List<Resource>();
 
     // Lifespan
@@ -78,6 +80,9 @@ public class SA_StationBuilderWindow : EditorWindow
     private static readonly GUIContent ProduceResourceSlotTip = new GUIContent(
         "Resource",
         "A resource this station creates. Add multiple resources for stations that produce several outputs.");
+    private static readonly GUIContent ProduceFromLootTableTip = new GUIContent(
+        "Produce from Loot Table",
+        "When enabled, output is chosen randomly from a loot table instead of fixed resources. Use for varied or random drops.");
     private static readonly GUIContent SingleUseTip = new GUIContent(
         "Single-Use Station",
         "When enabled, the station operates only once and then becomes inactive (or is destroyed). " +
@@ -561,24 +566,34 @@ public class SA_StationBuilderWindow : EditorWindow
         produceResource = EditorGUI.ToggleLeft(r1, ProduceResourceTip, produceResource);
         if (produceResource)
         {
-            if (produceResources.Count == 0)
-                produceResources.Add(null);
             EditorGUI.indentLevel = 1;
-            for (int i = 0; i < produceResources.Count; i++)
+            produceFromLootTable = EditorGUILayout.Toggle(ProduceFromLootTableTip, produceFromLootTable);
+            if (produceFromLootTable)
             {
-                EditorGUILayout.BeginHorizontal();
-                produceResources[i] = (Resource)EditorGUILayout.ObjectField(ProduceResourceSlotTip, produceResources[i], typeof(Resource), false);
-                DrawResourceIcon(produceResources[i], 24f);
-                if (GUILayout.Button("−", GUILayout.Width(20)))
-                {
-                    produceResources.RemoveAt(i);
-                    i--;
-                }
-                EditorGUILayout.EndHorizontal();
+                produceLootTable = (LootTable)EditorGUILayout.ObjectField(
+                    new GUIContent("Loot Table", "Loot table defining weighted random output resources."),
+                    produceLootTable, typeof(LootTable), false);
             }
-            if (GUILayout.Button("+ Add Output Resource"))
+            else
             {
-                produceResources.Add(null);
+                if (produceResources.Count == 0)
+                    produceResources.Add(null);
+                for (int i = 0; i < produceResources.Count; i++)
+                {
+                    EditorGUILayout.BeginHorizontal();
+                    produceResources[i] = (Resource)EditorGUILayout.ObjectField(ProduceResourceSlotTip, produceResources[i], typeof(Resource), false);
+                    DrawResourceIcon(produceResources[i], 24f);
+                    if (GUILayout.Button("−", GUILayout.Width(20)))
+                    {
+                        produceResources.RemoveAt(i);
+                        i--;
+                    }
+                    EditorGUILayout.EndHorizontal();
+                }
+                if (GUILayout.Button("+ Add Output Resource"))
+                {
+                    produceResources.Add(null);
+                }
             }
         }
         EditorGUILayout.Space(2);
@@ -652,7 +667,9 @@ public class SA_StationBuilderWindow : EditorWindow
         createRect.width -= 40;
 
         bool hasConsumeResources = !consumeResource || consumeResources.Exists(r => r != null);
-        bool hasProduceResources = !produceResource || produceResources.Exists(r => r != null);
+        bool hasProduceResources = !produceResource
+            || (produceFromLootTable && produceLootTable != null)
+            || produceResources.Exists(r => r != null);
         bool canCreate = hasConsumeResources && hasProduceResources;
 
         EditorGUI.BeginDisabledGroup(!canCreate);
@@ -664,9 +681,11 @@ public class SA_StationBuilderWindow : EditorWindow
 
         if (!canCreate)
         {
-            EditorGUILayout.HelpBox(
-                "When 'Consume Resources' or 'Produce Resources' is enabled, add at least one resource.",
-                MessageType.Warning);
+            string msg = "When 'Consume Resources' or 'Produce Resources' is enabled, add at least one resource";
+            if (produceResource && produceFromLootTable)
+                msg += " (or assign a loot table)";
+            msg += ".";
+            EditorGUILayout.HelpBox(msg, MessageType.Warning);
         }
 
         EditorGUILayout.HelpBox(
@@ -697,7 +716,7 @@ public class SA_StationBuilderWindow : EditorWindow
         }
 
         SA_AssetPathHelper.EnsureAssetPathDirectories("Game Assemblies/Databases/Stations");
-        SA_AssetPathHelper.EnsureAssetPathDirectories("Game Assemblies/Databases/Stations/Prefabs");
+        SA_AssetPathHelper.EnsureAssetPathDirectories("Game Assemblies/Prefabs/Stations");
 
         StationDataSO data = CreateStationDataFromBuilderState();
         string dataAssetPath = $"Assets/Game Assemblies/Databases/Stations/{stationName}.asset";
@@ -737,7 +756,7 @@ public class SA_StationBuilderWindow : EditorWindow
             }
         }
 
-        string prefabPath = $"Assets/Game Assemblies/Databases/Stations/Prefabs/{stationName}.prefab";
+        string prefabPath = $"Assets/Game Assemblies/Prefabs/Stations/{stationName}.prefab";
         GameObject newPrefab = PrefabUtility.SaveAsPrefabAssetAndConnect(instance, prefabPath, InteractionMode.AutomatedAction);
         if (newPrefab != null)
         {
@@ -773,7 +792,10 @@ public class SA_StationBuilderWindow : EditorWindow
         data.produces = new List<Resource>();
         foreach (var r in produceResources)
             if (r != null) data.produces.Add(r);
-        data.whatToProduce = Station.productionMode.Resource;
+        data.whatToProduce = produceFromLootTable && produceLootTable != null
+            ? Station.productionMode.LootTable
+            : Station.productionMode.Resource;
+        data.produceLootTable = produceFromLootTable ? produceLootTable : null;
         data.spawnResourcePrefab = true;
         data.useInputArea = useInputArea;
         data.useOutputArea = useOutputArea;

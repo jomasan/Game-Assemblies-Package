@@ -21,6 +21,7 @@ public class SA_CreateLootTableWindow : EditorWindow
     {
         public Resource resource;
         public float dropPercentage = 0f;
+        public int quantity = 1;
     }
 
     // Adds a menu item under Game Assemblies -> Loot Tables
@@ -145,6 +146,7 @@ public class SA_CreateLootTableWindow : EditorWindow
                 SerializedProperty entry = lootEntries.GetArrayElementAtIndex(i);
                 SerializedProperty resourceProp = entry.FindPropertyRelative("resource");
                 SerializedProperty percentageProp = entry.FindPropertyRelative("dropPercentage");
+                SerializedProperty quantityProp = entry.FindPropertyRelative("quantity");
 
                 EditorGUILayout.BeginVertical("box");
 
@@ -171,6 +173,8 @@ public class SA_CreateLootTableWindow : EditorWindow
                     percentageProp.floatValue = newPercentage;
                     serializedLootTable.ApplyModifiedProperties();
                 }
+
+                EditorGUILayout.PropertyField(quantityProp, new GUIContent("Quantity", "How many of this resource to generate when this entry is selected."));
 
                 EditorGUILayout.EndVertical();
                 EditorGUILayout.Space(5);
@@ -333,6 +337,7 @@ public class SA_CreateLootTableWindow : EditorWindow
             EditorGUILayout.EndHorizontal();
 
             entry.dropPercentage = EditorGUILayout.Slider("Drop %", entry.dropPercentage, 0.01f, 100f);
+            entry.quantity = Mathf.Max(1, EditorGUILayout.IntField(new GUIContent("Quantity", "How many of this resource to generate when this entry is selected."), entry.quantity));
 
             EditorGUILayout.EndVertical();
             EditorGUILayout.Space(5);
@@ -454,9 +459,11 @@ public class SA_CreateLootTableWindow : EditorWindow
             SerializedProperty newEntry = lootEntries.GetArrayElementAtIndex(lootEntries.arraySize - 1);
             SerializedProperty resourceProp = newEntry.FindPropertyRelative("resource");
             SerializedProperty percentageProp = newEntry.FindPropertyRelative("dropPercentage");
+            SerializedProperty quantityProp = newEntry.FindPropertyRelative("quantity");
 
             resourceProp.objectReferenceValue = entry.resource;
             percentageProp.floatValue = entry.dropPercentage;
+            quantityProp.intValue = Mathf.Max(1, entry.quantity);
         }
 
         // Apply the changes

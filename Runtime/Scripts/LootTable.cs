@@ -8,6 +8,9 @@ public class LootEntry
     public Resource resource;
     [Range(0.01f, 100f)]
     public float dropPercentage;
+    [Tooltip("How many of this resource to generate when this entry is selected.")]
+    [Min(1)]
+    public int quantity = 1;
 }
 
 [CreateAssetMenu(fileName = "New Loot Table", menuName = "Game Assemblies/Loot Table")]
@@ -65,7 +68,10 @@ public class LootTable : ScriptableObject
         }
     }
 
-    public Resource GetRandomDrop()
+    /// <summary>
+    /// Picks a random entry based on the probability distribution and returns the resource and quantity.
+    /// </summary>
+    public (Resource resource, int quantity) GetRandomDrop()
     {
         float randomValue = UnityEngine.Random.Range(0f, 100f);
         float cumulativePercentage = 0f;
@@ -79,7 +85,8 @@ public class LootTable : ScriptableObject
 
             if (randomValue <= cumulativePercentage)
             {
-                return entry.resource;
+                int qty = entry.quantity >= 1 ? entry.quantity : 1;
+                return (entry.resource, qty);
             }
         }
 
@@ -89,12 +96,13 @@ public class LootTable : ScriptableObject
             if (possibleLoot[i].resource != null)
             {
                 Debug.LogWarning("Loot table calculation failed to select an item properly. Returning last valid item.");
-                return possibleLoot[i].resource;
+                int qty = possibleLoot[i].quantity >= 1 ? possibleLoot[i].quantity : 1;
+                return (possibleLoot[i].resource, qty);
             }
         }
 
         Debug.LogError("No valid resources found in loot table!");
-        return null;
+        return (null, 1);
     }
 
     // Helper method to add a resource with a specified drop percentage
@@ -109,7 +117,8 @@ public class LootTable : ScriptableObject
         possibleLoot.Add(new LootEntry
         {
             resource = resource,
-            dropPercentage = Mathf.Clamp(dropPercentage, 0.01f, 100f)
+            dropPercentage = Mathf.Clamp(dropPercentage, 0.01f, 100f),
+            quantity = 1
         });
 
         ValidatePercentages();

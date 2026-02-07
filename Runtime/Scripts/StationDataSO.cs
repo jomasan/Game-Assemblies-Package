@@ -37,6 +37,8 @@ public class StationDataSO : ScriptableObject
     public List<Resource> produces = new List<Resource>();
     [Tooltip("What this station outputs: Resource, Station, or LootTable.")]
     public Station.productionMode whatToProduce = Station.productionMode.Resource;
+    [Tooltip("When whatToProduce is LootTable, this loot table defines the random output resources.")]
+    public LootTable produceLootTable;
     [Tooltip("When true, spawns physical resource prefabs in the output area.")]
     public bool spawnResourcePrefab = true;
     [Tooltip("When true, the InputArea child object is enabled. Use for stations that accept physical resources.")]
@@ -120,6 +122,8 @@ public class StationDataSO : ScriptableObject
             var outputAreaObj = FindChildRecursive(station.transform, "OutputArea");
             if (outputAreaObj != null) outputAreaObj.gameObject.SetActive(useOutputArea);
         }
+
+        station.produceLootTable = produceLootTable;
     }
 
     private static Transform FindChildRecursive(Transform parent, string name)
