@@ -40,6 +40,9 @@ Start with the main [README.md](../README.md) in the root directory for installa
 3. [Tutorial 03: Resource Manager and Goals](tutorials/03-Resource-Manager-and-Goals.md) — Set up resource tracking and UI
 4. [Tutorial 04: Goals and Goal Tracker](tutorials/04-Goals-and-Goal-Tracker.md) — Implement the Goals system
 5. [Tutorial 05: Levels and Level Editor](tutorials/05-Levels-and-Level-Editor.md) — Create structured gameplay experiences
+6. [Tutorial 06: Creating Environment Objects](tutorials/06-Creating-Environment-Objects.md) — Create backgrounds, obstacles, ground tiles, and foliage
+7. [Tutorial 07: Procedural Level Builder](tutorials/07-Procedural-Level-Builder.md) — Use Scatter, Grid, and Perlin Noise tools to generate level content; roadmap for planned tools
+8. [Tutorial 08: Database Inspector and Data Management](tutorials/08-Database-Inspector-and-Data-Management.md) — Understand the ScriptableObject-as-database paradigm and use the Database Inspector to browse, edit, validate, and manage all project data
 
 ---
 
@@ -84,6 +87,9 @@ Step-by-step guides for common workflows. Work through them in order for the bes
 | 03 | [Resource Manager and Goals](tutorials/03-Resource-Manager-and-Goals.md) | Use the **Resource Manager** system: add the Resource Management System to your scene, configure resource tracking and UI panels, and understand **global capital** and how it connects to the Goals system. |
 | 04 | [Goals and Goal Tracker](tutorials/04-Goals-and-Goal-Tracker.md) | Create **ResourceGoalSO** goals, configure the **GoalManager** and **Goal Tracker** UI, and use **stations as goal-completing modules** with `completesGoals_consumption` and `completesGoals_production`. |
 | 05 | [Levels and Level Editor](tutorials/05-Levels-and-Level-Editor.md) | Create **LevelDataSO** levels using the Create Level editor window. Learn about Sequential and Random Interval modes, configure level settings, and understand how LevelManager uses level data to spawn goals dynamically. |
+| 06 | [Creating Environment Objects](tutorials/06-Creating-Environment-Objects.md) | Create **Environment objects** using the Create Environment Object tool: **Obstacles** (solid, block movement), **Ground Tiles** (walkable surfaces), and **Foliage** (decorative, wiggle on contact). Also covers Create White Canvas and Create Stage Background. |
+| 07 | [Procedural Level Builder](tutorials/07-Procedural-Level-Builder.md) | Use the **Procedural Level Builder** to generate level content: **Scatter Prefab**, **Grid of Prefabs**, and **Perlin Noise Scatter**. Includes development status note and roadmap for planned tools (Room/Wave, Tilemap, Path, Spawn Points, Boundary, Layered Placement). |
+| 08 | [Database Inspector and Data Management](tutorials/08-Database-Inspector-and-Data-Management.md) | Understand the **ScriptableObject-as-database** paradigm (data-driven design, single source of truth, version control). Use the **Database Inspector** to browse, search, edit, validate, and manage all project data (Resources, Goals, Levels, Stations, Loot Tables, etc.) in one place. |
 
 ---
 
@@ -91,7 +97,7 @@ Step-by-step guides for common workflows. Work through them in order for the bes
 
 - **`README.md`** — This file; overview and navigation
 - **`basic concepts/`** — Foundational tutorials (01–10) explaining core concepts
-- **`tutorials/`** — Step-by-step tutorials (01–05) for common workflows
+- **`tutorials/`** — Step-by-step tutorials (01–08) for common workflows
 - **`API/`** — API reference documentation
 - **`Guides/`** — Detailed guides for specific features
 
