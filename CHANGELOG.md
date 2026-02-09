@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.7] - 2026-02-01
+
+### Changed
+- **Station Builder Tool** – Updated with loot table production, dead sprite, advanced options, UI settings, and station prefab output to Game Assemblies/Prefabs/Stations
+- **Player Builder Tool** – Updated with snap target options (radius, aim bias, use snap toggle), default speed, and sprite scale controls
+- **Procedural Level Builder** – Updated tools and workflows
+- **Graphic templates and samples** – Updated templates and sample assets
+
 ## [1.0.6] - 2026-02-01
 
 ### Changed
