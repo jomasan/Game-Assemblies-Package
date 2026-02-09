@@ -41,9 +41,18 @@ public class GoalManager : MonoBehaviour
     {
         allGoalTrackers = new List<GameObject>();
 
+        if (goalTracker == null || goalTrackerGrid == null)
+        {
+            Debug.LogWarning("GoalManager: goalTracker or goalTrackerGrid is not assigned. Goal trackers will not be created.");
+            UpdateScoreUI();
+            return;
+        }
+
         // For each goal template, create a runtime copy and reset its state.
         foreach (var goalTemplate in goalTemplates)
         {
+            if (goalTemplate == null) continue;
+
             // Use Instantiate to clone the ScriptableObject.
             ResourceGoalSO runtimeGoal = Instantiate(goalTemplate);
             runtimeGoal.ResetGoal();
@@ -134,6 +143,14 @@ public class GoalManager : MonoBehaviour
     // Add this method to allow the LevelManager to add new goals
     public void AddGoal(ResourceGoalSO goal)
     {
+        if (goal == null) return;
+        if (goalTracker == null || goalTrackerGrid == null)
+        {
+            Debug.LogWarning("GoalManager: goalTracker or goalTrackerGrid is not assigned. Cannot add goal tracker.");
+            activeGoals.Add(goal);
+            return;
+        }
+
         // Add the goal to active goals
         activeGoals.Add(goal);
 

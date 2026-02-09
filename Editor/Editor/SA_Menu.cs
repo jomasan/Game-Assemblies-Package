@@ -1,46 +1,37 @@
 using UnityEngine;
 using UnityEditor;
 using UnityEngine.SceneManagement;
-using TMPro;
 
 public static class SA_Menu
 {
-    [MenuItem("Game Assemblies/Systems/Create Levels System and Menu")]
-    public static void CreateLevelGameSystem()
+    [MenuItem("Game Assemblies/Systems/Create Level Manager")]
+    public static void CreateLevelManager()
     {
         GameObject lm_prefab = SA_AssetPathHelper.FindPrefab("Samples/Prefabs/Managers/LevelManager.prefab");
-        GameObject gsmc_prefab = SA_AssetPathHelper.FindPrefab("Samples/Prefabs/Managers/GameStateManagerAndCanvas.prefab");
-
         if (lm_prefab == null)
         {
-            Debug.LogError($"Prefab not found: LevelManager.prefab");
+            Debug.LogError("Prefab not found: LevelManager.prefab");
             return;
         }
 
+        GameObject lm_instance = (GameObject)PrefabUtility.InstantiatePrefab(lm_prefab, SceneManager.GetActiveScene());
+        lm_instance.transform.position = Vector3.zero;
+        Debug.Log("Level Manager created.");
+    }
+
+    [MenuItem("Game Assemblies/Systems/Create Game State Manager")]
+    public static void CreateGameStateManager()
+    {
+        GameObject gsmc_prefab = SA_AssetPathHelper.FindPrefab("Samples/Prefabs/Managers/GameStateManagerAndCanvas.prefab");
         if (gsmc_prefab == null)
         {
-            Debug.LogError($"Prefab not found: GameStateManagerAndCanvas.prefab");
+            Debug.LogError("Prefab not found: GameStateManagerAndCanvas.prefab");
             return;
         }
 
-        // Use PrefabUtility.InstantiatePrefab to properly instantiate in Editor/Scene
-        GameObject lm_instance = (GameObject)PrefabUtility.InstantiatePrefab(lm_prefab, SceneManager.GetActiveScene());
         GameObject gsmc_instance = (GameObject)PrefabUtility.InstantiatePrefab(gsmc_prefab, SceneManager.GetActiveScene());
-
-
-        // Set its position to (0,0,0)
-        lm_instance.transform.position = Vector3.zero;
         gsmc_instance.transform.position = Vector3.zero;
-
-        //GameObject gtg = rmc_instance.GetComponent<resourceManagerCanvas>().goalTrackerModule;
-        //TMP_Text gs = rmc_instance.GetComponent<resourceManagerCanvas>().globalScoreModule;
-
-        //gm_instance.GetComponent<GoalManager>().goalTrackerGrid = gtg;
-        //gm_instance.GetComponent<GoalManager>().scoreText = gs;
-
-        // Log success (optional)
-        Debug.Log("Levels System & Menu System Created");
-
+        Debug.Log("Game State Manager created.");
     }
 
     [MenuItem("Game Assemblies/Environment/Create White Canvas")]

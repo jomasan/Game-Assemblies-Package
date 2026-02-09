@@ -213,10 +213,9 @@ public class SA_CreateLevelWindow : EditorWindow
         AssetDatabase.SaveAssets();
         AssetDatabase.Refresh();
 
-        // Select the created asset in the Project window
         Selection.activeObject = newLevel;
+        EditorGUIUtility.PingObject(newLevel);
 
         Debug.Log($"Level created: {levelName} at {assetPath}");
-        EditorUtility.DisplayDialog("Success", $"Level '{levelName}' created successfully!", "OK");
     }
 }

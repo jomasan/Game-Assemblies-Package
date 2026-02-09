@@ -1,6 +1,6 @@
 {
   "name": "com.gameassemblylab.gameassemblies",
-  "version": "1.0.7",
+  "version": "1.0.9",
   "displayName": "Game Assemblies",
   "description": "A Unity-based game development library for creating local multiplayer games centered around resource conversion and goal achievement mechanics. Provides comprehensive systems for resource management, station-based production, goal tracking, level management, and player coordination - perfect for building cooperative and competitive multiplayer experiences inspired by games like Overcooked.",
   "unity": "2021.3",

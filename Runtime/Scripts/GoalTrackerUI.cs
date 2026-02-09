@@ -29,10 +29,10 @@ public class GoalTrackerUI : MonoBehaviour
         currentGoal = goal;
 
         // If the resource type has an associated icon, assign it to the UI Image.
-        // (Assuming your Resource class has a field named "resourceIcon" of type Sprite)
-        if (goal.resourceType != null)
+        if (goal.resourceType != null && resourceIcon != null)
         {
             resourceIcon.sprite = goal.resourceType.icon;
+            resourceIcon.color = GetIconTint(goal.resourceType);
         }
 
         // Set up the slider. We set the maximum value to the goal's time limit
@@ -43,6 +43,12 @@ public class GoalTrackerUI : MonoBehaviour
         // Update the fill color based on the current time.
         float ratio = currentGoal.remainingTime / currentGoal.timeLimit;
         sliderFillImage.color = timeColorRamp.Evaluate(ratio);
+    }
+
+    private static Color GetIconTint(Resource r)
+    {
+        if (r == null) return Color.white;
+        return r.iconTint.a < 0.01f ? Color.white : r.iconTint;
     }
 
     private void Update()

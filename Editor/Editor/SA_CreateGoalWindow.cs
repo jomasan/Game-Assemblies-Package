@@ -62,6 +62,9 @@ public class SA_CreateGoalWindow : EditorWindow
         AssetDatabase.CreateAsset(newAsset, assetPath);
         AssetDatabase.SaveAssets();
 
+        Selection.activeObject = newAsset;
+        EditorGUIUtility.PingObject(newAsset);
+
         Debug.Log("Goal created: " + goalName);
     }
 }

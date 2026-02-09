@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.9] - 2026-02-01
+
+### Added
+- **Revision tool** – New menu item (Game Assemblies > Revision) that validates the scene pipeline (Resources > Stations > Resource Manager > Goals > Levels > Game States), reports configuration issues, suggests next steps, and assesses scene complexity from resource chains
+
+## [1.0.8] - 2026-02-01
+
+### Changed
+- **Level and Game State systems** – Separated menu items: "Create Level Manager" and "Create Game State Manager" now create their respective prefabs independently (previously combined as "Create Levels System and Menu")
+
 ## [1.0.7] - 2026-02-01
 
 ### Changed
