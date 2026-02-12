@@ -389,13 +389,17 @@ Levels are **data assets** — they don't do anything by themselves. The **Level
 
 ### Setting Up LevelManager
 
-1. **Create Level System**: Use the menu:
+1. **Create Level Manager**: Use the menu:
    ```
-   Game Assemblies → Systems → Create Levels System and Menu
+   Game Assemblies → Systems → Create Level Manager
    ```
-   This creates:
-   - `LevelManager` GameObject
-   - `GameStateManagerAndCanvas` (for level selection UI)
+   This creates the `LevelManager` GameObject in the scene.
+
+   For level selection UI and game state (menus, pause, win/fail), add the Game State Manager separately:
+   ```
+   Game Assemblies → Systems → Create Game State Manager
+   ```
+   This creates `GameStateManagerAndCanvas`. Link **GameManager.lvlManager** to your LevelManager in the Inspector.
 
 2. **Assign Levels to LevelManager**:
    - Select the `LevelManager` GameObject in the scene

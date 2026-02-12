@@ -151,31 +151,21 @@ Now let's create a station that produces our "Wood" resource. We'll use the edit
 
 ### Option A: Using Editor Tools (Quick Setup)
 
-The Game Assemblies menu provides several station templates:
+Use the **Station Builder** to create stations from templates:
 
-1. **Automatic Station**:
+1. **Open the Station Builder**:
    ```
-   Game Assemblies → Stations → Create Automatic Station
+   Game Assemblies → Stations → Station Builder
    ```
-   - Creates a station that automatically produces resources
-   - No player interaction required
-   - Good for resource generation points
 
-2. **Resources When Worked Station**:
-   ```
-   Game Assemblies → Stations → Create Resources When Worked Station
-   ```
-   - Requires player to work (hold X button)
-   - Produces resources when work is completed
-   - Good for active gameplay
+2. **Choose a template** from the template dropdown (e.g. **Automatic Station**, **Convert on Work**, **Single Extract**, **Output Box**). Each template pre-fills the station configuration:
+   - **Automatic Station** — Produces resources on a timer; no player interaction required. Good for resource generation points.
+   - **Convert on Work** — Consumes input resources and produces output resources when the player works. Good for crafting/conversion.
+   - **Resources When Worked** — Player works to produce; no input resources. Good for active gameplay.
+   - **Single Extract** — One-time use; produces then becomes inactive (or shows dead sprite).
+   - **Output Box** — Consumes resources (e.g. delivery); no production. Good for goal delivery.
 
-3. **Convert Resources On Work Station**:
-   ```
-   Game Assemblies → Stations → Create Convert Resources on Work Station
-   ```
-   - Consumes input resources and produces output resources
-   - Requires player work
-   - Good for crafting/conversion
+3. **Configure** your station (name, sprite, inputs/outputs, timing), then click **Create Station** to generate the StationDataSO, prefab, and scene instance.
 
 ### Option B: Manual Station Setup (Full Control)
 

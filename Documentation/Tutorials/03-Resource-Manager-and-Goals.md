@@ -56,17 +56,20 @@ You don’t need to register or unregister resources manually. As long as your p
 
 ## Part 2: Creating the Resource Management System
 
-The easiest way to add the Resource Manager to your game is with the built-in menu. This creates the **ResourceManager**, **GoalManager**, and **ResourceManager_Canvas** in one step and wires the GoalManager to the canvas.
+The easiest way to add the Resource Manager to your game is with the built-in editor window. This creates the **ResourceManager**, **GoalManager**, and **ResourceManager_Canvas** in one step and wires the GoalManager to the canvas.
 
 ### Step-by-Step: Create Resource Management System
 
-1. **Open the menu**  
+1. **Open the window**  
    In Unity’s top menu bar, go to:
    ```
    Game Assemblies → Systems → Create Resource Management System
    ```
+   An editor window opens with options (Enable Overall Timer, Enable Overall Score) and a large create button.
 
-2. **What appears in the scene**
+2. **Configure options** — Toggle **Enable Overall Timer** and **Enable Overall Score** as needed, then click **Create Resource Management System**.
+
+3. **What appears in the scene**
    - **ResourceManager** — The `ResourceManager` component (singleton). Holds `allResources`, `resourcesToTrack`, and `globalCapital`.
    - **GoalManager** — Manages goal templates, active goals, and connects to the goal tracker UI and score text. (Tutorial 04 covers goals in detail.)
    - **ResourceManager_Canvas** — A Canvas with:
@@ -74,8 +77,8 @@ The easiest way to add the Resource Manager to your game is with the built-in me
      - **Goal Tracker** — Area where `GoalManager` spawns goal tracker UI elements.
      - **Global Score** — Text that shows `ResourceManager.globalCapital` (driven by `GoalManager` when goals complete or fail).
 
-3. **Linking done for you**  
-   The menu links:
+4. **Linking**  
+   The tool links:
    - `ResourceManager_Canvas.goalTrackerModule` → `GoalManager.goalTrackerGrid`
    - `ResourceManager_Canvas.globalScoreModule` → `GoalManager.scoreText`
 
@@ -160,7 +163,7 @@ Tutorial 04 will walk you through:
 
 For now, it’s enough to know that:
 
-- The **Create Resource Management System** menu sets up both ResourceManager and GoalManager and wires the canvas.
+- The **Create Resource Management System** window sets up both ResourceManager and GoalManager and wires the canvas.
 - Goals read from `ResourceManager.GetResourceCount` and write to `ResourceManager.globalCapital`.
 - The goal tracker and score on the ResourceManager_Canvas are driven by the GoalManager.
 
@@ -172,7 +175,7 @@ In this tutorial, you learned:
 
 - The **ResourceManager** is a singleton that tracks all `ResourceObject`s and drives the resource UI.
 - **ResourceObject** registers and unregisters itself in `Start` and `OnDestroy`; no manual registration is needed.
-- **Create Resource Management System** adds ResourceManager, GoalManager, and ResourceManager_Canvas and links the GoalManager to the canvas.
+- **Create Resource Management System** (Game Assemblies → Systems) opens a window; use it to add ResourceManager, GoalManager, and ResourceManager_Canvas and link the GoalManager to the canvas.
 - **`resourcesToTrack`** binds each `Resource` to a `resourceInfoManager` UI panel so `resourceName` and `resourceAmount` update in real time.
 - **`globalCapital`** is the shared score; **GoalManager** adds rewards and subtracts penalties when goals complete or fail.
 - The **Goals** system (ResourceGoalSO, GoalManager, GoalTrackerUI) is introduced here and covered in [Tutorial 04](04-Goals-and-Goal-Tracker.md).

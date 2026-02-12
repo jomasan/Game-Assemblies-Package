@@ -42,7 +42,7 @@ Start with the main [README.md](../README.md) in the root directory for installa
 5. [Tutorial 05: Levels and Level Editor](tutorials/05-Levels-and-Level-Editor.md) — Create structured gameplay experiences
 6. [Tutorial 06: Creating Environment Objects](tutorials/06-Creating-Environment-Objects.md) — Create backgrounds, obstacles, ground tiles, and foliage
 7. [Tutorial 07: Procedural Level Builder](tutorials/07-Procedural-Level-Builder.md) — Use Scatter, Grid, and Perlin Noise tools to generate level content; roadmap for planned tools
-8. [Tutorial 08: Database Inspector and Data Management](tutorials/08-Database-Inspector-and-Data-Management.md) — Understand the ScriptableObject-as-database paradigm and use the Database Inspector to browse, edit, validate, and manage all project data
+8. [Tutorial 08: Database Inspector and Data Management](tutorials/08-Database-Inspector-and-Data-Management.md) — Understand the ScriptableObject-as-database paradigm and use the Database Inspector to browse, search, edit, validate, and manage all project data
 
 ---
 

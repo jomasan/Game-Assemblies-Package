@@ -29,21 +29,17 @@ The first step is to create a clean background for your game scene.
    ```
 
 2. **What Happens**: 
-   - A prefab called `BackgroundPlane` is instantiated in your scene at position (0, 0, 0)
+   - A prefab called `BackgroundPlane` is instantiated in your scene at position (0, 0, 1)
    - The object is automatically selected in the Hierarchy
 
 3. **What Gets Created**:
    - **GameObject**: `BackgroundPlane` - A simple plane/sprite renderer that serves as your game's background
+   - Position (0, 0, 1) keeps it behind gameplay objects at z=0
    - This is a basic visual element with no scripts attached - just a clean white canvas for your game
 
 ### Understanding the Background Canvas
 
-The `BackgroundPlane` prefab is located at:
-```
-Assets/Simulated Assemblies/Prefabs/Canvas/BackgroundPlane.prefab
-```
-
-This prefab is intentionally simple - it's just a visual background element. You can:
+The `BackgroundPlane` prefab comes from the package Samples. The instance is placed at (0, 0, 1) so it sits behind gameplay. You can:
 - Change its color/material in the Inspector
 - Scale it to fit your game's viewport
 - Replace the sprite/material with your own artwork
@@ -246,10 +242,11 @@ You can customize the created prefabs:
 
 Now that you have a character and canvas set up, you can:
 
-- **Add Stations**: Use `Game Assemblies → Stations` menu to create interactive workstations
-- **Create Resources**: Use `Game Assemblies → Resources → Create Resource` to define game resources
+- **Add Stations**: Use `Game Assemblies → Stations → Station Builder` to create interactive workstations
+- **Create Resources**: Use `Game Assemblies → Resources → Resource Builder` or `Create Resource` to define game resources
 - **Set Up Goals**: Use `Game Assemblies → Goals → Create Goal` to create objectives
-- **Add Systems**: Use `Game Assemblies → Systems` to add resource management and level systems
+- **Add Systems**: Use `Game Assemblies → Systems → Create Resource Management System` (opens a window with timer/score options), **Create Level Manager**, and **Create Game State Manager** as needed
+- **Review your setup**: Use `Game Assemblies → Revision` to validate the scene pipeline
 
 Check out the next tutorial to learn about creating resources and stations!
 
@@ -276,6 +273,7 @@ The editor tools save you time by automatically:
 
 ## Related Documentation
 
-- [Player Systems Documentation](../PlayerSystems.md)
-- [Resource Management Documentation](../ResourceManagement.md)
-- [Station System Documentation](../StationSystem.md)
+- [Tutorial 02: Stations and Resources](02-Stations-and-Resources.md)
+- [Tutorial 03: Resource Manager and Goals](03-Resource-Manager-and-Goals.md)
+- [Tutorial 04: Goals and Goal Tracker](04-Goals-and-Goal-Tracker.md)
+- [Tutorial 08: Database Inspector and Data Management](08-Database-Inspector-and-Data-Management.md)

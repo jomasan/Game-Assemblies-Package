@@ -73,7 +73,7 @@ The **GoalManager** is a singleton that:
 
 ### Configuring the GoalManager
 
-The **Create Resource Management System** menu (Tutorial 03) adds the GoalManager and links:
+The **Create Resource Management System** window (Tutorial 03) adds the GoalManager and links:
 
 - `goalTrackerGrid` ← from `ResourceManager_Canvas.goalTrackerModule` (where trackers are parented)
 - `scoreText` ← from `ResourceManager_Canvas.globalScoreModule` (displays `globalCapital`)
