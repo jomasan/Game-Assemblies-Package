@@ -19,6 +19,7 @@ public class SA_StationBuilderWindow : EditorWindow
     private Sprite stationGraphic;
     private Sprite deadSprite;
     private Color stationSpriteTint = Color.white;
+    private Color deadSpriteTint = Color.white;
     private float stationScale = 0.5f;
     private float uiOffsetY = 0.5f;
     private float uiScale = 0.5f;
@@ -200,6 +201,8 @@ public class SA_StationBuilderWindow : EditorWindow
         EditorGUILayout.Space(2);
         stationName = EditorGUILayout.TextField("Station Name", stationName);
         stationSpriteTint = EditorGUILayout.ColorField(new GUIContent("Sprite Tint", "Tint color for the main station sprite. Use white for no tint."), stationSpriteTint);
+        if (isSingleUse)
+            deadSpriteTint = EditorGUILayout.ColorField(new GUIContent("Dead Sprite Tint", "Tint color for the dead/inactive station sprite. Use white for no tint."), deadSpriteTint);
         stationScale = EditorGUILayout.Slider(new GUIContent("Scale", "Overall scale of the station."), stationScale, 0.1f, 3f);
         uiOffsetY = EditorGUILayout.Slider(UIOffsetYTip, uiOffsetY, 0f, 5f);
         uiScale = EditorGUILayout.Slider(UIScaleTip, uiScale, 0.1f, 2f);
@@ -784,6 +787,7 @@ public class SA_StationBuilderWindow : EditorWindow
         data.manualSliderPosition = manualSliderPosition;
         data.sliderOffsetY = sliderOffsetY;
         data.deadSprite = deadSprite;
+        data.deadSpriteTint = deadSpriteTint;
         data.consumeResource = consumeResource;
         data.produceResource = produceResource;
         data.consumes = new List<Resource>();

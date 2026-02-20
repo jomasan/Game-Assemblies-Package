@@ -19,6 +19,8 @@ public class StationDataSO : ScriptableObject
     public float stationScale = 0.5f;
     [Tooltip("Sprite shown when the station is inactive/dead. If null, stationGraphic is used.")]
     public Sprite deadSprite;
+    [Tooltip("Tint color applied to the dead/inactive station sprite. Use white for no tint.")]
+    public Color deadSpriteTint = Color.white;
     [Tooltip("Reference to the prefab representing this station.")]
     public GameObject stationPrefab;
     [Tooltip("Vertical offset for the info panel pop-up. Higher values position the UI higher above the station.")]

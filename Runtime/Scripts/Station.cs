@@ -311,9 +311,12 @@ public class Station : ResourceNode
         if (isAlive)
         {
             spRender.sprite = normalSprite;
-        } else
+            spRender.color = stationData != null ? stationData.stationSpriteTint : Color.white;
+        }
+        else
         {
             spRender.sprite = deadSprite;
+            spRender.color = stationData != null ? stationData.deadSpriteTint : Color.white;
             sliderBar.SetActive(false);
             isBeingInspected = false;
             if (infoWindow != null) infoWindow.SetActive(false);
