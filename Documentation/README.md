@@ -98,6 +98,7 @@ Step-by-step guides for common workflows. Work through them in order for the bes
 - **`README.md`** — This file; overview and navigation
 - **`basic concepts/`** — Foundational tutorials (01–10) explaining core concepts
 - **`tutorials/`** — Step-by-step tutorials (01–08) for common workflows
+- **`Samples/`** — [Template Files and Local Copies](Samples/Template-Files-and-Local-Copies.md): main sample prefabs (stations, resources, players, environment) and how the package creates your own variants under `Game Assemblies/`
 - **`API/`** — API reference documentation
 - **`Guides/`** — Detailed guides for specific features
 
