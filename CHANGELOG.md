@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.10] - 2026-02-01
+
+### Changed
+- **InfoWindow** – Addressed scaling so the window sizes correctly for varying numbers of input/output resources (horizontal layout with minimum width and symmetric expansion)
+- **Goal Manager** – Updated font and graphics for the goal tracker UI
+- **Team Manager** – Started integration: TeamManager for team/solo scoring, score display count and labels; Resource Manager Canvas exposes a list of score items (max 4) and shows/hides them based on TeamManager
+
 ## [1.0.9] - 2026-02-01
 
 ### Added
