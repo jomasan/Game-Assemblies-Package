@@ -159,10 +159,19 @@ public class GameManager : MonoBehaviour
         Application.LoadLevel(id);
     }
 
+    private static int GetLevelScore()
+    {
+        if (TeamManager.Instance != null)
+            return TeamManager.Instance.GetScoreForLevel();
+        if (ResourceManager.Instance != null)
+            return ResourceManager.getGlobalCapital();
+        return 0;
+    }
+
     private void HandleLevelComplete()
     {
         if (debug) Debug.Log("LEVEL COMPLETE!!!!");
-        UpdateScore(ResourceManager.getGlobalCapital());
+        UpdateScore(GetLevelScore());
         SetState(GameState.Results);
 
         updateResultsScreen();
@@ -171,7 +180,7 @@ public class GameManager : MonoBehaviour
 
     public void displayStarsBasedOnBrakets()
     {
-        int score = ResourceManager.getGlobalCapital();
+        int score = GetLevelScore();
         List<int> scoreBrakets = LevelManager.Instance.scoreBrakets;
         for (int i = 0; i < scoreBrakets.Count; i++)
         {
@@ -187,7 +196,7 @@ public class GameManager : MonoBehaviour
 
     public void updateResultsScreen()
     {
-        finalScore.text = "" + ResourceManager.getGlobalCapital();
+        finalScore.text = "" + GetLevelScore();
         if (playingLevelID == 0) topScore.text = highScore_1.ToString();
         if (playingLevelID == 1) topScore.text = highScore_2.ToString();
     }
@@ -365,7 +374,7 @@ public class GameManager : MonoBehaviour
     // Complete level successfully - call when player completes a level
     public void CompleteLevel()
     {
-        UpdateScore(ResourceManager.getGlobalCapital());
+        UpdateScore(GetLevelScore());
         SetState(GameState.Success);
         updateResultsScreen();
     }

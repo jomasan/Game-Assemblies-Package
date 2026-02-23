@@ -21,6 +21,7 @@ public class ResourceGoalSO : ScriptableObject
     [System.NonSerialized] public float remainingTime;
     [System.NonSerialized] public bool isCompleted;
     [System.NonSerialized] public bool isFailed;
+    [System.NonSerialized] public playerController lastContributor;
 
     // Resets the runtime state of the goal
     public void ResetGoal()
@@ -28,6 +29,7 @@ public class ResourceGoalSO : ScriptableObject
         remainingTime = timeLimit;
         isCompleted = false;
         isFailed = false;
+        lastContributor = null;
     }
 
     // Updates the goal status based on elapsed time and collected resources

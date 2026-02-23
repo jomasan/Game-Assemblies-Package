@@ -93,8 +93,7 @@ public class SA_CreateResourceManagementWindow : EditorWindow
         {
             if (canvas.timerModule != null)
                 canvas.timerModule.SetActive(enableTimer);
-            if (canvas.globalScoreModule != null)
-                canvas.globalScoreModule.gameObject.SetActive(enableScore);
+            canvas.scoreDisplayEnabled = enableScore;
         }
 
         GameObject gtg = canvas?.goalTrackerModule;

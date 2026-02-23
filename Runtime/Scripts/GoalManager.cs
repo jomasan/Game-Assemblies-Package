@@ -88,35 +88,33 @@ public class GoalManager : MonoBehaviour
             // Iterate backwards to safely remove items from the list.
             for (int i = activeGoals.Count - 1; i >= 0; i--)
             {
-                if (activeGoals[i].isCompleted)
+                ResourceGoalSO goal = activeGoals[i];
+                if (goal.isCompleted)
                 {
-                    // Add the reward to the global score.
-                    //ResourceManager.Instance.globalCapital += activeGoals[i].rewardPoints;
-                    if(debug)Debug.Log($"Goal Completed: Collect {activeGoals[i].requiredCount} of {activeGoals[i].resourceType.resourceName}. " +
-                              $"Reward: {activeGoals[i].rewardPoints}. Global Score: {ResourceManager.Instance.globalCapital}");
+                    if (debug) Debug.Log($"Goal Completed: Collect {goal.requiredCount} of {goal.resourceType.resourceName}. Reward: {goal.rewardPoints}.");
+                    if (TeamManager.Instance != null)
+                        TeamManager.Instance.AddScore(goal.rewardPoints, goal.lastContributor);
+                    else if (ResourceManager.Instance != null)
+                        ResourceManager.Instance.globalCapital += goal.rewardPoints;
 
-                    ResourceManager.Instance.globalCapital += activeGoals[i].rewardPoints;
-
-                    // Remove the completed goal.
                     activeGoals.RemoveAt(i);
                     Destroy(allGoalTrackers[i]);
                     allGoalTrackers.RemoveAt(i);
-
-                    UpdateScoreUI();
-                }else if (activeGoals[i].isFailed){
-                    if(debug)Debug.Log($"Goal Failed: Collect {activeGoals[i].requiredCount} of {activeGoals[i].resourceType.resourceName}. " +
-                              $"Reward: {activeGoals[i].rewardPoints}. Global Score: {ResourceManager.Instance.globalCapital}");
-
-                    ResourceManager.Instance.globalCapital -= activeGoals[i].penalty;
-
-                    // Remove the completed goal.
-                    activeGoals.RemoveAt(i);
-                    Destroy(allGoalTrackers[i]);
-                    allGoalTrackers.RemoveAt(i);
-
                     UpdateScoreUI();
                 }
+                else if (goal.isFailed)
+                {
+                    if (debug) Debug.Log($"Goal Failed: Collect {goal.requiredCount} of {goal.resourceType.resourceName}. Penalty: {goal.penalty}.");
+                    if (TeamManager.Instance != null)
+                        TeamManager.Instance.AddScore(-goal.penalty, null);
+                    else if (ResourceManager.Instance != null)
+                        ResourceManager.Instance.globalCapital -= goal.penalty;
 
+                    activeGoals.RemoveAt(i);
+                    Destroy(allGoalTrackers[i]);
+                    allGoalTrackers.RemoveAt(i);
+                    UpdateScoreUI();
+                }
             }
         }
 
@@ -128,13 +126,19 @@ public class GoalManager : MonoBehaviour
 
     public void goalContribution(Resource rType)
     {
-        if(debug) Debug.Log("GOAL CONTRIBUTION CALLED WITH " + rType.resourceName);
+        goalContribution(rType, null);
+    }
+
+    public void goalContribution(Resource rType, playerController contributor)
+    {
+        if (debug) Debug.Log("GOAL CONTRIBUTION CALLED WITH " + rType.resourceName + (contributor != null ? " (contributor: player " + contributor.playerID + ")" : ""));
 
         foreach (ResourceGoalSO goal in activeGoals)
         {
-            if (goal.UpdateGoalObjective(rType) == true)
+            if (goal.UpdateGoalObjective(rType))
             {
-                Debug.Log("GOAL COMPLETED!!!");
+                goal.lastContributor = contributor;
+                if (debug) Debug.Log("GOAL COMPLETED!!!");
                 break;
             }
         }
@@ -189,8 +193,10 @@ public class GoalManager : MonoBehaviour
     {
         if (scoreText != null)
         {
-            scoreText.text = "Score: " + ResourceManager.Instance.globalCapital.ToString(); 
-        } else
+            int score = TeamManager.Instance != null ? TeamManager.Instance.GetScoreForLevel() : (ResourceManager.Instance != null ? ResourceManager.Instance.globalCapital : 0);
+            scoreText.text = "Score: " + score.ToString();
+        }
+        else
         {
             Debug.LogWarning("Score Text UI element is not assigned in GoalManager.");
         }

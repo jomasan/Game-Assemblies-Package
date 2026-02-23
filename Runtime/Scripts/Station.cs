@@ -238,7 +238,7 @@ public class Station : ResourceNode
             //if resources are there, they are consumed, if they are not, the unit decays
             if (inputArea.AreAllRequirementsMet()) 
             {
-                ConsumeResource();
+                ConsumeResource(worker);
                 ConsumeCapital(worker);
                 //Debug.Log("TRUE!");
             } else{
@@ -283,28 +283,23 @@ public class Station : ResourceNode
     }
     public void ConsumeCapital(playerController pC)
     {
-        if (capitalInput)
-        {
-            Debug.Log("Capital consumption called");
-            if (pC != null)
-            {
-                Debug.Log("Capital removed from worker");
-                pC.capital -= capitalInputAmount;
-            }
-            if (rManager != null)
-            {
-                Debug.Log("Capital removed from global");
-                rManager.globalCapital -= capitalInputAmount;
-            }
-        }
+        if (!capitalInput) return;
+        if (debug) Debug.Log("Capital consumption called");
+        if (pC != null) pC.capital -= capitalInputAmount;
+        if (TeamManager.Instance != null)
+            TeamManager.Instance.AddScore(-capitalInputAmount, pC);
+        else if (rManager != null)
+            rManager.globalCapital -= capitalInputAmount;
     }
+
     public void ProduceCapital(playerController pC)
     {
-        if (capitalOutput)
-        {
-            if (pC != null) pC.capital += capitalOutputAmount;
-            if (rManager != null) rManager.globalCapital += capitalOutputAmount;
-        }
+        if (!capitalOutput) return;
+        if (pC != null) pC.capital += capitalOutputAmount;
+        if (TeamManager.Instance != null)
+            TeamManager.Instance.AddScore(capitalOutputAmount, pC);
+        else if (rManager != null)
+            rManager.globalCapital += capitalOutputAmount;
     }
     public void swapSprite()
     {
@@ -440,7 +435,7 @@ public class Station : ResourceNode
     {
         if (workCompleted)
         {
-            ProduceResource();
+            ProduceResource(worker);
             ProduceCapital(worker);
             //workCompleted = false;
         }
@@ -456,7 +451,7 @@ public class Station : ResourceNode
             //workCompleted = false;
         }
     }
-    void ConsumeResource()
+    void ConsumeResource(playerController contributor = null)
     {
         if (inputArea == null) return;
 
@@ -467,7 +462,7 @@ public class Station : ResourceNode
             resourcesConsumed = true;
 
             if (completesGoals_consumption && gManager != null && consumes.Count > 0 && consumes[0] != null)
-                gManager.goalContribution(consumes[0]); //IF IT CONTRIBUTES TO GOALS - CHECK AND PASS INFO TO THE GLOBAL SCORE
+                gManager.goalContribution(consumes[0], contributor);
 
             if (canBeUpgraded) flaggedToUpgrade = 2;//upgradeStation();
         }
@@ -477,7 +472,7 @@ public class Station : ResourceNode
         if (debug) Debug.Log("Consumed Production Started - resources Consumed: " + resourcesConsumed);
         if (resourcesConsumed)
         {
-            ProduceResource();
+            ProduceResource(worker);
             ProduceCapital(worker);
             resourcesConsumed = false;
         }
@@ -489,7 +484,7 @@ public class Station : ResourceNode
 
         //if (productionTimer >= productionInterval)
         //{
-            ConsumeResource();
+            ConsumeResource(owner);
             ConsumeCapital(owner);
             //productionTimer = 0f;
         //}
@@ -501,7 +496,7 @@ public class Station : ResourceNode
 
         if (productionTimer >= productionInterval)
         {
-            ProduceResource();
+            ProduceResource(owner);
             ProduceCapital(owner);
 
             productionTimer = 0f;
@@ -515,7 +510,7 @@ public class Station : ResourceNode
         outputAudio.Play();
     }
 
-    void ProduceResource()
+    void ProduceResource(playerController contributor = null)
     {
         if (WhatToProduce == productionMode.Resource)
         {
@@ -524,8 +519,6 @@ public class Station : ResourceNode
                 // Add the produced resources to the local storage
                 AddResource(produces[i], 1);
 
-                // Optional: Visual or audio feedback
-                //if (debug) 
                 if (debug) Debug.Log($"{gameObject.name}: Produced {1} of {produces[i].resourceName}");
 
                 if (spawnResourcePrefab)
@@ -534,12 +527,9 @@ public class Station : ResourceNode
                 }
 
                 if (completesGoals_production && gManager != null && produces.Count > 0 && produces[0] != null)
-                    gManager.goalContribution(produces[0]); //CONTRIBUTES TO GOALS THROUGH PRODUCTION
+                    gManager.goalContribution(produces[0], contributor);
 
-
-                //AUDIO:
                 playProductionSound();
-                
             }
 
             if (isSingleUse)
