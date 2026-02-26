@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.11] - 2026-02-01
+
+### Added
+- **Recipe system** – `RecipeSO` and `RecipeSlot` for defining alternative production methods with inputs/outputs and quantities; stations can use a list of recipes via **Use Recipes** and an active recipe index at runtime; **Create Recipe** editor (Game Assemblies → Recipes → Create Recipe) saves to `Databases/Recipes`; Station Builder supports **Use Recipes** and recipe list; Database Inspector includes Recipes; backward compatible (stations without recipes use fixed consumes/produces)
+- **Policy system** – **Policy Manager** and `PolicyDataSO` define the current “law” (ownership model, stealing, goal attribution, station use, sharing, visibility); **Create Policy Manager** editor (Game Assemblies → Systems → Create Policy Manager) creates policy assets and instantiates/assigns the manager; one Policy Manager per scene; Database Inspector supports viewing and editing Policies
+- **Ownership model** – Resource and station ownership; when no Policy Manager, default is communal (anyone can grab/use, global score); with Policy Manager, production sets owner, grab/absorb and station use respect policy (`CanTakeResource`, `CanWorkerUseStation`), grabbable filtering in grab regions; **ownership-aware counting** – `ResourceManager.GetResourceCount(Resource, playerController ownerOrNull)` and `GetAllResourceCounts(ownerOrNull)` (null = all or unowned by policy)
+- **Documentation** – Tutorials 09 (Recipe System), 10 (Policy System), and 11 (Ownership Model); feature-planning docs for Recipe System, Policy Manager, and Resource Ownership updated
+
+### Changed
+- **Station** – Consumes/produces can come from active recipe when `useRecipes` and recipes are set; `GetWorkDuration()` supports recipe work duration override; input area requirements sync from active recipe
+- **ResourceManager** – Count APIs accept optional owner; when owner is null, behavior follows policy (communal or no manager → count all; otherwise → unowned only)
+- **playerController** – Grab and absorb check `CanTakeResource` and set owner when policy is not communal
+- **grabRegion** – Adds `ResourceObject` to grabbable list only if `CanTakeResource` allows (or no Policy Manager)
+
 ## [1.0.10] - 2026-02-01
 
 ### Changed
