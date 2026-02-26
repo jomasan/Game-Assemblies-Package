@@ -33,6 +33,10 @@ public class StationDataSO : ScriptableObject
     public float sliderOffsetY = -0.46f;
 
     [Header("Consume (IN) - Produce (OUT)")]
+    [Tooltip("When true, this station uses the Recipe list; one recipe is active at a time and defines inputs/outputs. When false, uses the fixed consumes/produces lists below.")]
+    public bool useRecipes;
+    [Tooltip("Alternative methods of production. When useRecipes is true, the station's active recipe defines what is consumed and produced. When false, this list is ignored.")]
+    public List<RecipeSO> recipes = new List<RecipeSO>();
     public bool consumeResource;
     public bool produceResource;
     public List<Resource> consumes = new List<Resource>();
@@ -106,8 +110,16 @@ public class StationDataSO : ScriptableObject
         if (station.inputArea != null)
         {
             station.inputArea.requirements.Clear();
-            foreach (var r in consumes)
-                if (r != null) station.inputArea.requirements.Add(r);
+            if (useRecipes && recipes != null && recipes.Count > 0 && recipes[0] != null)
+            {
+                foreach (var r in recipes[0].GetInputsExpanded())
+                    if (r != null) station.inputArea.requirements.Add(r);
+            }
+            else
+            {
+                foreach (var r in consumes)
+                    if (r != null) station.inputArea.requirements.Add(r);
+            }
             station.inputArea.gameObject.SetActive(useInputArea);
         }
         else

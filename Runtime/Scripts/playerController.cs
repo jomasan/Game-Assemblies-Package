@@ -812,8 +812,14 @@ public class playerController : MonoBehaviour
     }
     private void GrabObject()
     {   
-        if(objectToGrab != null)
+        if (objectToGrab != null)
         {
+            // Policy: when Policy Manager present, only allow grab if CanTakeResource; otherwise communal (anyone can grab)
+            var resourceObj = objectToGrab.GetComponent<ResourceObject>();
+            if (resourceObj != null && PolicyManager.Instance != null
+                && !PolicyManager.Instance.CanTakeResource(this, resourceObj.owner))
+                return;
+
             isCarryingObject = true;
 
             // Disable object's physics if necessary
@@ -840,6 +846,11 @@ public class playerController : MonoBehaviour
                 //objectToGrab.transform.localPosition = grabOffset;
                 //objectToGrab.transform.localRotation = Quaternion.identity;
             }
+
+            // Ownership transfer: when policy is present and not communal, set resource owner to this player on grab
+            if (resourceObj != null && PolicyManager.Instance != null
+                && PolicyManager.Instance.GetOwnershipModel() != OwnershipModel.Communal)
+                resourceObj.setOwner(this);
         }
         
     }
@@ -887,6 +898,12 @@ public class playerController : MonoBehaviour
         if (listobjectsToGrab.Contains(obj)) return;
         if (listobjectsToGrab.Count >= maxObjectsToCarry) return;
 
+        // Policy: when Policy Manager present, only allow absorb if CanTakeResource; otherwise communal
+        var resourceObj = obj.GetComponent<ResourceObject>();
+        if (resourceObj != null && PolicyManager.Instance != null
+            && !PolicyManager.Instance.CanTakeResource(this, resourceObj.owner))
+            return;
+
         // When carrying one (normal grab) but absorbing more: merge into multigrab
         if (isCarryingObject && objectToGrab != null && !listobjectsToGrab.Contains(objectToGrab))
         {
@@ -896,6 +913,11 @@ public class playerController : MonoBehaviour
         }
 
         listobjectsToGrab.Add(obj);
+
+        // Ownership transfer: when policy is present and not communal, set resource owner to this player on absorb
+        if (resourceObj != null && PolicyManager.Instance != null
+            && PolicyManager.Instance.GetOwnershipModel() != OwnershipModel.Communal)
+            resourceObj.setOwner(this);
 
         Rigidbody2D objectRb = obj.GetComponent<Rigidbody2D>();
         if (objectRb != null)

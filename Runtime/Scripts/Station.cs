@@ -23,12 +23,40 @@ public class Station : ResourceNode
         LootTable
     }
     [Header("Consume (IN) - Produce (OUT)")]
-    // --- Data from StationDataSO (getters read from stationData; hidden from inspector) ---
+    // --- Data from StationDataSO or active recipe (getters read from stationData; hidden from inspector) ---
     [HideInInspector] public productionMode WhatToProduce => stationData != null ? stationData.whatToProduce : productionMode.Resource;
     [HideInInspector] public bool produceResource => stationData != null && stationData.produceResource;
     [HideInInspector] public bool consumeResource => stationData != null && stationData.consumeResource;
-    [HideInInspector] public List<Resource> produces => stationData != null ? stationData.produces : new List<Resource>();
-    [HideInInspector] public List<Resource> consumes => stationData != null ? stationData.consumes : new List<Resource>();
+    [Tooltip("When station uses recipes, this index selects which recipe is active. 0 = first recipe.")]
+    public int activeRecipeIndex;
+    [HideInInspector] public List<Resource> produces => GetProduces();
+    [HideInInspector] public List<Resource> consumes => GetConsumes();
+
+    /// <summary>Effective consumes: from active recipe when useRecipes, otherwise stationData.consumes.</summary>
+    public List<Resource> GetConsumes()
+    {
+        if (stationData == null) return new List<Resource>();
+        if (stationData.useRecipes && stationData.recipes != null && stationData.recipes.Count > 0)
+        {
+            int idx = Mathf.Clamp(activeRecipeIndex, 0, stationData.recipes.Count - 1);
+            var recipe = stationData.recipes[idx];
+            return recipe != null ? recipe.GetInputsExpanded() : stationData.consumes;
+        }
+        return stationData.consumes;
+    }
+
+    /// <summary>Effective produces: from active recipe when useRecipes, otherwise stationData.produces.</summary>
+    public List<Resource> GetProduces()
+    {
+        if (stationData == null) return new List<Resource>();
+        if (stationData.useRecipes && stationData.recipes != null && stationData.recipes.Count > 0)
+        {
+            int idx = Mathf.Clamp(activeRecipeIndex, 0, stationData.recipes.Count - 1);
+            var recipe = stationData.recipes[idx];
+            return recipe != null ? recipe.GetOutputsExpanded() : stationData.produces;
+        }
+        return stationData.produces;
+    }
 
     public List<Station> produces_stations = new List<Station>();
 
@@ -63,7 +91,19 @@ public class Station : ResourceNode
     }
     [HideInInspector] public interactionType typeOfProduction => stationData != null ? stationData.typeOfProduction : interactionType.None;
     [HideInInspector] public interactionType typeOfConsumption => stationData != null ? stationData.typeOfConsumption : interactionType.None;
-    [HideInInspector] public float workDuration => stationData != null ? stationData.workDuration : 5f;
+    [HideInInspector] public float workDuration => GetWorkDuration();
+    float GetWorkDuration()
+    {
+        if (stationData == null) return 5f;
+        if (stationData.useRecipes && stationData.recipes != null && stationData.recipes.Count > 0)
+        {
+            int idx = Mathf.Clamp(activeRecipeIndex, 0, stationData.recipes.Count - 1);
+            var recipe = stationData.recipes[idx];
+            if (recipe != null && recipe.workDurationOverride > 0f)
+                return recipe.workDurationOverride;
+        }
+        return stationData.workDuration;
+    }
     public float workProgress = 0f; // Progress towards completing the work cycle
     public bool isBeingWorkedOn = false; // Is work currently being performed?
     public List<playerController> workerCount;
@@ -145,7 +185,7 @@ public class Station : ResourceNode
         if (!canBeWorked) sliderBar.SetActive(false);
 
         progressSlider = sliderBar.GetComponent<Slider>();
-        if (inputArea != null) inputArea.requirements = consumes;
+        RefreshFromRecipe();
 
         sManager = GameObject.FindAnyObjectByType<StationManager>();
         rManager = GameObject.FindAnyObjectByType<ResourceManager>();
@@ -236,12 +276,12 @@ public class Station : ResourceNode
         if (decayTimer >= decayCycle) //decay cycle
         {   
             //if resources are there, they are consumed, if they are not, the unit decays
-            if (inputArea.AreAllRequirementsMet()) 
+            if (inputArea.AreAllRequirementsMet() && (worker == null || CanWorkerUseStation()))
             {
                 ConsumeResource(worker);
                 ConsumeCapital(worker);
                 //Debug.Log("TRUE!");
-            } else{
+            } else if (!inputArea.AreAllRequirementsMet()) {
                 if (decayValue < maxDecay)
                 {
                     decayValue++;
@@ -319,13 +359,24 @@ public class Station : ResourceNode
             if (destroyAfterSingleUse) Destroy(this.gameObject);
         }
     }
+    /// <summary>Syncs input area requirements and info panel to the current consumes/produces (e.g. after changing activeRecipeIndex).</summary>
+    public void RefreshFromRecipe()
+    {
+        if (inputArea != null)
+        {
+            inputArea.requirements.Clear();
+            foreach (var r in GetConsumes())
+                if (r != null) inputArea.requirements.Add(r);
+        }
+        InitializeInforPanel();
+    }
+
     public void InitializeInforPanel()
     {
-        if(infoWindow != null)
+        if (infoWindow != null)
         {
-            infoWindow.GetComponent<InfoWindow>().InitializeResources(produces, consumes);
+            infoWindow.GetComponent<InfoWindow>().InitializeResources(GetProduces(), GetConsumes());
         }
-        
     }
     public void updateInfoPanel()
     {
@@ -431,9 +482,15 @@ public class Station : ResourceNode
             Destroy(this.gameObject);
         }
     }
+    /// <summary>When no Policy Manager, anyone can use. When present, use policy (e.g. OwnerOnly, SameTeam, Anyone).</summary>
+    bool CanWorkerUseStation()
+    {
+        return PolicyManager.Instance == null || PolicyManager.Instance.CanUseStation(worker, owner);
+    }
+
     void ProduceOnWork()
     {
-        if (workCompleted)
+        if (workCompleted && (worker == null || CanWorkerUseStation()))
         {
             ProduceResource(worker);
             ProduceCapital(worker);
@@ -443,7 +500,7 @@ public class Station : ResourceNode
     void ConsumeOnWork()
     {
         if(debug) Debug.Log("Consume on Work Called, workCompleted: " + workCompleted);
-        if (workCompleted)
+        if (workCompleted && (worker == null || CanWorkerUseStation()))
         {
             if (debug) Debug.Log("Consume on Work Called Completed Sequence");
             ConsumeResource();
@@ -470,7 +527,7 @@ public class Station : ResourceNode
     void ConsumedProduction()
     {
         if (debug) Debug.Log("Consumed Production Started - resources Consumed: " + resourcesConsumed);
-        if (resourcesConsumed)
+        if (resourcesConsumed && (worker == null || CanWorkerUseStation()))
         {
             ProduceResource(worker);
             ProduceCapital(worker);
@@ -607,9 +664,10 @@ public class Station : ResourceNode
 
                 if (productionParticles != null) Instantiate(productionParticles, spawnPosition, Quaternion.identity);
 
-                //Set owner
+                // Set owner only when policy is present and not communal (no Policy Manager = communal default)
                 ResourceObject rsObj = resourceInstance.GetComponent<ResourceObject>();
-                if (rsObj != null && owner != null)
+                if (rsObj != null && owner != null && PolicyManager.Instance != null
+                    && PolicyManager.Instance.GetOwnershipModel() != OwnershipModel.Communal)
                 {
                     rsObj.setOwner(owner);
                 }

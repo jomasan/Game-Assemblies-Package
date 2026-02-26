@@ -49,7 +49,7 @@ public class ResourceManager : MonoBehaviour
         {
             Resource toTrack = resourcesToTrack[i].resourceType;
             resourceInfoManager resourceIM = resourcesToTrack[i].resourceUIPanel;
-            int count = GetResourceCount2(toTrack);
+            int count = GetResourceCount(toTrack, null);
             resourceIM.resourceName.text = toTrack.resourceName.ToString();
             resourceIM.resourceAmount.text = count.ToString();
             //Debug.Log("Resource: " + toTrack.resourceName + " Amount: " + count + ", from: " + allResources.Count);
@@ -72,28 +72,52 @@ public class ResourceManager : MonoBehaviour
         }
     }
 
+    /// <summary>Counts resources of the given type. When ownerOrNull is null, behavior depends on policy: if Policy Manager exists and ownership model is not Communal, counts only unowned (common) resources; otherwise counts all.</summary>
+    public int GetResourceCount(Resource resourceType, playerController ownerOrNull)
+    {
+        if (ownerOrNull != null)
+        {
+            return allResources.Count(r => r != null && r.resourceType == resourceType && r.owner == ownerOrNull);
+        }
+
+        if (PolicyManager.Instance != null && PolicyManager.Instance.GetOwnershipModel() != OwnershipModel.Communal)
+        {
+            return allResources.Count(r => r != null && r.resourceType == resourceType && r.owner == null);
+        }
+
+        return allResources.Count(r => r != null && r.resourceType == resourceType);
+    }
+
+    /// <summary>Counts all resources of the given type (or policy-based when owner is null). See GetResourceCount(Resource, playerController).</summary>
     public int GetResourceCount(Resource resourceType)
-    {   
-        return allResources.Count(r => r.resourceType == resourceType);
+    {
+        return GetResourceCount(resourceType, null);
     }
 
     public int GetResourceCount2(Resource resourceType)
     {
-        int count = 0;
-        foreach (var resource in allResources)
-        {
-            if (resource.resourceType == resourceType)
-            {
-                count++;
-            }
-        }
-        return count;
+        return GetResourceCount(resourceType, null);
     }
 
-
-    public Dictionary<Resource, int> GetAllResourceCounts()
+    /// <summary>Returns counts per resource type, optionally filtered by owner. When ownerOrNull is null, uses same policy rule as GetResourceCount (all vs unowned only).</summary>
+    public Dictionary<Resource, int> GetAllResourceCounts(playerController ownerOrNull = null)
     {
+        if (ownerOrNull != null)
+        {
+            return allResources
+                .Where(r => r != null && r.owner == ownerOrNull)
+                .GroupBy(r => r.resourceType)
+                .ToDictionary(g => g.Key, g => g.Count());
+        }
+        if (PolicyManager.Instance != null && PolicyManager.Instance.GetOwnershipModel() != OwnershipModel.Communal)
+        {
+            return allResources
+                .Where(r => r != null && r.owner == null)
+                .GroupBy(r => r.resourceType)
+                .ToDictionary(g => g.Key, g => g.Count());
+        }
         return allResources
+            .Where(r => r != null)
             .GroupBy(r => r.resourceType)
             .ToDictionary(g => g.Key, g => g.Count());
     }

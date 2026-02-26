@@ -43,6 +43,9 @@ Start with the main [README.md](../README.md) in the root directory for installa
 6. [Tutorial 06: Creating Environment Objects](tutorials/06-Creating-Environment-Objects.md) — Create backgrounds, obstacles, ground tiles, and foliage
 7. [Tutorial 07: Procedural Level Builder](tutorials/07-Procedural-Level-Builder.md) — Use Scatter, Grid, and Perlin Noise tools to generate level content; roadmap for planned tools
 8. [Tutorial 08: Database Inspector and Data Management](tutorials/08-Database-Inspector-and-Data-Management.md) — Understand the ScriptableObject-as-database paradigm and use the Database Inspector to browse, search, edit, validate, and manage all project data
+9. [Tutorial 09: Recipe System](tutorials/09-Recipe-System.md) — Create recipes and assign them to stations for multiple alternative methods of production
+10. [Tutorial 10: Policy System](tutorials/10-Policy-System.md) — Create policy data and the Policy Manager to control ownership, stealing, station use, and more
+11. [Tutorial 11: Ownership Model](tutorials/11-Ownership-Model.md) — Understand resource and station ownership, communal default, and ownership-aware counting
 
 ---
 
@@ -90,6 +93,9 @@ Step-by-step guides for common workflows. Work through them in order for the bes
 | 06 | [Creating Environment Objects](tutorials/06-Creating-Environment-Objects.md) | Create **Environment objects** using the Create Environment Object tool: **Obstacles** (solid, block movement), **Ground Tiles** (walkable surfaces), and **Foliage** (decorative, wiggle on contact). Also covers Create White Canvas and Create Stage Background. |
 | 07 | [Procedural Level Builder](tutorials/07-Procedural-Level-Builder.md) | Use the **Procedural Level Builder** to generate level content: **Scatter Prefab**, **Grid of Prefabs**, and **Perlin Noise Scatter**. Includes development status note and roadmap for planned tools (Room/Wave, Tilemap, Path, Spawn Points, Boundary, Layered Placement). |
 | 08 | [Database Inspector and Data Management](tutorials/08-Database-Inspector-and-Data-Management.md) | Understand the **ScriptableObject-as-database** paradigm (data-driven design, single source of truth, version control). Use the **Database Inspector** to browse, search, edit, validate, and manage all project data (Resources, Goals, Levels, Stations, Loot Tables, etc.) in one place. |
+| 09 | [Recipe System](tutorials/09-Recipe-System.md) | Create **recipes** (inputs/outputs with quantities), assign them to stations with **Use Recipes**, and use **activeRecipeIndex** so one station can have multiple alternative methods of production. |
+| 10 | [Policy System](tutorials/10-Policy-System.md) | Create **Policy Data** and add the **Policy Manager** to the scene. Configure ownership model, stealing, station use, goal attribution, sharing, and visibility; understand communal default when no manager. |
+| 11 | [Ownership Model](tutorials/11-Ownership-Model.md) | Understand **resource and station ownership**: communal vs private, how grab/absorb and station use respect policy, and **ownership-aware counting** (all vs unowned, per-player). |
 
 ---
 
@@ -97,7 +103,7 @@ Step-by-step guides for common workflows. Work through them in order for the bes
 
 - **`README.md`** — This file; overview and navigation
 - **`basic concepts/`** — Foundational tutorials (01–10) explaining core concepts
-- **`tutorials/`** — Step-by-step tutorials (01–08) for common workflows
+- **`tutorials/`** — Step-by-step tutorials (01–11) for common workflows
 - **`Samples/`** — [Template Files and Local Copies](Samples/Template-Files-and-Local-Copies.md): main sample prefabs (stations, resources, players, environment) and how the package creates your own variants under `Game Assemblies/`
 - **`API/`** — API reference documentation
 - **`Guides/`** — Detailed guides for specific features

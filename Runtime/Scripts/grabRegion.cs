@@ -35,9 +35,15 @@ public class grabRegion : MonoBehaviour
                     && resourceObj.resourceType.typeOfBehavior == Resource.ResourceBehavior.Consumable;
                 if (!isConsumable)
                 {
-                    if (debug) Debug.Log("GRABABBLE OBJECT DEFINED: " + other);
-                    if (!pController.listobjectsToGrab.Contains(other.gameObject))
-                        pController.listobjectsToGrab.Add(other.gameObject);
+                    // Policy: when Policy Manager present, only offer as grabbable if CanTakeResource; otherwise communal (anyone can target)
+                    bool canTake = resourceObj == null || PolicyManager.Instance == null
+                        || PolicyManager.Instance.CanTakeResource(pController, resourceObj.owner);
+                    if (canTake)
+                    {
+                        if (debug) Debug.Log("GRABABBLE OBJECT DEFINED: " + other);
+                        if (!pController.listobjectsToGrab.Contains(other.gameObject))
+                            pController.listobjectsToGrab.Add(other.gameObject);
+                    }
                 }
             }
             if (TagUtilities.HasTag(other.gameObject, TagType.Workable))

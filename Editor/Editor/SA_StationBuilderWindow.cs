@@ -29,6 +29,8 @@ public class SA_StationBuilderWindow : EditorWindow
     // Resource consumption (list)
     private bool consumeResource;
     private List<Resource> consumeResources = new List<Resource>();
+    private bool useRecipes;
+    private List<RecipeSO> recipeList = new List<RecipeSO>();
 
     // Resource production (list)
     private bool produceResource;
@@ -511,6 +513,29 @@ public class SA_StationBuilderWindow : EditorWindow
         int savedIndent = EditorGUI.indentLevel;
         EditorGUI.indentLevel = 0;
 
+        useRecipes = EditorGUILayout.ToggleLeft(
+            new GUIContent("Use Recipes", "When enabled, this station uses the recipe list below; each recipe defines inputs and outputs. One recipe is active at a time (set activeRecipeIndex on the station at runtime)."),
+            useRecipes);
+        if (useRecipes)
+        {
+            EditorGUI.indentLevel = 1;
+            if (recipeList == null) recipeList = new List<RecipeSO>();
+            for (int i = 0; i < recipeList.Count; i++)
+            {
+                EditorGUILayout.BeginHorizontal();
+                recipeList[i] = (RecipeSO)EditorGUILayout.ObjectField(recipeList[i], typeof(RecipeSO), false);
+                if (GUILayout.Button("−", GUILayout.Width(20)))
+                {
+                    recipeList.RemoveAt(i);
+                    i--;
+                }
+                EditorGUILayout.EndHorizontal();
+            }
+            if (GUILayout.Button("+ Add Recipe"))
+                recipeList.Add(null);
+            EditorGUILayout.Space(4);
+        }
+
         GUILayout.Label("INPUTS", EditorStyles.miniBoldLabel);
         EditorGUILayout.Space(2);
 
@@ -788,6 +813,13 @@ public class SA_StationBuilderWindow : EditorWindow
         data.sliderOffsetY = sliderOffsetY;
         data.deadSprite = deadSprite;
         data.deadSpriteTint = deadSpriteTint;
+        data.useRecipes = useRecipes;
+        data.recipes = new List<RecipeSO>();
+        if (useRecipes && recipeList != null)
+        {
+            foreach (var r in recipeList)
+                if (r != null) data.recipes.Add(r);
+        }
         data.consumeResource = consumeResource;
         data.produceResource = produceResource;
         data.consumes = new List<Resource>();
