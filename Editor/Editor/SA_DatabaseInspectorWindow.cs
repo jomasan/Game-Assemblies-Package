@@ -26,7 +26,8 @@ public class SA_DatabaseInspectorWindow : EditorWindow
     // Optional fields that are commonly left empty - excluded from "missing reference" validation
     private static readonly HashSet<string> OptionalFieldNames = new HashSet<string>
     {
-        "previewImage", "preview", "sprite", "resourcePrefab", "icon"
+        "previewImage", "preview", "sprite", "resourcePrefab", "icon",
+        "triggerResource", "triggerGoal", "effectPolicy", "effectRecipe", "effectStation"
     };
 
     // Unity internal serialization fields - never declared in user ScriptableObjects, skip these

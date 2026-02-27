@@ -8,7 +8,8 @@ public class SA_CreateRuleWindow : EditorWindow
     private RuleCategory category = RuleCategory.Custom;
     private Sprite icon;
 
-    [MenuItem("Game Assemblies/Rules/Create Rule")]
+    // Rules menu hidden; Rule system is in planning. See Documentation/features planning/Rule-System.md
+    // [MenuItem("Game Assemblies/Rules/Create Rule")]
     public static void ShowWindow()
     {
         GetWindow<SA_CreateRuleWindow>("Create Rule");

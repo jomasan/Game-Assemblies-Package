@@ -6,7 +6,8 @@ public class SA_CreateRulesSessionWindow : EditorWindow
     private string sessionName = "NewSession";
     private string description = "";
 
-    [MenuItem("Game Assemblies/Rules/Create Rules Session")]
+    // Rules menu hidden; Rule system is in planning. See Documentation/features planning/Rule-System.md
+    // [MenuItem("Game Assemblies/Rules/Create Rules Session")]
     public static void ShowWindow()
     {
         GetWindow<SA_CreateRulesSessionWindow>("Create Rules Session");

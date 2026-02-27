@@ -25,9 +25,11 @@ public static class SA_DatabaseManager
         (typeof(PolicyDataSO), "Policies"),
         (typeof(ColorPaletteSO), "Color Palettes"),
         (typeof(ResourceManager_SO), "Resource Managers"),
-        (typeof(RuleSO), "Rules"),
-        (typeof(RulesSessionSO), "Rules Sessions"),
+        // Rules / Rules Sessions hidden; Rule system in planning. See Documentation/features planning/Rule-System.md
+        // (typeof(RuleSO), "Rules"),
+        // (typeof(RulesSessionSO), "Rules Sessions"),
         (typeof(StationDataSO), "Station Data"),
+        (typeof(EventSO), "Events"),
     };
 
     /// <summary>

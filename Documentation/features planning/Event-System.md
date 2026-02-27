@@ -55,17 +55,22 @@ Implementation can be modifier-based (e.g., “current speed = base speed × eve
 
 ## 3. Current State
 
-- **Not implemented.** There is no first-class Event type, Event Manager, or hooks for events to modify policies, speed, recipe data, or decay. No card system exists.
+- **Event data model (implemented)** — `EventSO` ScriptableObject with name, icon, description, trigger type and parameters (TriggeredByManager, TimeElapsed, ScoreThreshold, GoalCompleted, ResourceCountExceeds), modality (Permanent / WithDuration + durationSeconds), and a list of `EventEffect` entries.
+- **Effect types (implemented)** — `EventEffect` with `EventEffectType` enum: ChangePolicy, MultiplySpeed, ScaleRecipeInputs, ScaleRecipeOutputs, ScaleDecay, ScaleWorkDuration, Other; parameters include effectParamFloat, optional effectPolicy / effectRecipe / effectStation for targeting.
+- **Event Manager (implemented)** — `EventManager` runtime component (singleton): optional `conditionEvents` list, `FireEvent(EventSO)` / `RemoveEvent(EventSO)` / `GetActiveEvents()` / `IsActive(EventSO)`; applies and removes events by modality (duration-based events auto-expire in Update); condition evaluation implemented only for **TimeElapsed** (Score/Goal/ResourceCount triggers are stubs for later integration).
+- **Editor tools (implemented)** — **Game Assemblies > Events > Create Event** window creates `EventSO` assets and saves to `Game Assemblies/Databases/Events`; **Database Inspector** includes an "Events" database type so events can be listed, viewed, and edited in the inspector.
+- **Integration points (not yet implemented)** — Policy Manager, playerController (speed), stations/recipes, and decay logic do not yet read from `EventManager.GetActiveEvents()` or apply modifiers; the data and manager are in place for that wiring.
+- **Card system** — Not implemented; can be built once integration is done.
 
 ---
 
 ## 4. To-Do / Next Steps
 
-- [ ] **Define Event data model** — ScriptableObject or asset type for an Event: name, icon, trigger (condition or “triggered by manager”), modality (permanent vs duration), and a list or structure of “effects” (what variables to change and how).
-- [ ] **Define effect types** — How events express “change policy,” “multiply speed,” “scale recipe inputs/outputs,” “scale decay,” etc. (e.g., effect type enum + parameters, or small scriptable effect descriptors).
-- [ ] **Event Manager** — Runtime component that holds or references events, evaluates explicit conditions, and/or fires events on a schedule or when signaled; applies and removes effects based on modality (duration vs permanent).
+- [x] **Define Event data model** — ScriptableObject or asset type for an Event: name, icon, trigger (condition or “triggered by manager”), modality (permanent vs duration), and a list or structure of “effects” (what variables to change and how). *(Done: `EventSO`, `EventEffect`, trigger/modality enums.)*
+- [x] **Define effect types** — How events express “change policy,” “multiply speed,” “scale recipe inputs/outputs,” “scale decay,” etc. *(Done: `EventEffectType` enum + `EventEffect` with params and optional policy/recipe/station refs.)*
+- [x] **Event Manager** — Runtime component that holds or references events, evaluates explicit conditions, and/or fires events on a schedule or when signaled; applies and removes effects based on modality (duration vs permanent). *(Done: `EventManager`; only TimeElapsed condition is evaluated; others are stubs.)*
 - [ ] **Integration points** — Policy Manager, playerController (speed), stations/recipes, decay logic, etc., read from “current active events” or “effective modifiers” and apply the combined result.
-- [ ] **Editor tools** — Event creator/editor (e.g. Game Assemblies > Events > Create Event), store events in a Databases or similar folder; optional list/view of events for level or game design.
+- [x] **Editor tools** — Event creator/editor (e.g. Game Assemblies > Events > Create Event), store events in a Databases or similar folder; optional list/view of events for level or game design. *(Done: Create Event window; Events in Database Inspector.)*
 - [ ] **Card system (later)** — UI layer that displays active (or available) events as cards with name, icon, and optional description/duration; can be built once the event data and manager exist.
 
 ---
