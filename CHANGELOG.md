@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.12] - 2026-02-01
+
+### Added
+- **UI elements for resource and score tracking** – New components and editor tools to easily track resources and scores in the UI:
+  - **Resource tracker viewer** – `ResourceCounterDisplay`: attach to a TextMeshPro element to show a resource count; options for resource to track, display mode (all of type / owned by player / unowned), player dropdown (1–4), optional icon with tint, optional label; finds `playersInfo` automatically on Start when not assigned
+  - **Player resource list viewer** – `PlayerResourceListDisplay`: vertical list that instantiates a row per resource for a selected player; link canvas parent, row prefab, player (1–4), and resource list; optional player/list background images with color and visibility toggles; row scale factor; "Populate from project" in editor for resources
+  - **Player score viewer** – `TeamScoreDisplay`: attach to a TextMeshPro element to show TeamManager score; options for player score, team score (1–3), or global score; optional label (e.g. "Score: ") and "Add name" toggle; finds `playersInfo` automatically on Start when not assigned
+  - **UI Builder** – Editor window (Game Assemblies → UI → UI Builder): link a canvas element as parent, choose widget type (Resource Counter, Resource Counter With Image, Player Resource List, Player Score), set resource/player/score options, and instantiate prefabs (`ResourceScore`, `ResourceScoreWithImage`, `PlayerResourceList`, `PlayerScore`) with options applied
+
 ## [1.0.11] - 2026-02-01
 
 ### Added
