@@ -26,7 +26,7 @@ RectTransform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3356282167374068066}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -35,7 +35,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 60.835938, y: -931}
+  m_AnchoredPosition: {x: 60, y: -100}
   m_SizeDelta: {x: 747.6086, y: 64.2279}
   m_Pivot: {x: 0.000000008381903, y: -0.00000014156103}
 --- !u!222 &2509926087794406763
@@ -150,8 +150,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 93941d3777d2a41febd16a59d86c8481, type: 3}
   m_Name: 
   m_EditorClassIdentifier: GameAssemblyLab.GameAssemblies::ResourceCounterDisplay
-  resourceToTrack: {fileID: 0}
+  resourceToTrack: {fileID: 11400000, guid: 0c0a28db8dc284235aa9591f59aeae9c, type: 2}
   displayMode: 0
   playerSlot: 0
   playerList: {fileID: 0}
   includeName: 1
+  showIcon: 0
+  iconImage: {fileID: 0}
