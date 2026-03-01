@@ -94,6 +94,18 @@ public class ResourceManager : MonoBehaviour
         return GetResourceCount(resourceType, null);
     }
 
+    /// <summary>Counts all resources of the given type, regardless of owner or policy.</summary>
+    public int GetResourceCountAll(Resource resourceType)
+    {
+        return allResources.Count(r => r != null && r.resourceType == resourceType);
+    }
+
+    /// <summary>Counts resources of the given type that have no owner (owner == null).</summary>
+    public int GetResourceCountUnowned(Resource resourceType)
+    {
+        return allResources.Count(r => r != null && r.resourceType == resourceType && r.owner == null);
+    }
+
     public int GetResourceCount2(Resource resourceType)
     {
         return GetResourceCount(resourceType, null);
