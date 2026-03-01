@@ -20,7 +20,7 @@ public class PlayerResourceListDisplay : MonoBehaviour
     [Range(0, 3)]
     public int playerSlot;
 
-    [Tooltip("Source of players and names. If not set, finds playersInfo in the scene at runtime.")]
+    [Tooltip("Source of players and names. If not set, finds the single playersInfo in the scene on Start.")]
     public playersInfo playerList;
 
     [Tooltip("Resource types to show one row each. Populate in the editor (e.g. via the custom inspector).")]
@@ -49,6 +49,8 @@ public class PlayerResourceListDisplay : MonoBehaviour
 
     private void Start()
     {
+        if (playerList == null)
+            playerList = FindObjectOfType<playersInfo>();
         RebuildList();
     }
 

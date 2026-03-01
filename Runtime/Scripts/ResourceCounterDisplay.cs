@@ -29,7 +29,7 @@ public class ResourceCounterDisplay : MonoBehaviour
     [Range(0, 3)]
     public int playerSlot;
 
-    [Tooltip("Optional: source of players for OwnedByPlayer mode. If not set, finds playersInfo in the scene at runtime.")]
+    [Tooltip("Optional: source of players for OwnedByPlayer mode. If not set, finds the single playersInfo in the scene on Start.")]
     public playersInfo playerList;
 
     [Tooltip("If true, display as \"Resource name: count\". If false, display only the count.")]
@@ -48,6 +48,12 @@ public class ResourceCounterDisplay : MonoBehaviour
         _text = GetComponent<TMP_Text>();
         if (_text == null)
             _text = GetComponentInChildren<TMP_Text>();
+    }
+
+    private void Start()
+    {
+        if (playerList == null)
+            playerList = FindObjectOfType<playersInfo>();
     }
 
     private void Update()
