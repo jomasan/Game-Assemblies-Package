@@ -86,6 +86,11 @@ public class playerController : MonoBehaviour
     public UnityEvent onPlayerButton_LB;
     public UnityEvent onPlayerButton_RB;
 
+    // Prevent duplicate recipe cycles when both direct input and UnityEvent listeners fire on the same frame.
+    private int lastRecipeCycleFrame = -1;
+    private Station lastRecipeCycleStation;
+    private int lastRecipeCycleDelta = 0;
+
     private bool coroutineRunning = false;
     public bool doUpdate = false;
     public bool debug = false;
@@ -644,60 +649,70 @@ public class playerController : MonoBehaviour
 
     public void onFire5(InputAction.CallbackContext context)
     {
-
-        if (context.started)
-        {
-            Debug.Log("Button RB Pressed Down");
-            
-            if (playerSprite == null) return;
-            
-            spriteID--;
-            
-            // Handle wrapping based on available sprites
-            int maxSprites = (characterSprites != null && characterSprites.Count > 0) 
-                ? characterSprites.Count 
-                : 4; // Fallback to 4 for individual sprite fields
-            
-            if (spriteID < 0)
-            {
-                spriteID = maxSprites - 1;
-            }
-            
-            Sprite spriteToUse = GetSpriteByID(spriteID);
-            if (spriteToUse != null)
-            {
-                playerSprite.sprite = spriteToUse;
-            }
-        }
-
+        if (!context.started) return;
+        if (debug) Debug.Log("Button LB Held");
+        CycleActiveRecipePrevious();
+        onPlayerButton_LB?.Invoke();
     }
 
     public void onFire6(InputAction.CallbackContext context)
     {
-        if (context.started)
+        if (!context.started) return;
+        if (debug) Debug.Log("Button RB Held");
+        CycleActiveRecipeNext();
+        onPlayerButton_RB?.Invoke();
+    }
+
+    /// <summary>Previous recipe on the active multi-recipe station. Wire to <c>onPlayerButton_LB</c> for UnityEvent-only setups; <see cref="onFire5"/> also calls this then invokes that event.</summary>
+    public void CycleActiveRecipePrevious()
+    {
+        Station stationForRecipes = GetStationForRecipeCycle();
+        if (stationForRecipes == null) return;
+        if (IsDuplicateRecipeCycleThisFrame(stationForRecipes, -1)) return;
+        stationForRecipes.CycleActiveRecipe(-1);
+        CacheRecipeCycle(stationForRecipes, -1);
+        if (debug) Debug.Log("Recipe cycle: previous (CycleActiveRecipePrevious)");
+    }
+
+    /// <summary>Next recipe on the active multi-recipe station. Wire to <c>onPlayerButton_RB</c> for UnityEvent-only setups; <see cref="onFire6"/> also calls this then invokes that event.</summary>
+    public void CycleActiveRecipeNext()
+    {
+        Station stationForRecipes = GetStationForRecipeCycle();
+        if (stationForRecipes == null) return;
+        if (IsDuplicateRecipeCycleThisFrame(stationForRecipes, 1)) return;
+        stationForRecipes.CycleActiveRecipe(1);
+        CacheRecipeCycle(stationForRecipes, 1);
+        if (debug) Debug.Log("Recipe cycle: next (CycleActiveRecipeNext)");
+    }
+
+    bool IsDuplicateRecipeCycleThisFrame(Station station, int delta)
+    {
+        return lastRecipeCycleFrame == Time.frameCount
+            && lastRecipeCycleStation == station
+            && lastRecipeCycleDelta == delta;
+    }
+
+    void CacheRecipeCycle(Station station, int delta)
+    {
+        lastRecipeCycleFrame = Time.frameCount;
+        lastRecipeCycleStation = station;
+        lastRecipeCycleDelta = delta;
+    }
+
+    /// <summary>Station the player is inspecting or working at, if it has multiple recipes to cycle.</summary>
+    Station GetStationForRecipeCycle()
+    {
+        if (objectToInspect != null)
         {
-            Debug.Log("Button LB Pressed Down");
-            
-            if (playerSprite == null) return;
-            
-            spriteID++;
-            
-            // Handle wrapping based on available sprites
-            int maxSprites = (characterSprites != null && characterSprites.Count > 0) 
-                ? characterSprites.Count 
-                : 4; // Fallback to 4 for individual sprite fields
-            
-            if (spriteID >= maxSprites)
-            {
-                spriteID = 0;
-            }
-            
-            Sprite spriteToUse = GetSpriteByID(spriteID);
-            if (spriteToUse != null)
-            {
-                playerSprite.sprite = spriteToUse;
-            }
+            var s = objectToInspect.GetComponent<Station>();
+            if (s != null && s.HasMultipleRecipes()) return s;
         }
+        if (objectToLabor != null)
+        {
+            var s = objectToLabor.GetComponent<Station>();
+            if (s != null && s.HasMultipleRecipes()) return s;
+        }
+        return null;
     }
 
     public void onPause(InputAction.CallbackContext context)
@@ -1000,5 +1015,28 @@ public class playerController : MonoBehaviour
     public void pauseGame()
     {
         if(gameManager != null) gameManager.SetState(GameState.Paused);
+    }
+
+    /// <summary>
+    /// Adds reward points earned by this player (e.g., from consuming consumables) and routes
+    /// the value into the active score system shown by the resource canvas.
+    /// </summary>
+    public void AddRewardPoints(int amount)
+    {
+        if (amount <= 0) return;
+
+        // Preserve existing per-player currency behavior.
+        capital += amount;
+
+        // Route score to TeamManager when present (Solo/Teams/EveryoneOneTeam handling lives there).
+        if (TeamManager.Instance != null)
+        {
+            TeamManager.Instance.AddScore(amount, this);
+        }
+        else if (ResourceManager.Instance != null)
+        {
+            // Fallback path used by resourceManagerCanvas when TeamManager is absent.
+            ResourceManager.Instance.globalCapital += amount;
+        }
     }
 }

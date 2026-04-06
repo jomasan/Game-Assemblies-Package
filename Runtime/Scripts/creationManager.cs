@@ -55,6 +55,7 @@ public class creationManager : MonoBehaviour
         {
             // Instantiate the sprite prefab as a child of the canvas
             GameObject newSprite = Instantiate(sprites[spriteID], hit.point, Quaternion.identity);
+            NotifyStationGoalContribution(newSprite, null);
         }
     }
 
@@ -76,6 +77,8 @@ public class creationManager : MonoBehaviour
         }
         
         GameObject newSprite = Instantiate(sprites[spriteIDforPlayer], player.transform.position, Quaternion.identity);
+        playerController contributor = player.GetComponent<playerController>();
+        NotifyStationGoalContribution(newSprite, contributor);
     }
     
     // Method to update the sprite ID from the inventory system
@@ -109,6 +112,16 @@ public class creationManager : MonoBehaviour
             Debug.LogWarning($"No sprite ID found for player ID {playerId}");
             return -1; // Or any default/error value
         }
+    }
+
+    private void NotifyStationGoalContribution(GameObject createdObject, playerController contributor)
+    {
+        if (createdObject == null || GoalManager.Instance == null) return;
+
+        Station station = createdObject.GetComponent<Station>();
+        if (station == null || station.stationData == null) return;
+
+        GoalManager.Instance.stationGoalContribution(station.stationData, contributor);
     }
     
     

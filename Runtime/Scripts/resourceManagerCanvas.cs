@@ -1,18 +1,22 @@
 using UnityEngine;
 using TMPro;
 using System.Collections.Generic;
+using UnityEngine.Serialization;
 
 public class resourceManagerCanvas : MonoBehaviour
 {
 
     public GameObject timerModule;
     public GameObject goalTrackerModule;
-    public TMP_Text globalScoreModule;
+    [FormerlySerializedAs("globalScoreModule")]
+    [Tooltip("Text used for independent/general score display (shared total).")]
+    public TMP_Text totalScoreText;
 
-    [Tooltip("Optional list of score UI elements (max 4). When set, these are shown/hidden and updated based on TeamManager. If empty, globalScoreModule is used for a single score.")]
-    public List<TMP_Text> scoreItems = new List<TMP_Text>();
+    [FormerlySerializedAs("scoreItems")]
+    [Tooltip("Optional list of player score texts (max 4), one slot per player.")]
+    public List<TMP_Text> playerScoreTexts = new List<TMP_Text>();
 
-    [Tooltip("When false, all score UI (scoreItems and globalScoreModule) is hidden. Set by Create Resource Management System or at runtime.")]
+    [Tooltip("When false, all score UI (playerScoreTexts and totalScoreText) is hidden. Set by Create Resource Management System or at runtime.")]
     public bool scoreDisplayEnabled = true;
 
     //game states:
@@ -39,62 +43,90 @@ public class resourceManagerCanvas : MonoBehaviour
     {
         if (!scoreDisplayEnabled)
         {
-            if (globalScoreModule != null)
-                globalScoreModule.gameObject.SetActive(false);
-            if (scoreItems != null)
-            {
-                for (int i = 0; i < scoreItems.Count; i++)
-                {
-                    if (scoreItems[i] != null)
-                        scoreItems[i].gameObject.SetActive(false);
-                }
-            }
+            SetTotalScoreVisible(false);
+            SetAllPlayerScoresVisible(false);
             return;
         }
 
-        bool useScoreItems = scoreItems != null && scoreItems.Count > 0;
-
         if (TeamManager.Instance != null)
         {
-            int count = TeamManager.Instance.GetScoreDisplayCount();
-            if (useScoreItems)
+            bool showPlayerScores = TeamManager.Instance.UsesPerPlayerScores();
+
+            if (showPlayerScores)
             {
-                for (int i = 0; i < scoreItems.Count && i < TeamManager.MaxScoreDisplayCount; i++)
-                {
-                    if (scoreItems[i] == null) continue;
-                    bool active = i < count;
-                    scoreItems[i].gameObject.SetActive(active);
-                    if (active)
-                    {
-                        scoreItems[i].text = TeamManager.Instance.GetScoreLabel(i) + ": " + TeamManager.Instance.GetScoreValue(i).ToString();
-                    }
-                }
+                ShowPlayerScoresFromTeamManager();
             }
-            else if (globalScoreModule != null)
+            else
             {
-                globalScoreModule.gameObject.SetActive(true);
-                globalScoreModule.text = "Score: " + TeamManager.Instance.GetScoreForLevel().ToString();
+                SetAllPlayerScoresVisible(false);
+                SetTotalScoreVisible(true);
+                if (totalScoreText != null)
+                    totalScoreText.text = "Total Score: " + TeamManager.Instance.GetScoreForLevel().ToString();
             }
         }
         else
         {
+            SetAllPlayerScoresVisible(false);
+            SetTotalScoreVisible(true);
             int singleScore = ResourceManager.Instance != null ? ResourceManager.Instance.globalCapital : 0;
-            if (useScoreItems && scoreItems[0] != null)
-            {
-                scoreItems[0].gameObject.SetActive(true);
-                scoreItems[0].text = "Score: " + singleScore.ToString();
-                for (int i = 1; i < scoreItems.Count && i < TeamManager.MaxScoreDisplayCount; i++)
-                {
-                    if (scoreItems[i] != null)
-                        scoreItems[i].gameObject.SetActive(false);
-                }
-            }
-            else if (globalScoreModule != null)
-            {
-                globalScoreModule.gameObject.SetActive(true);
-                globalScoreModule.text = "Score: " + singleScore.ToString();
-            }
+            if (totalScoreText != null)
+                totalScoreText.text = "Total Score: " + singleScore.ToString();
         }
+    }
+
+    private void ShowPlayerScoresFromTeamManager()
+    {
+        int displayCount = TeamManager.Instance.GetScoreDisplayCount();
+        List<TMP_Text> usableScoreTexts = GetUsablePlayerScoreTexts();
+        bool totalTextIsUsedAsPlayerSlot = totalScoreText != null && usableScoreTexts.Contains(totalScoreText);
+
+        // If total score text is also used as a player slot in the scene, keep it visible here.
+        if (!totalTextIsUsedAsPlayerSlot) SetTotalScoreVisible(false);
+
+        for (int i = 0; i < usableScoreTexts.Count; i++)
+        {
+            if (usableScoreTexts[i] != null)
+                usableScoreTexts[i].gameObject.SetActive(false);
+        }
+
+        int visibleSlots = Mathf.Min(Mathf.Min(TeamManager.MaxScoreDisplayCount, displayCount), usableScoreTexts.Count);
+        for (int i = 0; i < visibleSlots; i++)
+        {
+            TMP_Text scoreText = usableScoreTexts[i];
+            if (scoreText == null) continue;
+            scoreText.gameObject.SetActive(true);
+            scoreText.text = "Player " + (i + 1) + ": " + TeamManager.Instance.GetScoreValue(i).ToString();
+        }
+    }
+
+    private void SetTotalScoreVisible(bool visible)
+    {
+        if (totalScoreText != null)
+            totalScoreText.gameObject.SetActive(visible);
+    }
+
+    private void SetAllPlayerScoresVisible(bool visible)
+    {
+        if (playerScoreTexts == null) return;
+        for (int i = 0; i < playerScoreTexts.Count; i++)
+        {
+            if (playerScoreTexts[i] != null)
+                playerScoreTexts[i].gameObject.SetActive(visible);
+        }
+    }
+
+    private List<TMP_Text> GetUsablePlayerScoreTexts()
+    {
+        var usable = new List<TMP_Text>();
+        if (playerScoreTexts == null) return usable;
+
+        for (int i = 0; i < playerScoreTexts.Count; i++)
+        {
+            TMP_Text txt = playerScoreTexts[i];
+            if (txt == null) continue;
+            if (!usable.Contains(txt)) usable.Add(txt);
+        }
+        return usable;
     }
 
     public void updatePlayerInvites()

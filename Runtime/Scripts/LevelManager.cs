@@ -140,6 +140,7 @@ public class LevelManager : MonoBehaviour
         if (currentLevel.levelType == LevelType.Sequential &&
             sequentialGoalIndex >= currentLevel.sequentialGoals.Count &&
             GoalManager.Instance.activeGoals.Count == 0 &&
+            GoalManager.Instance.activeStationGoals.Count == 0 &&
             currentLevel.endLevelWhenComplete)
         {
             delayCount += Time.deltaTime; //delay the completion of a level
@@ -247,8 +248,16 @@ public class LevelManager : MonoBehaviour
         if (Time.time >= nextGoalTime && sequentialGoalIndex < currentLevel.sequentialGoals.Count)
         {
             // Create the next goal in the sequence
-            CreateGoal(currentLevel.sequentialGoals[sequentialGoalIndex]);
+            var nextGoal = currentLevel.sequentialGoals[sequentialGoalIndex];
             sequentialGoalIndex++;
+            if (nextGoal == null)
+            {
+                if (debug) Debug.LogWarning("Sequential goal entry is null. Skipping.");
+            }
+            else
+            {
+                CreateGoal(nextGoal);
+            }
 
             // Update the time for the next goal
             nextGoalTime = Time.time + currentLevel.goalInterval;
@@ -267,14 +276,17 @@ public class LevelManager : MonoBehaviour
         {
             // Check if we're under the max active goals limit
             if (GoalManager.Instance != null &&
-                GoalManager.Instance.activeGoals.Count < currentLevel.maxActiveGoals)
+                (GoalManager.Instance.activeGoals.Count + GoalManager.Instance.activeStationGoals.Count) < currentLevel.maxActiveGoals)
             {
 
                 if(manualGoals == false)
                 {
                     // Select a random goal from the pool
                     int randomIndex = Random.Range(0, currentLevel.randomGoalPool.Count);
-                    CreateGoal(currentLevel.randomGoalPool[randomIndex]);
+                    var randomGoal = currentLevel.randomGoalPool[randomIndex];
+                    if (randomGoal != null)
+                        CreateGoal(randomGoal);
+                    else if (debug) Debug.LogWarning("Random goal entry is null. Skipping.");
 
                     // Update the time for the next goal
                     nextGoalTime = Time.time + currentLevel.goalInterval;
@@ -285,20 +297,46 @@ public class LevelManager : MonoBehaviour
     }
     public void CreateGoal(ResourceGoalSO goalTemplate)
     {
+        CreateGoal((ScriptableObject)goalTemplate);
+    }
+
+    public void CreateGoal(StationGoalSO goalTemplate)
+    {
+        CreateGoal((ScriptableObject)goalTemplate);
+    }
+
+    public void CreateGoal(ScriptableObject goalTemplate)
+    {
+        if (goalTemplate == null)
+        {
+            if (debug) Debug.LogWarning("CreateGoal called with null goal.");
+            return;
+        }
         if (GoalManager.Instance == null)
         {
             Debug.LogError("GoalManager instance not found!");
             return;
         }
 
-        // Create a runtime copy of the goal
-        ResourceGoalSO runtimeGoal = Instantiate(goalTemplate);
-        runtimeGoal.ResetGoal();
+        if (goalTemplate is ResourceGoalSO resourceGoalTemplate)
+        {
+            ResourceGoalSO runtimeGoal = Instantiate(resourceGoalTemplate);
+            runtimeGoal.ResetGoal();
+            GoalManager.Instance.AddGoal(runtimeGoal);
+            if (debug) Debug.Log($"Created resource goal: Collect {runtimeGoal.requiredCount} of {(runtimeGoal.resourceType != null ? runtimeGoal.resourceType.resourceName : "Unknown")}");
+            return;
+        }
 
-        // Add the goal to the GoalManager
-        GoalManager.Instance.AddGoal(runtimeGoal);
+        if (goalTemplate is StationGoalSO stationGoalTemplate)
+        {
+            StationGoalSO runtimeGoal = Instantiate(stationGoalTemplate);
+            runtimeGoal.ResetGoal();
+            GoalManager.Instance.AddStationGoal(runtimeGoal);
+            if (debug) Debug.Log($"Created station goal: Create {runtimeGoal.requiredCount} of {(runtimeGoal.stationType != null ? runtimeGoal.stationType.stationName : "Unknown")}");
+            return;
+        }
 
-        if (debug) Debug.Log($"Created new goal: Collect {runtimeGoal.requiredCount} of {runtimeGoal.resourceType.resourceName}");
+        Debug.LogWarning($"Unsupported goal type in LevelManager.CreateGoal: {goalTemplate.GetType().Name}");
     }
     // Public methods to manually control level flow
     public void RestartCurrentLevel()
@@ -317,7 +355,9 @@ public class LevelManager : MonoBehaviour
         if (currentLevel.randomGoalPool.Count > 0)
         {
             int randomIndex = Random.Range(0, currentLevel.randomGoalPool.Count);
-            CreateGoal(currentLevel.randomGoalPool[randomIndex]);
+            var randomGoal = currentLevel.randomGoalPool[randomIndex];
+            if (randomGoal != null)
+                CreateGoal(randomGoal);
         }
     }
     public void ForceCreateNextSequentialGoal()
@@ -325,7 +365,9 @@ public class LevelManager : MonoBehaviour
         if (currentLevel.levelType == LevelType.Sequential &&
             sequentialGoalIndex < currentLevel.sequentialGoals.Count)
         {
-            CreateGoal(currentLevel.sequentialGoals[sequentialGoalIndex]);
+            var nextGoal = currentLevel.sequentialGoals[sequentialGoalIndex];
+            if (nextGoal != null)
+                CreateGoal(nextGoal);
             sequentialGoalIndex++;
         }
     }

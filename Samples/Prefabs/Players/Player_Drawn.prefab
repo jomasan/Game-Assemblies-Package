@@ -172,11 +172,35 @@ MonoBehaviour:
     m_ActionId: d04f2ad8-42c0-47b5-966e-2870b759b5c0
     m_ActionName: 'Player/Pause[/XInputControllerWindows/start,/Keyboard/escape]'
   - m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1452746343743981490}
+        m_TargetAssemblyTypeName: playerController, GameAssemblyLab.GameAssemblies
+        m_MethodName: onFire5
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
     m_ActionId: 14997d26-c561-4f95-aca6-6d629646552a
     m_ActionName: 'Player/Fire 5[/XInputControllerWindows/leftShoulder]'
   - m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1452746343743981490}
+        m_TargetAssemblyTypeName: playerController, GameAssemblyLab.GameAssemblies
+        m_MethodName: onFire6
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
     m_ActionId: a3e574b9-2d9a-44de-8c1c-526dade39c9f
     m_ActionName: 'Player/Fire 6[/XInputControllerWindows/rightShoulder]'
   m_NeverAutoSwitchControlSchemes: 1
@@ -218,8 +242,13 @@ MonoBehaviour:
   maxObjectsToCarry: 8
   isAbsorbingResources: 0
   objectToLabor: {fileID: 0}
+  listObjectsToLabor: []
   objectToInspect: {fileID: 0}
+  listObjectsToInspect: []
   performingLabor: 0
+  useSnapTarget: 1
+  snapRadius: 2.5
+  snapAimBias: 0.3
   capital: 0
   properties: []
   distanceFromPlayer: 0.4
@@ -305,10 +334,34 @@ MonoBehaviour:
         m_CallState: 2
   onPlayerButton_LB:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1452746343743981490}
+        m_TargetAssemblyTypeName: playerController, GameAssemblyLab.GameAssemblies
+        m_MethodName: CycleActiveRecipePrevious
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
   onPlayerButton_RB:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1452746343743981490}
+        m_TargetAssemblyTypeName: playerController, GameAssemblyLab.GameAssemblies
+        m_MethodName: CycleActiveRecipeNext
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
   doUpdate: 0
   debug: 1
   useManagerColors: 0

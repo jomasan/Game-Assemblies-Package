@@ -9,8 +9,9 @@ public class GoalTrackerUI : MonoBehaviour
     // Assign the Slider that will represent the remaining time.
     [SerializeField] private Slider timeSlider;
 
-    // The goal that this UI tracker is currently displaying.
-    private ResourceGoalSO currentGoal;
+    // The goal this UI tracker is currently displaying.
+    private ResourceGoalSO currentResourceGoal;
+    private StationGoalSO currentStationGoal;
 
     
 
@@ -26,7 +27,8 @@ public class GoalTrackerUI : MonoBehaviour
     /// <param name="goal">The ResourceGoalSO to track.</param>
     public void Initialize(ResourceGoalSO goal)
     {
-        currentGoal = goal;
+        currentResourceGoal = goal;
+        currentStationGoal = null;
 
         // If the resource type has an associated icon, assign it to the UI Image.
         if (goal.resourceType != null && resourceIcon != null)
@@ -37,12 +39,41 @@ public class GoalTrackerUI : MonoBehaviour
 
         // Set up the slider. We set the maximum value to the goal's time limit
         // and initialize it with the remaining time.
-        timeSlider.maxValue = goal.timeLimit;
-        timeSlider.value = goal.remainingTime;
+        if (timeSlider != null)
+        {
+            timeSlider.maxValue = goal.timeLimit;
+            timeSlider.value = goal.remainingTime;
+        }
 
         // Update the fill color based on the current time.
-        float ratio = currentGoal.remainingTime / currentGoal.timeLimit;
-        sliderFillImage.color = timeColorRamp.Evaluate(ratio);
+        float ratio = goal.timeLimit > 0f ? (goal.remainingTime / goal.timeLimit) : 0f;
+        if (sliderFillImage != null)
+            sliderFillImage.color = timeColorRamp.Evaluate(ratio);
+    }
+
+    /// <summary>
+    /// Initializes the GoalTrackerUI with a station creation goal.
+    /// </summary>
+    public void Initialize(StationGoalSO goal)
+    {
+        currentStationGoal = goal;
+        currentResourceGoal = null;
+
+        if (goal.stationType != null && resourceIcon != null)
+        {
+            resourceIcon.sprite = goal.stationType.stationGraphic;
+            resourceIcon.color = goal.stationType.stationSpriteTint.a < 0.01f ? Color.white : goal.stationType.stationSpriteTint;
+        }
+
+        if (timeSlider != null)
+        {
+            timeSlider.maxValue = goal.timeLimit;
+            timeSlider.value = goal.remainingTime;
+        }
+
+        float ratio = goal.timeLimit > 0f ? (goal.remainingTime / goal.timeLimit) : 0f;
+        if (sliderFillImage != null)
+            sliderFillImage.color = timeColorRamp.Evaluate(ratio);
     }
 
     private static Color GetIconTint(Resource r)
@@ -53,15 +84,26 @@ public class GoalTrackerUI : MonoBehaviour
 
     private void Update()
     {
-        if (currentGoal != null)
+        if (currentResourceGoal != null)
         {
             // Update the slider to represent the remaining time.
-            timeSlider.value = currentGoal.remainingTime;
+            if (timeSlider != null)
+                timeSlider.value = currentResourceGoal.remainingTime;
 
             // Calculate the ratio of remaining time to total time.
-            float ratio = currentGoal.remainingTime / currentGoal.timeLimit;
+            float ratio = currentResourceGoal.timeLimit > 0f ? (currentResourceGoal.remainingTime / currentResourceGoal.timeLimit) : 0f;
             // Update the fill color using the gradient.
-            sliderFillImage.color = timeColorRamp.Evaluate(ratio);
+            if (sliderFillImage != null)
+                sliderFillImage.color = timeColorRamp.Evaluate(ratio);
+        }
+        else if (currentStationGoal != null)
+        {
+            if (timeSlider != null)
+                timeSlider.value = currentStationGoal.remainingTime;
+
+            float ratio = currentStationGoal.timeLimit > 0f ? (currentStationGoal.remainingTime / currentStationGoal.timeLimit) : 0f;
+            if (sliderFillImage != null)
+                sliderFillImage.color = timeColorRamp.Evaluate(ratio);
         }
     }
 }

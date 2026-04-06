@@ -15,7 +15,8 @@ public class TeamManager : MonoBehaviour
     {
         EveryoneOneTeam,
         Teams,
-        Solo
+        Solo,
+        CompetitiveSolo
     }
 
     public enum LevelScoreAggregate
@@ -25,7 +26,7 @@ public class TeamManager : MonoBehaviour
     }
 
     [Header("Configuration")]
-    [Tooltip("EveryoneOneTeam = one shared score (ResourceManager.globalCapital). Teams = per-team scores. Solo = per-player scores.")]
+    [Tooltip("EveryoneOneTeam = one shared score (ResourceManager.globalCapital). Teams = per-team scores. Solo = per-player scores for joined players. CompetitiveSolo = per-player competitive scores with 4 UI slots (Player 1-4).")]
     public Mode mode = Mode.EveryoneOneTeam;
     [Tooltip("When mode is Teams, how to derive the level score for results/stars.")]
     public LevelScoreAggregate levelScoreAggregate = LevelScoreAggregate.SumAll;
@@ -71,7 +72,7 @@ public class TeamManager : MonoBehaviour
     public void RegisterPlayer(playerController pc)
     {
         if (pc == null) return;
-        if (mode == Mode.Solo)
+        if (mode == Mode.Solo || mode == Mode.CompetitiveSolo)
         {
             if (!playerScores.ContainsKey(pc))
                 playerScores[pc] = 0;
@@ -109,7 +110,7 @@ public class TeamManager : MonoBehaviour
             return;
         }
 
-        if (mode == Mode.Solo)
+        if (mode == Mode.Solo || mode == Mode.CompetitiveSolo)
         {
             if (contributor != null)
             {
@@ -141,7 +142,7 @@ public class TeamManager : MonoBehaviour
             return 0;
         }
 
-        if (mode == Mode.Solo)
+        if (mode == Mode.Solo || mode == Mode.CompetitiveSolo)
         {
             int sum = 0;
             foreach (var v in playerScores.Values)
@@ -201,6 +202,18 @@ public class TeamManager : MonoBehaviour
         return playerScores.ContainsKey(pc) ? playerScores[pc] : 0;
     }
 
+    /// <summary>True when score is tracked per player (individual competition/co-op split).</summary>
+    public bool UsesPerPlayerScores()
+    {
+        return mode == Mode.Solo || mode == Mode.CompetitiveSolo;
+    }
+
+    /// <summary>True when score should be shown as one shared total (global/team aggregate).</summary>
+    public bool UsesSharedTotalScore()
+    {
+        return mode == Mode.EveryoneOneTeam || mode == Mode.Teams;
+    }
+
     /// <summary>Number of score slots to show in UI (1 for EveryoneOneTeam, up to 4 for Teams/Solo).</summary>
     public const int MaxScoreDisplayCount = 4;
 
@@ -214,6 +227,8 @@ public class TeamManager : MonoBehaviour
                 return 1;
             return Mathf.Min(MaxScoreDisplayCount, playerList.allControllers.Count);
         }
+        if (mode == Mode.CompetitiveSolo)
+            return MaxScoreDisplayCount;
         if (mode == Mode.Teams)
         {
             var ids = GetOrderedTeamIds();
@@ -227,6 +242,8 @@ public class TeamManager : MonoBehaviour
     {
         if (mode == Mode.EveryoneOneTeam)
             return "Score";
+        if (mode == Mode.CompetitiveSolo && index >= 0 && index < MaxScoreDisplayCount)
+            return "Player " + (index + 1);
         if (mode == Mode.Solo && playerList != null && playerList.allControllers != null && index >= 0 && index < playerList.allControllers.Count)
             return "Player " + (index + 1);
         if (mode == Mode.Teams)
@@ -243,6 +260,14 @@ public class TeamManager : MonoBehaviour
     {
         if (mode == Mode.EveryoneOneTeam)
             return GetScoreForLevel();
+        if (mode == Mode.CompetitiveSolo)
+        {
+            if (index < 0 || index >= MaxScoreDisplayCount || playerList == null || playerList.allControllers == null)
+                return 0;
+            if (index >= playerList.allControllers.Count) return 0;
+            var pc = playerList.allControllers[index];
+            return GetPlayerScore(pc);
+        }
         if (mode == Mode.Solo && playerList != null && playerList.allControllers != null && index >= 0 && index < playerList.allControllers.Count)
         {
             var pc = playerList.allControllers[index];

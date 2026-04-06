@@ -97,7 +97,7 @@ public class SA_CreateResourceManagementWindow : EditorWindow
         }
 
         GameObject gtg = canvas?.goalTrackerModule;
-        TMP_Text gs = canvas?.globalScoreModule;
+        TMP_Text gs = canvas?.totalScoreText;
 
         var goalManager = gm_instance.GetComponent<GoalManager>();
         if (goalManager != null)

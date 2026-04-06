@@ -27,7 +27,8 @@ public class playerConsumeArea : MonoBehaviour
         {
             if (debug) Debug.Log("Consumed: " + other);
             Destroy(other.gameObject);
-            pController.capital += 1;
+            if (pController != null)
+                pController.AddRewardPoints(1);
         }
         else if (pController.isAbsorbingResources && TagUtilities.HasTag(other.gameObject, TagType.Resource) && TagUtilities.HasTag(other.gameObject, TagType.Grabbable))
         {

@@ -21,6 +21,7 @@ public static class SA_DatabaseManager
         (typeof(LootTable), "Loot Tables"),
         (typeof(LevelDataSO), "Levels"),
         (typeof(ResourceGoalSO), "Resource Goals"),
+        (typeof(StationGoalSO), "Station Goals"),
         (typeof(RecipeSO), "Recipes"),
         (typeof(PolicyDataSO), "Policies"),
         (typeof(ColorPaletteSO), "Color Palettes"),

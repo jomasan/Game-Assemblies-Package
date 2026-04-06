@@ -58,6 +58,14 @@ public class StationDataSO : ScriptableObject
     public bool isSingleUse;
     public bool destroyAfterSingleUse = true;
 
+    [Header("Upgrade (Auto Over Time)")]
+    [Tooltip("When enabled, this station automatically upgrades to one random prefab from the list below after upgradeTimeInterval seconds.")]
+    public bool upgradeOverTime = false;
+    [Tooltip("Seconds before automatic upgrade triggers when upgradeOverTime is enabled.")]
+    public float upgradeTimeInterval = 30f;
+    [Tooltip("Possible prefabs to instantiate when automatic timed upgrade occurs. One is chosen randomly each time.")]
+    public List<GameObject> upgradeOverTimePrefabs = new List<GameObject>();
+
     [Header("Capital")]
     public bool capitalInput;
     public bool capitalOutput;
@@ -74,6 +82,26 @@ public class StationDataSO : ScriptableObject
     public float productionInterval = 5f;
     public Station.interactionType typeOfProduction = Station.interactionType.whenWorked;
     public Station.interactionType typeOfConsumption = Station.interactionType.whenWorked;
+
+    /// <summary>
+    /// Sets <see cref="CanvasScaler.scaleFactor"/> on the first <see cref="CanvasScaler"/> under the station (info panel / progress UI).
+    /// </summary>
+    public void ApplyUiScale(Transform stationRoot)
+    {
+        if (stationRoot == null) return;
+        var canvasScaler = stationRoot.GetComponentInChildren<CanvasScaler>();
+        if (canvasScaler != null) canvasScaler.scaleFactor = uiScale;
+    }
+
+    /// <summary>
+    /// Applies <see cref="offsetY"/> and <see cref="uiScale"/> to the station (info window height + canvas scaler).
+    /// </summary>
+    public void ApplyInspectUiLayout(Station station)
+    {
+        if (station == null) return;
+        station.offsetY = offsetY;
+        ApplyUiScale(station.transform);
+    }
 
     /// <summary>
     /// Applies this data to a Station component. Assigns this SO as the station's data source
@@ -97,10 +125,7 @@ public class StationDataSO : ScriptableObject
         }
 
         station.transform.localScale = new Vector3(stationScale, stationScale, 1f);
-        station.offsetY = offsetY;
-
-        var canvasScaler = station.GetComponentInChildren<CanvasScaler>();
-        if (canvasScaler != null) canvasScaler.scaleFactor = uiScale;
+        ApplyInspectUiLayout(station);
 
         station.manualSliderPosition = manualSliderPosition;
 

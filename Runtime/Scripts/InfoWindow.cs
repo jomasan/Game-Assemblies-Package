@@ -21,6 +21,19 @@ public class InfoWindow : MonoBehaviour
     public GameObject inputResource;
     public GameObject outputResource;
 
+    [Header("Recipe cycle hint (multi-recipe stations)")]
+    [Tooltip("Optional. Shown only when the station has more than one recipe (player can cycle with LB/RB).")]
+    public GameObject recipeCycleArrowLeft;
+    [Tooltip("Optional. Shown only when the station has more than one recipe (player can cycle with LB/RB).")]
+    public GameObject recipeCycleArrowRight;
+
+    /// <summary>Enables left/right arrow graphics when <paramref name="visible"/> is true (multiple recipes on the station).</summary>
+    public void SetRecipeCycleArrowsVisible(bool visible)
+    {
+        if (recipeCycleArrowLeft != null) recipeCycleArrowLeft.SetActive(visible);
+        if (recipeCycleArrowRight != null) recipeCycleArrowRight.SetActive(visible);
+    }
+
     private static Color GetIconTint(Resource r)
     {
         if (r == null) return Color.white;
@@ -82,6 +95,85 @@ public class InfoWindow : MonoBehaviour
         }
 
         ResizeToFitContent(consumes.Count, produces.Count, inputGrid, outputGrid);
+    }
+
+    /// <summary>Output panel for recipes that mix resource and station outputs (uses resource icon or station graphic).</summary>
+    public void InitializeRecipeOutputs(List<RecipeOutputSlot> recipeOutputs, List<Resource> consumes)
+    {
+        if (inputResource == null || outputResource == null || inputPanel == null || outputPanel == null) return;
+        if (recipeOutputs == null) recipeOutputs = new List<RecipeOutputSlot>();
+
+        for (int i = inputPanel.transform.childCount - 1; i >= 0; i--)
+            Destroy(inputPanel.transform.GetChild(i).gameObject);
+        for (int i = outputPanel.transform.childCount - 1; i >= 0; i--)
+            Destroy(outputPanel.transform.GetChild(i).gameObject);
+
+        var inputGrid = inputPanel.GetComponent<GridLayoutGroup>();
+        if (inputGrid != null)
+        {
+            inputGrid.constraint = GridLayoutGroup.Constraint.FixedRowCount;
+            inputGrid.constraintCount = 1;
+        }
+        var outputGrid = outputPanel.GetComponent<GridLayoutGroup>();
+        if (outputGrid != null)
+        {
+            outputGrid.constraint = GridLayoutGroup.Constraint.FixedRowCount;
+            outputGrid.constraintCount = 1;
+        }
+
+        foreach (Resource c in consumes)
+        {
+            if (c == null) continue;
+            GameObject inputObjects = Instantiate(inputResource);
+            inputObjects.transform.SetParent(inputPanel.transform, false);
+            var inputImage = inputObjects.GetComponentInChildren<Image>(true);
+            if (inputImage != null)
+            {
+                if (c.icon != null) inputImage.sprite = c.icon;
+                inputImage.color = GetIconTint(c);
+            }
+        }
+
+        int outputCellCount = 0;
+        foreach (var slot in recipeOutputs)
+        {
+            if (slot == null) continue;
+            if (slot.kind == RecipeOutputKind.Resource && slot.resource != null)
+            {
+                int amt = Mathf.Max(1, slot.amount);
+                for (int a = 0; a < amt; a++)
+                {
+                    GameObject outputObjects = Instantiate(outputResource);
+                    outputObjects.transform.SetParent(outputPanel.transform, false);
+                    var outputImage = outputObjects.GetComponentInChildren<Image>(true);
+                    if (outputImage != null)
+                    {
+                        if (slot.resource.icon != null) outputImage.sprite = slot.resource.icon;
+                        outputImage.color = GetIconTint(slot.resource);
+                    }
+                    outputCellCount++;
+                }
+            }
+            else if (slot.kind == RecipeOutputKind.Station && slot.stationData != null)
+            {
+                int amt = Mathf.Max(1, slot.amount);
+                for (int a = 0; a < amt; a++)
+                {
+                    GameObject outputObjects = Instantiate(outputResource);
+                    outputObjects.transform.SetParent(outputPanel.transform, false);
+                    var outputImage = outputObjects.GetComponentInChildren<Image>(true);
+                    if (outputImage != null)
+                    {
+                        var sd = slot.stationData;
+                        if (sd.stationGraphic != null) outputImage.sprite = sd.stationGraphic;
+                        outputImage.color = sd.stationSpriteTint;
+                    }
+                    outputCellCount++;
+                }
+            }
+        }
+
+        ResizeToFitContent(consumes.Count, outputCellCount, inputGrid, outputGrid);
     }
 
     private void ResizeToFitContent(int inputCount, int outputCount,

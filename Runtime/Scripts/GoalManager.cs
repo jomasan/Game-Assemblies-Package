@@ -9,9 +9,11 @@ public class GoalManager : MonoBehaviour
     [Header("Goal Templates")]
     // Drag-and-drop your ResourceGoalSO assets into this list in the Inspector.
     [SerializeField] private List<ResourceGoalSO> goalTemplates = new List<ResourceGoalSO>();
+    [SerializeField] private List<StationGoalSO> stationGoalTemplates = new List<StationGoalSO>();
 
     // This list will hold runtime instances of the goals.
     public List<ResourceGoalSO> activeGoals = new List<ResourceGoalSO>();
+    public List<StationGoalSO> activeStationGoals = new List<StationGoalSO>();
 
     //[Header("Global Score")]
     //public int globalScore = 0;
@@ -65,6 +67,22 @@ public class GoalManager : MonoBehaviour
             gTracker.GetComponent<GoalTrackerUI>().Initialize(runtimeGoal);
         }
 
+        // For each station goal template, create a runtime copy and reset its state.
+        foreach (var stationGoalTemplate in stationGoalTemplates)
+        {
+            if (stationGoalTemplate == null) continue;
+
+            StationGoalSO runtimeStationGoal = Instantiate(stationGoalTemplate);
+            runtimeStationGoal.ResetGoal();
+            activeStationGoals.Add(runtimeStationGoal);
+
+            GameObject gTracker = Instantiate(goalTracker);
+            gTracker.transform.parent = goalTrackerGrid.transform;
+            allGoalTrackers.Add(gTracker);
+
+            gTracker.GetComponent<GoalTrackerUI>().Initialize(runtimeStationGoal);
+        }
+
         UpdateScoreUI();
     }
 
@@ -82,6 +100,10 @@ public class GoalManager : MonoBehaviour
             foreach (ResourceGoalSO goal in activeGoals)
             {
                 goal.UpdateGoaltime(dt);
+            }
+            foreach (StationGoalSO stationGoal in activeStationGoals)
+            {
+                stationGoal.UpdateGoaltime(dt);
             }
 
             // Check for completed goals.
@@ -113,6 +135,46 @@ public class GoalManager : MonoBehaviour
                     activeGoals.RemoveAt(i);
                     Destroy(allGoalTrackers[i]);
                     allGoalTrackers.RemoveAt(i);
+                    UpdateScoreUI();
+                }
+            }
+
+            // Check for completed/failed station goals.
+            for (int i = activeStationGoals.Count - 1; i >= 0; i--)
+            {
+                StationGoalSO goal = activeStationGoals[i];
+                if (goal.isCompleted)
+                {
+                    if (debug) Debug.Log($"Station Goal Completed: Create {goal.requiredCount} of {(goal.stationType != null ? goal.stationType.stationName : "Unknown")}. Reward: {goal.rewardPoints}.");
+                    if (TeamManager.Instance != null)
+                        TeamManager.Instance.AddScore(goal.rewardPoints, goal.lastContributor);
+                    else if (ResourceManager.Instance != null)
+                        ResourceManager.Instance.globalCapital += goal.rewardPoints;
+
+                    int trackerIndex = activeGoals.Count + i;
+                    activeStationGoals.RemoveAt(i);
+                    if (trackerIndex >= 0 && trackerIndex < allGoalTrackers.Count)
+                    {
+                        Destroy(allGoalTrackers[trackerIndex]);
+                        allGoalTrackers.RemoveAt(trackerIndex);
+                    }
+                    UpdateScoreUI();
+                }
+                else if (goal.isFailed)
+                {
+                    if (debug) Debug.Log($"Station Goal Failed: Create {goal.requiredCount} of {(goal.stationType != null ? goal.stationType.stationName : "Unknown")}. Penalty: {goal.penalty}.");
+                    if (TeamManager.Instance != null)
+                        TeamManager.Instance.AddScore(-goal.penalty, null);
+                    else if (ResourceManager.Instance != null)
+                        ResourceManager.Instance.globalCapital -= goal.penalty;
+
+                    int trackerIndex = activeGoals.Count + i;
+                    activeStationGoals.RemoveAt(i);
+                    if (trackerIndex >= 0 && trackerIndex < allGoalTrackers.Count)
+                    {
+                        Destroy(allGoalTrackers[trackerIndex]);
+                        allGoalTrackers.RemoveAt(trackerIndex);
+                    }
                     UpdateScoreUI();
                 }
             }
@@ -170,6 +232,26 @@ public class GoalManager : MonoBehaviour
         if (debug) Debug.Log($"Added new goal: {goal.resourceType.resourceName} x{goal.requiredCount}");
     }
 
+    public void AddStationGoal(StationGoalSO goal)
+    {
+        if (goal == null) return;
+        if (goalTracker == null || goalTrackerGrid == null)
+        {
+            Debug.LogWarning("GoalManager: goalTracker or goalTrackerGrid is not assigned. Cannot add station goal tracker.");
+            activeStationGoals.Add(goal);
+            return;
+        }
+
+        activeStationGoals.Add(goal);
+
+        GameObject gTracker = Instantiate(goalTracker);
+        gTracker.transform.parent = goalTrackerGrid.transform;
+        allGoalTrackers.Add(gTracker);
+        gTracker.GetComponent<GoalTrackerUI>().Initialize(goal);
+
+        if (debug) Debug.Log($"Added new station goal: {(goal.stationType != null ? goal.stationType.stationName : "Unknown")} x{goal.requiredCount}");
+    }
+
     // Add this method to clear all active goals (useful for level transitions)
     public void ClearAllGoals()
     {
@@ -182,6 +264,7 @@ public class GoalManager : MonoBehaviour
         // Clear the lists
         allGoalTrackers.Clear();
         activeGoals.Clear();
+        activeStationGoals.Clear();
 
         if (debug) Debug.Log("Cleared all active goals");
     }
@@ -191,15 +274,21 @@ public class GoalManager : MonoBehaviour
     /// </summary>
     public void UpdateScoreUI()
     {
-        if (scoreText != null)
+        if (scoreText == null) return;
+
+        // In per-player modes, the resourceManagerCanvas renders per-slot player scores.
+        // Do not overwrite that UI with a summed total label here.
+        if (TeamManager.Instance != null && TeamManager.Instance.UsesPerPlayerScores())
         {
-            int score = TeamManager.Instance != null ? TeamManager.Instance.GetScoreForLevel() : (ResourceManager.Instance != null ? ResourceManager.Instance.globalCapital : 0);
-            scoreText.text = "Score: " + score.ToString();
+            scoreText.gameObject.SetActive(false);
+            return;
         }
-        else
-        {
-            Debug.LogWarning("Score Text UI element is not assigned in GoalManager.");
-        }
+
+        scoreText.gameObject.SetActive(true);
+        int score = TeamManager.Instance != null
+            ? TeamManager.Instance.GetScoreForLevel()
+            : (ResourceManager.Instance != null ? ResourceManager.Instance.globalCapital : 0);
+        scoreText.text = "Total Score: " + score.ToString();
     }
 
     // A debug function to print the active goals and their progress.
@@ -216,6 +305,36 @@ public class GoalManager : MonoBehaviour
             Debug.Log($"Goal: Collect {goal.requiredCount} of {goalName} " +
                       $"(Current: {currentCount} - {progressPercent:F1}%) | " +
                       $"Time Remaining: {goal.remainingTime:F1}s | Status: {status}");
+        }
+
+        foreach (StationGoalSO goal in activeStationGoals)
+        {
+            string stationName = goal.stationType != null ? goal.stationType.stationName : "Unknown";
+            string status = goal.isCompleted ? "Completed" : (goal.isFailed ? "Failed" : "Active");
+            float progressPercent = ((float)goal.currentCount / Mathf.Max(1, goal.requiredCount)) * 100f;
+
+            Debug.Log($"Station Goal: Create {goal.requiredCount} of {stationName} " +
+                      $"(Current: {goal.currentCount} - {progressPercent:F1}%) | " +
+                      $"Time Remaining: {goal.remainingTime:F1}s | Status: {status}");
+        }
+    }
+
+    public void stationGoalContribution(StationDataSO stationType)
+    {
+        stationGoalContribution(stationType, null);
+    }
+
+    public void stationGoalContribution(StationDataSO stationType, playerController contributor)
+    {
+        if (stationType == null) return;
+        if (debug) Debug.Log("STATION GOAL CONTRIBUTION CALLED WITH " + stationType.stationName + (contributor != null ? " (contributor: player " + contributor.playerID + ")" : ""));
+
+        foreach (StationGoalSO goal in activeStationGoals)
+        {
+            if (goal.UpdateGoalObjective(stationType))
+            {
+                goal.lastContributor = contributor;
+            }
         }
     }
 }

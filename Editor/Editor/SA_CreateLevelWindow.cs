@@ -11,12 +11,12 @@ public class SA_CreateLevelWindow : EditorWindow
     private float timeLimit = 0f;
 
     // Sequential mode settings
-    private List<ResourceGoalSO> sequentialGoals = new List<ResourceGoalSO>();
-    private ResourceGoalSO newSequentialGoal;
+    private List<ScriptableObject> sequentialGoals = new List<ScriptableObject>();
+    private ScriptableObject newSequentialGoal;
 
     // Random mode settings
-    private List<ResourceGoalSO> randomGoalPool = new List<ResourceGoalSO>();
-    private ResourceGoalSO newRandomGoal;
+    private List<ScriptableObject> randomGoalPool = new List<ScriptableObject>();
+    private ScriptableObject newRandomGoal;
     private float goalInterval = 30f;
     private int maxActiveGoals = 3;
 
@@ -90,18 +90,20 @@ public class SA_CreateLevelWindow : EditorWindow
         for (int i = 0; i < sequentialGoals.Count; i++)
         {
             EditorGUILayout.BeginHorizontal();
-            sequentialGoals[i] = (ResourceGoalSO)EditorGUILayout.ObjectField($"Goal {i + 1}", sequentialGoals[i], typeof(ResourceGoalSO), false);
+            sequentialGoals[i] = (ScriptableObject)EditorGUILayout.ObjectField($"Goal {i + 1}", sequentialGoals[i], typeof(ScriptableObject), false);
+            if (!IsSupportedGoalType(sequentialGoals[i]))
+                sequentialGoals[i] = null;
 
             if (GUILayout.Button("↑", GUILayout.Width(25)) && i > 0)
             {
-                ResourceGoalSO temp = sequentialGoals[i - 1];
+                ScriptableObject temp = sequentialGoals[i - 1];
                 sequentialGoals[i - 1] = sequentialGoals[i];
                 sequentialGoals[i] = temp;
             }
 
             if (GUILayout.Button("↓", GUILayout.Width(25)) && i < sequentialGoals.Count - 1)
             {
-                ResourceGoalSO temp = sequentialGoals[i + 1];
+                ScriptableObject temp = sequentialGoals[i + 1];
                 sequentialGoals[i + 1] = sequentialGoals[i];
                 sequentialGoals[i] = temp;
             }
@@ -119,7 +121,9 @@ public class SA_CreateLevelWindow : EditorWindow
 
         // Add new goal
         EditorGUILayout.BeginHorizontal();
-        newSequentialGoal = (ResourceGoalSO)EditorGUILayout.ObjectField("New Goal", newSequentialGoal, typeof(ResourceGoalSO), false);
+        newSequentialGoal = (ScriptableObject)EditorGUILayout.ObjectField("New Goal", newSequentialGoal, typeof(ScriptableObject), false);
+        if (!IsSupportedGoalType(newSequentialGoal))
+            newSequentialGoal = null;
 
         GUI.enabled = newSequentialGoal != null;
         if (GUILayout.Button("Add Goal", GUILayout.Width(100)))
@@ -147,7 +151,9 @@ public class SA_CreateLevelWindow : EditorWindow
         for (int i = 0; i < randomGoalPool.Count; i++)
         {
             EditorGUILayout.BeginHorizontal();
-            randomGoalPool[i] = (ResourceGoalSO)EditorGUILayout.ObjectField($"Goal {i + 1}", randomGoalPool[i], typeof(ResourceGoalSO), false);
+            randomGoalPool[i] = (ScriptableObject)EditorGUILayout.ObjectField($"Goal {i + 1}", randomGoalPool[i], typeof(ScriptableObject), false);
+            if (!IsSupportedGoalType(randomGoalPool[i]))
+                randomGoalPool[i] = null;
 
             if (GUILayout.Button("X", GUILayout.Width(25)))
             {
@@ -162,7 +168,9 @@ public class SA_CreateLevelWindow : EditorWindow
 
         // Add new goal to pool
         EditorGUILayout.BeginHorizontal();
-        newRandomGoal = (ResourceGoalSO)EditorGUILayout.ObjectField("New Goal", newRandomGoal, typeof(ResourceGoalSO), false);
+        newRandomGoal = (ScriptableObject)EditorGUILayout.ObjectField("New Goal", newRandomGoal, typeof(ScriptableObject), false);
+        if (!IsSupportedGoalType(newRandomGoal))
+            newRandomGoal = null;
 
         GUI.enabled = newRandomGoal != null;
         if (GUILayout.Button("Add to Pool", GUILayout.Width(100)))
@@ -201,10 +209,10 @@ public class SA_CreateLevelWindow : EditorWindow
 
         if (levelType == LevelType.Sequential)
         {
-            newLevel.sequentialGoals = new List<ResourceGoalSO>(sequentialGoals);
+            newLevel.sequentialGoals = new List<ScriptableObject>(sequentialGoals);
         } else
         {
-            newLevel.randomGoalPool = new List<ResourceGoalSO>(randomGoalPool);
+            newLevel.randomGoalPool = new List<ScriptableObject>(randomGoalPool);
             newLevel.goalInterval = goalInterval;
             newLevel.maxActiveGoals = maxActiveGoals;
         }
@@ -217,5 +225,11 @@ public class SA_CreateLevelWindow : EditorWindow
         EditorGUIUtility.PingObject(newLevel);
 
         Debug.Log($"Level created: {levelName} at {assetPath}");
+    }
+
+    private bool IsSupportedGoalType(ScriptableObject goal)
+    {
+        if (goal == null) return true;
+        return goal is ResourceGoalSO || goal is StationGoalSO;
     }
 }

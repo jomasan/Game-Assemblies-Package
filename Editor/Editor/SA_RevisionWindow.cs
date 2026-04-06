@@ -6,6 +6,7 @@ using UnityEditor;
 /// <summary>
 /// Scene revision tool that validates the game assembly pipeline:
 /// Resources > Stations > Resource Manager > Goals > Levels > Game States
+/// plus multiplayer/policy systems (Team Manager and Policy Manager).
 /// Provides feedback, suggestions, and a complexity assessment.
 /// </summary>
 public class SA_RevisionWindow : EditorWindow
@@ -16,6 +17,7 @@ public class SA_RevisionWindow : EditorWindow
     private Color complexityColor = Color.white;
     private int chainCount;
     private string suggestion = "";
+    private List<string> nextSteps = new List<string>();
     private bool hasRun = false;
 
     private enum EntryStatus { Pass, Warning, Fail, Info }
@@ -40,7 +42,8 @@ public class SA_RevisionWindow : EditorWindow
         EditorGUILayout.LabelField("Scene Revision", EditorStyles.boldLabel);
         EditorGUILayout.HelpBox(
             "This tool validates the game assembly pipeline in your scene:\n" +
-            "Resources > Stations > Resource Manager > Goals > Levels > Game States\n\n" +
+            "Resources > Stations > Resource Manager > Goals > Levels > Game States\n" +
+            "And checks Team Manager + Policy Manager for multiplayer/policy setups.\n\n" +
             "Click 'Run Revision' to analyze the current scene.",
             MessageType.Info);
 
@@ -53,6 +56,22 @@ public class SA_RevisionWindow : EditorWindow
         if (!hasRun) return;
 
         GUILayout.Space(10);
+
+        // Next steps (action-oriented)
+        EditorGUILayout.BeginVertical("box");
+        EditorGUILayout.LabelField("Next Steps", EditorStyles.boldLabel);
+        if (nextSteps == null || nextSteps.Count == 0)
+        {
+            EditorGUILayout.HelpBox("Run Revision to generate next-step recommendations.", MessageType.None);
+        }
+        else
+        {
+            for (int i = 0; i < nextSteps.Count; i++)
+                EditorGUILayout.HelpBox("• " + nextSteps[i], MessageType.None);
+        }
+        EditorGUILayout.EndVertical();
+
+        GUILayout.Space(8);
 
         // Complexity banner
         var prevBg = GUI.backgroundColor;
@@ -105,7 +124,7 @@ public class SA_RevisionWindow : EditorWindow
     {
         switch (s)
         {
-            case EntryStatus.Pass: return "OK";
+            case EntryStatus.Pass: return "✅";
             case EntryStatus.Warning: return "WARNING";
             case EntryStatus.Fail: return "MISSING";
             case EntryStatus.Info: return "NOTE";
@@ -129,6 +148,8 @@ public class SA_RevisionWindow : EditorWindow
         var gameManager = Object.FindFirstObjectByType<GameManager>();
         var playerInputManager = Object.FindFirstObjectByType<UnityEngine.InputSystem.PlayerInputManager>();
         var rmCanvas = Object.FindFirstObjectByType<resourceManagerCanvas>();
+        var teamManager = Object.FindFirstObjectByType<TeamManager>();
+        var policyManager = Object.FindFirstObjectByType<PolicyManager>();
 
         int tier = 0; // how far along the pipeline the scene is
 
@@ -153,12 +174,17 @@ public class SA_RevisionWindow : EditorWindow
         // ── PLAYERS ──
         CheckPlayers(playerInputManager);
 
+        // ── TEAM / POLICY SYSTEMS ──
+        CheckTeamManager(teamManager);
+        CheckPolicyManager(policyManager);
+
         // ── COMPLEXITY ──
         chainCount = CountResourceChains(stations);
         AssessComplexity(stations, resourceObjects, chainCount, tier);
 
         // ── SUGGESTION ──
         BuildSuggestion(tier, stations, resourceManager, goalManager, levelManager, gameManager);
+        BuildNextSteps();
 
         Repaint();
     }
@@ -231,10 +257,17 @@ public class SA_RevisionWindow : EditorWindow
 
             var data = s.stationData;
 
-            if (data.produceResource && data.whatToProduce == Station.productionMode.Resource && (data.produces == null || data.produces.Count == 0 || data.produces.All(r => r == null)))
+            bool usesRecipeOutputs = data.useRecipes && data.recipes != null && data.recipes.Count > 0;
+
+            if (!usesRecipeOutputs &&
+                data.produceResource &&
+                data.whatToProduce == Station.productionMode.Resource &&
+                (data.produces == null || data.produces.Count == 0 || data.produces.All(r => r == null)))
                 missingProduce++;
 
-            if (data.consumeResource && (data.consumes == null || data.consumes.Count == 0 || data.consumes.All(r => r == null)))
+            if (!usesRecipeOutputs &&
+                data.consumeResource &&
+                (data.consumes == null || data.consumes.Count == 0 || data.consumes.All(r => r == null)))
                 missingConsume++;
 
             if (data.whatToProduce == Station.productionMode.LootTable && s.produceLootTable == null)
@@ -374,6 +407,59 @@ public class SA_RevisionWindow : EditorWindow
             entries.Add(new RevisionEntry { category = cat, message = "PlayerInputManager has no player prefab assigned.", status = EntryStatus.Warning });
     }
 
+    private void CheckTeamManager(TeamManager tm)
+    {
+        string cat = "Team Manager";
+        if (tm == null)
+        {
+            entries.Add(new RevisionEntry
+            {
+                category = cat,
+                message = "No TeamManager found. Add one with Game Assemblies > Systems > Create Team Manager if you want team/per-player scoring modes.",
+                status = EntryStatus.Info
+            });
+            return;
+        }
+
+        entries.Add(new RevisionEntry { category = cat, message = $"TeamManager is present (Mode: {tm.mode}).", status = EntryStatus.Pass });
+
+        if ((tm.mode == TeamManager.Mode.Solo || tm.mode == TeamManager.Mode.CompetitiveSolo || tm.mode == TeamManager.Mode.Teams) && tm.playerList == null)
+        {
+            entries.Add(new RevisionEntry
+            {
+                category = cat,
+                message = "TeamManager.playerList is not assigned. Per-player labels/registration may be incomplete until playersInfo is linked.",
+                status = EntryStatus.Warning
+            });
+        }
+    }
+
+    private void CheckPolicyManager(PolicyManager pm)
+    {
+        string cat = "Policy Manager";
+        if (pm == null)
+        {
+            entries.Add(new RevisionEntry
+            {
+                category = cat,
+                message = "No PolicyManager found. Add one with Game Assemblies > Systems > Create Policy Manager if you want ownership/stealing/station-use rules.",
+                status = EntryStatus.Info
+            });
+            return;
+        }
+
+        entries.Add(new RevisionEntry { category = cat, message = "PolicyManager is present in the scene.", status = EntryStatus.Pass });
+        if (pm.policy == null)
+        {
+            entries.Add(new RevisionEntry
+            {
+                category = cat,
+                message = "PolicyManager has no PolicyDataSO assigned. Policy rules will not be applied until a policy asset is linked.",
+                status = EntryStatus.Warning
+            });
+        }
+    }
+
     // ─────────────────────────── CHAIN ANALYSIS ───────────────────────────
 
     /// <summary>
@@ -508,5 +594,39 @@ public class SA_RevisionWindow : EditorWindow
                              "(Game Assemblies > Players > Create Local Multiplayer System).";
                 break;
         }
+    }
+
+    private void BuildNextSteps()
+    {
+        nextSteps.Clear();
+
+        bool hasFailures = entries.Any(e => e.status == EntryStatus.Fail);
+        bool hasWarnings = entries.Any(e => e.status == EntryStatus.Warning);
+
+        // Prioritize missing systems first.
+        if (entries.Any(e => e.status == EntryStatus.Fail && e.category == "3. Resource Manager"))
+            nextSteps.Add("Add the Resource Management System: Game Assemblies > Systems > Create Resource Management System.");
+        if (entries.Any(e => e.status == EntryStatus.Fail && e.category == "4. Goals"))
+            nextSteps.Add("Add/Configure GoalManager as part of the Resource Management System so goals can run.");
+        if (entries.Any(e => e.status == EntryStatus.Fail && e.category == "5. Levels"))
+            nextSteps.Add("Add a Level Manager: Game Assemblies > Systems > Create Level Manager.");
+        if (entries.Any(e => e.status == EntryStatus.Fail && e.category == "6. Game States"))
+            nextSteps.Add("Add a Game State Manager: Game Assemblies > Systems > Create Game State Manager.");
+        if (entries.Any(e => e.status == EntryStatus.Fail && e.category == "2. Stations"))
+            nextSteps.Add("Create at least one station and assign StationDataSO (Game Assemblies > Stations > Station Builder).");
+        if (entries.Any(e => e.status == EntryStatus.Fail && e.category == "1. Resources"))
+            nextSteps.Add("Create resource types first (Game Assemblies > Resources > Resource Builder).");
+
+        // Optional systems and warning cleanup.
+        if (entries.Any(e => e.category == "Team Manager" && e.status == EntryStatus.Info))
+            nextSteps.Add("If using team or per-player scoring, add TeamManager: Game Assemblies > Systems > Create Team Manager.");
+        if (entries.Any(e => e.category == "Policy Manager" && e.status == EntryStatus.Info))
+            nextSteps.Add("If using ownership/stealing/station-use rules, add PolicyManager: Game Assemblies > Systems > Create Policy Manager.");
+
+        if (hasWarnings)
+            nextSteps.Add("Review warnings in Detailed Results and fix Inspector assignments (null references, missing prefabs, missing UI links).");
+
+        if (!hasFailures && !hasWarnings)
+            nextSteps.Add("No blockers found. Playtest the scene and tune station chains, goals, and scoring balance.");
     }
 }

@@ -1,4 +1,5 @@
 {
+    "version": 1,
     "name": "playerControls",
     "maps": [
         {
@@ -312,8 +313,30 @@
                 },
                 {
                     "name": "",
+                    "id": "c4a24944-1eff-4498-a03e-477fcd9b519e",
+                    "path": "<XInputController>/leftShoulder",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";Joystick",
+                    "action": "Fire 5",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
                     "id": "a594a98a-aa9c-45da-91bc-73636ce2bfb5",
                     "path": "<Gamepad>/rightShoulder",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";Joystick",
+                    "action": "Fire 6",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "5460390b-706c-4840-a0e1-8971147414ad",
+                    "path": "<XInputController>/rightShoulder",
                     "interactions": "",
                     "processors": "",
                     "groups": ";Joystick",

@@ -7,6 +7,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.13] - 2026-04-05
+
+### Added
+- **New complete sample game** – Added sample scene **Forest Commons**, a complete game setup demonstrating end-to-end systems working together.
+- **Team Manager system support** – Added Team Manager creation/configuration tooling and expanded system/revision coverage for team and per-player score flows.
+- **Policy Manager system support** – Added/expanded policy-system tooling and revision checks so ownership/stealing/station-use rules are easier to set up and validate.
+- **Station goals** – Added station-goal asset type and runtime support for goals based on creating specific station types.
+
+### Changed
+- **Station recipe cycling UX** – Updated station/player recipe navigation flow so looping through station recipes is more reliable and predictable.
+- **Level goals** – Level goal lists now support both resource goals and station goals in sequential and random configurations.
+- **Station upgrades over time** – Stations can now auto-upgrade using a time interval, including random upgrade outcomes from a configured prefab list.
+
+### Fixed
+- **Goal completion on station production** – Stations configured to complete goals on production now properly contribute to station goals when producing stations.
+- **Score display behavior** – Fixed/expanded score UI behavior for competitive and collaborative setups so player-vs-total score contexts are handled correctly.
+- **Revision and setup quality-of-life** – Multiple revision/checking improvements and bug fixes to reduce false warnings and improve multiplayer/policy setup validation.
+
 ## [1.0.12] - 2026-02-01
 
 ### Added

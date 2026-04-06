@@ -9,12 +9,12 @@ public class LevelDataSO : ScriptableObject
     public LevelType levelType = LevelType.Sequential;
     
     [Header("Sequential Mode Settings")]
-    [Tooltip("Goals that will appear one after another")]
-    public List<ResourceGoalSO> sequentialGoals = new List<ResourceGoalSO>();
+    [Tooltip("Goals that will appear one after another (supports ResourceGoalSO and StationGoalSO).")]
+    public List<ScriptableObject> sequentialGoals = new List<ScriptableObject>();
     
     [Header("Random Mode Settings")]
-    [Tooltip("Pool of goals to randomly select from")]
-    public List<ResourceGoalSO> randomGoalPool = new List<ResourceGoalSO>();
+    [Tooltip("Pool of goals to randomly select from (supports ResourceGoalSO and StationGoalSO).")]
+    public List<ScriptableObject> randomGoalPool = new List<ScriptableObject>();
     [Tooltip("Time between generating random goals (seconds)")]
     public float goalInterval = 30f;
     [Tooltip("Maximum number of goals active at once")]

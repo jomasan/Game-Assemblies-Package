@@ -80,6 +80,9 @@ public class Station : ResourceNode
     public Area outputArea;
 
     [HideInInspector] public bool canBeWorked => stationData != null && stationData.canBeWorked;
+    [HideInInspector] public bool upgradeOverTime => stationData != null && stationData.upgradeOverTime;
+    [HideInInspector] public float upgradeTimeInterval => stationData != null ? stationData.upgradeTimeInterval : 0f;
+    [HideInInspector] public List<GameObject> upgradeOverTimePrefabs => stationData != null ? stationData.upgradeOverTimePrefabs : null;
 
     public enum interactionType
     {
@@ -104,6 +107,38 @@ public class Station : ResourceNode
         }
         return stationData.workDuration;
     }
+
+    /// <summary>Active recipe when useRecipes is enabled; null otherwise.</summary>
+    public RecipeSO GetActiveRecipe()
+    {
+        if(debug) Debug.Log("GetActiveRecipe called: " + stationData.useRecipes + " " + stationData.recipes.Count + " " + activeRecipeIndex);
+        if (stationData == null || !stationData.useRecipes || stationData.recipes == null || stationData.recipes.Count == 0)
+            return null;
+        int idx = Mathf.Clamp(activeRecipeIndex, 0, stationData.recipes.Count - 1);
+        return stationData.recipes[idx];
+    }
+
+    bool ShouldProduceFromRecipe()
+    {
+        var r = GetActiveRecipe();
+        return r != null && r.HasOutputs();
+    }
+
+    /// <summary>Whether this station uses recipes and has more than one to choose from.</summary>
+    public bool HasMultipleRecipes()
+    {
+        return stationData != null && stationData.useRecipes && stationData.recipes != null && stationData.recipes.Count > 1;
+    }
+
+    /// <summary>Move active recipe by delta (-1 / +1) with wrap; refreshes input requirements and info window.</summary>
+    public void CycleActiveRecipe(int delta)
+    {
+        if (!HasMultipleRecipes() || delta == 0) return;
+        int n = stationData.recipes.Count;
+        activeRecipeIndex = ((activeRecipeIndex + delta) % n + n) % n;
+        RefreshFromRecipe();
+    }
+
     public float workProgress = 0f; // Progress towards completing the work cycle
     public bool isBeingWorkedOn = false; // Is work currently being performed?
     public List<playerController> workerCount;
@@ -136,6 +171,7 @@ public class Station : ResourceNode
     public bool canBeUpgraded = false;
     public GameObject upgradePrefab;
     private int flaggedToUpgrade = -1;
+    private float autoUpgradeTimer = 0f;
 
     [HideInInspector] public bool completesGoals_production => stationData != null && stationData.completesGoals_production;
     [HideInInspector] public bool completesGoals_consumption => stationData != null && stationData.completesGoals_consumption;
@@ -182,6 +218,9 @@ public class Station : ResourceNode
     {
         workerCount = new List<playerController>();
 
+        if (stationData != null)
+            stationData.ApplyInspectUiLayout(this);
+
         if (!canBeWorked) sliderBar.SetActive(false);
 
         progressSlider = sliderBar.GetComponent<Slider>();
@@ -200,6 +239,8 @@ public class Station : ResourceNode
             age = Random.Range(0, maxAge);//make random age based on max age
             ageTimer = Random.Range(0, growthRate);
         }
+
+        autoUpgradeTimer = 0f;
 
         InitializeInforPanel();
         updateInfoPanel();
@@ -238,6 +279,7 @@ public class Station : ResourceNode
             }
 
             growOlder();
+            if (TryAutoUpgrade()) return;
             workCompleted = false;
 
             playWorkingSound();
@@ -375,7 +417,13 @@ public class Station : ResourceNode
     {
         if (infoWindow != null)
         {
-            infoWindow.GetComponent<InfoWindow>().InitializeResources(GetProduces(), GetConsumes());
+            var iw = infoWindow.GetComponent<InfoWindow>();
+            var recipe = GetActiveRecipe();
+            if (recipe != null && recipe.outputs != null && recipe.outputs.Count > 0)
+                iw.InitializeRecipeOutputs(recipe.outputs, GetConsumes());
+            else
+                iw.InitializeResources(GetProduces(), GetConsumes());
+            iw.SetRecipeCycleArrowsVisible(HasMultipleRecipes());
         }
     }
     public void updateInfoPanel()
@@ -476,11 +524,41 @@ public class Station : ResourceNode
     }
     void upgradeStation()
     {
-        if(upgradePrefab != null)
+        GameObject randomTimedUpgradePrefab = GetRandomUpgradeOverTimePrefab();
+        GameObject targetPrefab = randomTimedUpgradePrefab != null ? randomTimedUpgradePrefab : upgradePrefab;
+        if(targetPrefab != null)
         {
-            GameObject newStation = Instantiate(upgradePrefab, transform.position, Quaternion.identity);
+            Instantiate(targetPrefab, transform.position, Quaternion.identity);
             Destroy(this.gameObject);
         }
+    }
+
+    bool TryAutoUpgrade()
+    {
+        if (!upgradeOverTime) return false;
+        if (GetRandomUpgradeOverTimePrefab() == null) return false;
+        if (upgradeTimeInterval <= 0f) return false;
+
+        autoUpgradeTimer += Time.deltaTime;
+        if (autoUpgradeTimer < upgradeTimeInterval) return false;
+
+        upgradeStation();
+        return true;
+    }
+
+    GameObject GetRandomUpgradeOverTimePrefab()
+    {
+        if (upgradeOverTimePrefabs == null || upgradeOverTimePrefabs.Count == 0) return null;
+
+        List<GameObject> validPrefabs = new List<GameObject>();
+        for (int i = 0; i < upgradeOverTimePrefabs.Count; i++)
+        {
+            if (upgradeOverTimePrefabs[i] != null) validPrefabs.Add(upgradeOverTimePrefabs[i]);
+        }
+        if (validPrefabs.Count == 0) return null;
+
+        int idx = Random.Range(0, validPrefabs.Count);
+        return validPrefabs[idx];
     }
     /// <summary>When no Policy Manager, anyone can use. When present, use policy (e.g. OwnerOnly, SameTeam, Anyone).</summary>
     bool CanWorkerUseStation()
@@ -569,6 +647,12 @@ public class Station : ResourceNode
 
     void ProduceResource(playerController contributor = null)
     {
+        if (ShouldProduceFromRecipe())
+        {
+            ProduceFromActiveRecipe(contributor);
+            return;
+        }
+
         if (WhatToProduce == productionMode.Resource)
         {
             for (int i = 0; i < produces.Count; i++)
@@ -599,7 +683,7 @@ public class Station : ResourceNode
         {
             for (int i = 0; i < produces_stations.Count; i++)
             {
-                InstantiateStationPrefabs(i);
+                InstantiateStationPrefabs(i, contributor);
             }
         }else if (WhatToProduce == productionMode.LootTable)
         {
@@ -630,12 +714,92 @@ public class Station : ResourceNode
             }
         }
     }
-    void InstantiateStationPrefabs(int index)
+
+    void ProduceFromActiveRecipe(playerController contributor = null)
+    {
+        var recipe = GetActiveRecipe();
+        if (recipe == null || recipe.outputs == null) return;
+
+        Resource firstResourceForGoal = null;
+
+        foreach (var slot in recipe.outputs)
+        {
+            if (slot == null) continue;
+
+            if (slot.kind == RecipeOutputKind.Resource && slot.resource != null)
+            {
+                int amt = Mathf.Max(1, slot.amount);
+                for (int i = 0; i < amt; i++)
+                {
+                    AddResource(slot.resource, 1);
+                    if (debug) Debug.Log($"{gameObject.name}: Produced 1 of {slot.resource.resourceName} (recipe)");
+                    if (spawnResourcePrefab)
+                        InstantiateResourcePrefabs(slot.resource);
+                    if (firstResourceForGoal == null)
+                        firstResourceForGoal = slot.resource;
+                }
+            }
+            else if (slot.kind == RecipeOutputKind.Station && slot.stationData != null)
+            {
+                int amt = Mathf.Max(1, slot.amount);
+                for (int i = 0; i < amt; i++)
+                {
+                    InstantiateStationFromRecipe(slot.stationData, contributor);
+                    if (debug) Debug.Log($"{gameObject.name}: Spawned station from recipe ({slot.stationData.stationName})");
+                }
+            }
+        }
+
+        if (completesGoals_production && gManager != null && firstResourceForGoal != null)
+            gManager.goalContribution(firstResourceForGoal, contributor);
+
+        playProductionSound();
+
+        if (isSingleUse)
+        {
+            isAlive = false;
+            swapSprite();
+        }
+    }
+
+    void InstantiateStationFromRecipe(StationDataSO data, playerController contributor = null)
+    {
+        if (data == null || data.stationPrefab == null) return;
+
+        Vector3 spawnPosition;
+        if (useOutputArea && outputArea != null)
+            spawnPosition = outputArea.GetPositionWithRandomness(0.1f);
+        else
+        {
+            Vector2 randomCircle = Random.insideUnitCircle * spawnRadius;
+            spawnPosition = transform.position + new Vector3(randomCircle.x, randomCircle.y, 0f);
+        }
+
+        GameObject go = Instantiate(data.stationPrefab, spawnPosition, Quaternion.identity);
+        Station st = go.GetComponent<Station>();
+        if (st != null)
+            data.ApplyToStation(st);
+
+        if (completesGoals_production && gManager != null)
+            gManager.stationGoalContribution(data, contributor);
+
+        if (productionParticles != null)
+            Instantiate(productionParticles, spawnPosition, Quaternion.identity);
+    }
+
+    void InstantiateStationPrefabs(int index, playerController contributor = null)
     {
         if (produces_stations[index] != null)
         {
             Vector3 spawnPosition = outputArea.GetPosition();
             GameObject stationInstance = Instantiate(produces_stations[index].gameObject, spawnPosition, Quaternion.identity);
+
+            if (completesGoals_production && gManager != null)
+            {
+                Station producedStation = stationInstance.GetComponent<Station>();
+                if (producedStation != null && producedStation.stationData != null)
+                    gManager.stationGoalContribution(producedStation.stationData, contributor);
+            }
         }
     }
     void InstantiateResourcePrefabs(Resource rs)
